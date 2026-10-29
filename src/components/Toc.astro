@@ -1,0 +1,143 @@
+---
+/** 案例页目录：吸顶在导航下方，滚动时高亮当前所在的一节。 */
+interface Props {
+  items: { id: string; label: string }[];
+  label: string;
+}
+
+const { items, label } = Astro.props;
+---
+
+<nav class="toc" aria-label={label}>
+  <div class="wrap toc-inner">
+    <span class="toc-k">{label}</span>
+    <ol>
+      {
+        items.map((it, i) => (
+          <li>
+            <a href={`#${it.id}`} data-id={it.id}>
+              <span class="n">{String(i + 1).padStart(2, '0')}</span>
+              {it.label}
+            </a>
+          </li>
+        ))
+      }
+    </ol>
+  </div>
+</nav>
+
+<script>
+  document.querySelectorAll<HTMLElement>('nav.toc').forEach((toc) => {
+    const links = [...toc.querySelectorAll<HTMLAnchorElement>('a[data-id]')];
+    const list = toc.querySelector('ol');
+    const targets = links.map((a) => document.getElementById(a.dataset.id ?? '')).filter((x): x is HTMLElement => !!x);
+    if (!targets.length || !('IntersectionObserver' in window)) return;
+    const visible = new Set<string>();
+    const mark = () => {
+      const cur = targets.find((t) => visible.has(t.id));
+      links.forEach((a) => {
+        const on = !!cur && a.dataset.id === cur.id;
+        if (on) {
+          a.setAttribute('aria-current', 'location');
+          if (list) list.scrollTo({ left: a.offsetLeft - 16, behavior: 'smooth' });
+        } else a.removeAttribute('aria-current');
+      });
+    };
+    const io = new IntersectionObserver(
+      (entries) => {
+        for (const e of entries) e.isIntersecting ? visible.add(e.target.id) : visible.delete(e.target.id);
+        mark();
+      },
+      { rootMargin: '-120px 0px -55% 0px' },
+    );
+    targets.forEach((t) => io.observe(t));
+  });
+</script>
+
+<style is:global>
+  :root:has(nav.toc) {
+    --toc-h: 46px;
+    scroll-padding-top: calc(60px + var(--toc-h) + 16px);
+  }
+</style>
+
+<style>
+  .toc {
+    position: sticky;
+    top: 60px;
+    z-index: 30;
+    margin-top: clamp(36px, 5vw, 56px);
+    background: color-mix(in srgb, var(--bg) 88%, transparent);
+    backdrop-filter: blur(12px);
+    -webkit-backdrop-filter: blur(12px);
+    border-bottom: 1px solid var(--line);
+  }
+
+  .toc-inner {
+    height: 46px;
+    display: flex;
+    align-items: center;
+    gap: 16px;
+  }
+
+  .toc-k {
+    flex-shrink: 0;
+    font-family: var(--mono);
+    font-size: 11px;
+    letter-spacing: 0.06em;
+    color: var(--ink-3);
+  }
+
+  ol {
+    margin: 0;
+    padding: 0;
+    list-style: none;
+    display: flex;
+    gap: 4px;
+    overflow-x: auto;
+    scrollbar-width: none;
+    min-width: 0;
+  }
+
+  ol::-webkit-scrollbar {
+    display: none;
+  }
+
+  li {
+    flex-shrink: 0;
+  }
+
+  a {
+    display: inline-flex;
+    align-items: baseline;
+    gap: 6px;
+    padding: 5px 10px;
+    border-radius: 999px;
+    font-size: 13.5px;
+    color: var(--ink-2);
+    white-space: nowrap;
+    transition: color 0.2s, background 0.2s;
+  }
+
+  a:hover {
+    color: var(--ink);
+    background: var(--bg-2);
+  }
+
+  a[aria-current='location'] {
+    color: var(--accent-ink);
+    background: var(--accent-soft);
+  }
+
+  .n {
+    font-family: var(--mono);
+    font-size: 10.5px;
+    opacity: 0.7;
+  }
+
+  @media (max-width: 640px) {
+    .toc-k {
+      display: none;
+    }
+  }
+</style>

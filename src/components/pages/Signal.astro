@@ -1,7 +1,7 @@
 ---
 import Base from '../../layouts/Base.astro';
 import CaseHeader from '../CaseHeader.astro';
-import Placeholder from '../Placeholder.astro';
+import Toc from '../Toc.astro';
 import Section from '../Section.astro';
 import NextWork from '../NextWork.astro';
 import type { Content } from '../../i18n/zh';
@@ -13,6 +13,8 @@ interface Props {
 const { t } = Astro.props;
 const s = t.signal;
 const base = t.lang === 'zh' ? '' : '/en';
+const ids = ['why', 'architecture', 'built', 'reports', 'competition'];
+const toc = ids.map((id, i) => ({ id, label: s.toc[i] }));
 ---
 
 <Base lang={t.lang} title={s.title} description={s.description}>
@@ -25,11 +27,13 @@ const base = t.lang === 'zh' ? '' : '/en';
     </figure>
   </section>
 
-  <Section no="01" title={s.s1}>
+  <Toc items={toc} label={t.lang === 'zh' ? '目录' : 'Contents'} />
+
+  <Section no="01" title={s.s1} id="why">
     <p class="body">{s.s1Body}</p>
   </Section>
 
-  <Section no="02" title={s.s2}>
+  <Section no="02" title={s.s2} id="architecture">
     <ol class="arch reveal">
       {
         s.arch.map((a, i) => (
@@ -47,16 +51,12 @@ const base = t.lang === 'zh' ? '' : '/en';
     </ol>
   </Section>
 
-  <Section no="03" title={s.s3}>
+  <Section no="03" title={s.s3} id="built">
     <div class="mods">
       {
         s.modules.map((m) => (
-          <article class="mod reveal">
-            {m.shot ? (
-              <img class="mod-img" src={m.shot} alt={m.name} loading="lazy" data-zoom="signal" />
-            ) : m.badge ? null : (
-              <Placeholder kind="wide" label={t.lang === 'zh' ? 'App 界面截图' : 'App screens'} lang={t.lang} />
-            )}
+          <article class={`mod reveal ${m.span ? 'span' : ''}`}>
+            {m.shot && <img class="mod-img" src={m.shot} alt={m.name} loading="lazy" data-zoom="signal" />}
             <div class="mod-top">
               <h3 class="serif">{m.name}</h3>
               {m.badge && <span class="badge">{m.badge}</span>}
@@ -69,14 +69,30 @@ const base = t.lang === 'zh' ? '' : '/en';
     </div>
   </Section>
 
-  <Section no="04" title={s.s4}>
+  <Section no="04" title={s.s5} lead={s.s5Lead} id="reports">
+    <div class="reports reveal">
+      {
+        s.reports.map((r) => (
+          <figure>
+            <img src={r.src} alt={r.cap} loading="lazy" width="557" height="786" data-zoom="signal" />
+            <figcaption>{r.cap}</figcaption>
+          </figure>
+        ))
+      }
+    </div>
+  </Section>
+
+  <Section no="05" title={s.s4} id="competition">
     <div class="honors reveal">
       <figure class="photo">
         <img src={s.photo} alt={s.photoCap} loading="lazy" width="1080" height="1440" data-zoom="signal" />
         <figcaption>{s.photoCap}</figcaption>
       </figure>
-      <div class="certs">
-        {s.certs.map((c) => <Placeholder kind="doc" label={c} lang={t.lang} />)}
+      <div>
+        <p class="certs-k">{s.certsTitle}</p>
+        <ul class="certs">
+          {s.certs.map((c, i) => <li class={i === 0 ? 'top' : ''}>{c}</li>)}
+        </ul>
       </div>
     </div>
     <p class="note-link">
@@ -238,10 +254,68 @@ const base = t.lang === 'zh' ? '' : '/en';
     color: var(--ink-3) !important;
   }
 
+  .certs-k {
+    margin: 0 0 10px;
+    font-family: var(--mono);
+    font-size: 12px;
+    color: var(--ink-3);
+  }
+
   .certs {
+    margin: 0;
+    padding: 0;
+    list-style: none;
+    display: grid;
+    gap: 10px;
+  }
+
+  .certs li {
+    padding: 14px 16px;
+    border-radius: var(--r);
+    border: 1px solid var(--line);
+    background: var(--card);
+    font-size: 15px;
+    color: var(--ink-2);
+  }
+
+  .certs li.top {
+    font-family: var(--serif);
+    font-size: 19px;
+    font-weight: 600;
+    color: var(--ink);
+    border-color: color-mix(in srgb, var(--accent) 35%, transparent);
+    background: var(--accent-soft);
+  }
+
+  .mod.span {
+    grid-column: 1 / -1;
+  }
+
+  .mod.span .mod-img {
+    aspect-ratio: auto;
+  }
+
+  .reports {
     display: grid;
     grid-template-columns: repeat(2, minmax(0, 1fr));
-    gap: 16px;
+    gap: 20px;
+  }
+
+  .reports figure {
+    margin: 0;
+    transition: transform 0.3s;
+  }
+
+  .reports figure:hover {
+    transform: translateY(-4px);
+  }
+
+  .reports img {
+    width: 100%;
+    height: auto;
+    border-radius: var(--r);
+    border: 1px solid var(--line);
+    box-shadow: var(--shadow);
   }
 
   .note-link {

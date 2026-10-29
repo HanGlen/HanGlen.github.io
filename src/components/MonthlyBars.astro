@@ -4,28 +4,47 @@ import { prTypes } from '../lib/prtype';
 
 interface Props {
   lang: 'zh' | 'en';
+  /** 默认画每月合入的 PR（按新功能 / 修复分段）；传入别的按月数据可复用同一种柱状图，不分段 */
+  series?: Record<string, number>;
+  label?: string;
+  note?: string;
 }
 
-const { lang } = Astro.props;
+const { lang, series, label: aria, note } = Astro.props;
 const zh = lang === 'zh';
 const L = prTypes[lang];
+const stacked = !series;
 const types = data.monthlyTypes as Record<string, { feat: number; fix: number }>;
-const months = Object.entries(data.monthlyPRs as Record<string, number>).map(([k, n]) => {
-  const { feat = 0, fix = 0 } = types[k] ?? {};
+const months = Object.entries(series ?? (data.monthlyPRs as Record<string, number>)).map(([k, n]) => {
+  const { feat = 0, fix = 0 } = (stacked && types[k]) || {};
   return { k, n, feat, fix, other: n - feat - fix };
 });
 const max = Math.max(...months.map((m) => m.n));
-const label = (k: string) => (zh ? `${Number(k.slice(5))}月` : ['Jun', 'Jul', 'Aug', 'Sep', 'Oct'][Number(k.slice(5)) - 6] ?? k);
+const EN = ['Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun', 'Jul', 'Aug', 'Sep', 'Oct', 'Nov', 'Dec'];
+const label = (k: string) => (zh ? `${Number(k.slice(5))}月` : EN[Number(k.slice(5)) - 1] ?? k);
 const other = zh ? '其他' : 'Other';
 const tip = (m: (typeof months)[number]) =>
-  zh
-    ? `${label(m.k)}合入 ${m.n} 个：${L.feat} ${m.feat} · ${L.fix} ${m.fix} · ${other} ${m.other}`
-    : `${label(m.k)}: ${m.n} merged · ${m.feat} features · ${m.fix} fixes · ${m.other} other`;
-const initial = zh ? '鼠标移到柱子上，看每个月新功能和修复各占多少' : 'Hover a bar to split features from fixes';
+  !stacked
+    ? zh
+      ? `${label(m.k)}：${m.n}`
+      : `${label(m.k)}: ${m.n}`
+    : zh
+      ? `${label(m.k)}合入 ${m.n} 个：${L.feat} ${m.feat} · ${L.fix} ${m.fix} · ${other} ${m.other}`
+      : `${label(m.k)}: ${m.n} merged · ${m.feat} features · ${m.fix} fixes · ${m.other} other`;
+const initial = stacked
+  ? zh
+    ? '鼠标移到柱子上，看每个月新功能和修复各占多少'
+    : 'Hover a bar to split features from fixes'
+  : zh
+    ? '鼠标移到柱子上看数字'
+    : 'Hover a bar to read it';
+const fine =
+  note ??
+  (zh ? '按提交标题的 feat / fix 前缀分类；10 月统计到 29 日' : 'Split by the feat / fix prefix in each title; October counted through the 29th');
 ---
 
-<figure class="mb" data-mb>
-  <ol class="bars" aria-label={zh ? '每月合入的 PR 数' : 'Merged PRs per month'}>
+<figure class={`mb ${stacked ? '' : 'plain'}`} data-mb>
+  <ol class="bars" aria-label={aria ?? (zh ? '每月合入的 PR 数' : 'Merged PRs per month')}>
     {
       months.map((m, i) => (
         <li style={`--h:${(m.n / max) * 100}%`} class={i === months.length - 1 ? 'last' : ''}>
@@ -42,12 +61,16 @@ const initial = zh ? '鼠标移到柱子上，看每个月新功能和修复各�
   </ol>
   <figcaption>
     <span class="readout" aria-live="polite">{initial}</span>
-    <span class="legend" aria-hidden="true">
-      <i class="feat"></i>{L.feat}
-      <i class="fix"></i>{L.fix}
-      <i class="other"></i>{other}
-    </span>
-    <span class="fine">{zh ? '按提交标题的 feat / fix 前缀分类；10 月统计到 29 日' : 'Split by the feat / fix prefix in each title; October counted through the 29th'}</span>
+    {
+      stacked && (
+        <span class="legend" aria-hidden="true">
+          <i class="feat"></i>{L.feat}
+          <i class="fix"></i>{L.fix}
+          <i class="other"></i>{other}
+        </span>
+      )
+    }
+    <span class="fine">{fine}</span>
   </figcaption>
 </figure>
 
@@ -130,6 +153,15 @@ const initial = zh ? '鼠标移到柱子上，看每个月新功能和修复各�
 
   .other {
     background: var(--heat-1);
+  }
+
+  /* 不分段时画成一种颜色，最后一个月用强调色 */
+  .plain .seg {
+    background: var(--heat-2);
+  }
+
+  .plain .last .seg {
+    background: var(--accent);
   }
 
   .val {
