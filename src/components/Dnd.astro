@@ -1,0 +1,400 @@
+---
+import type { Content } from '../i18n/zh';
+
+interface Props {
+  t: Content;
+}
+
+const { t } = Astro.props;
+const d = t.dnd;
+const p = t.pipeline;
+---
+
+<section class="section" id="work">
+  <div class="wrap">
+    <p class="kicker reveal">{t.work.kicker}</p>
+    <h2 class="h2 reveal">{t.work.heading}</h2>
+
+    <article class="case card reveal">
+      <div class="case-copy">
+        <p class="tag">{d.tag}</p>
+        <h3>{d.name}</h3>
+        <p class="sub">{d.sub}</p>
+        <p class="summary">{d.summary}</p>
+        <ul class="features">
+          {d.features.map((f) => <li>{f}</li>)}
+        </ul>
+        <ul class="chips">
+          {d.stack.map((s) => <li class="chip">{s}</li>)}
+        </ul>
+      </div>
+      <div class="case-side">
+        <dl class="metrics">
+          {
+            d.metrics.map((m) => (
+              <div>
+                <dd>{m.value}</dd>
+                <dt>{m.label}</dt>
+              </div>
+            ))
+          }
+        </dl>
+        <div class="orb" aria-hidden="true"></div>
+      </div>
+    </article>
+  </div>
+</section>
+
+<section class="section" id="pipeline">
+  <div class="wrap">
+    <p class="kicker reveal">{p.kicker}</p>
+    <h2 class="h2 reveal">{p.heading}</h2>
+    <p class="lead reveal">{p.lead}</p>
+
+    <ol class="flow">
+      {
+        p.steps.map((s, i) => (
+          <li class={`step reveal ${s.who.includes('HanGlen') ? 'human' : ''}`} style={`transition-delay:${(i % 4) * 70}ms`}>
+            <div class="step-head">
+              <span class="no">{s.no}</span>
+              <span class="rail" aria-hidden="true" />
+            </div>
+            <h3>{s.title}</h3>
+            <p>{s.body}</p>
+            <ul class="chips">
+              {s.who.map((w) => <li class="chip">{w}</li>)}
+            </ul>
+          </li>
+        ))
+      }
+    </ol>
+  </div>
+</section>
+
+<section class="section" id="method">
+  <div class="wrap">
+    <p class="kicker reveal">{t.principles.kicker}</p>
+    <h2 class="h2 reveal">{t.principles.heading}</h2>
+    <ol class="principles">
+      {
+        t.principles.items.map((it, i) => (
+          <li class="reveal" style={`transition-delay:${i * 60}ms`}>
+            <span class="pi">{String(i + 1).padStart(2, '0')}</span>
+            <h3>{it.title}</h3>
+            <p>{it.body}</p>
+          </li>
+        ))
+      }
+    </ol>
+  </div>
+</section>
+
+<style>
+  .case {
+    display: grid;
+    grid-template-columns: minmax(0, 1.25fr) minmax(0, 0.75fr);
+    margin-top: 48px;
+    overflow: hidden;
+  }
+
+  .case-copy {
+    padding: clamp(28px, 4vw, 52px);
+  }
+
+  .tag {
+    margin: 0;
+    font-family: var(--font-mono);
+    font-size: 12px;
+    color: var(--warm);
+    letter-spacing: 0.06em;
+  }
+
+  h3 {
+    margin: 0;
+  }
+
+  .case h3 {
+    margin-top: 14px;
+    font-size: clamp(26px, 3.2vw, 36px);
+    line-height: 1.2;
+    letter-spacing: -0.02em;
+    font-weight: 650;
+  }
+
+  .sub {
+    margin: 8px 0 0;
+    color: var(--text-3);
+    font-size: 14px;
+  }
+
+  .summary {
+    margin: 22px 0 0;
+    color: var(--text-2);
+  }
+
+  .features {
+    margin: 22px 0 28px;
+    padding: 0;
+    list-style: none;
+    display: grid;
+    gap: 10px;
+  }
+
+  .features li {
+    position: relative;
+    padding-left: 22px;
+    font-size: 15px;
+  }
+
+  .features li::before {
+    content: '';
+    position: absolute;
+    left: 2px;
+    top: 0.72em;
+    width: 8px;
+    height: 1px;
+    background: var(--accent);
+  }
+
+  .case-side {
+    position: relative;
+    border-left: 1px solid var(--line);
+    background: radial-gradient(circle at 70% 30%, rgba(143, 162, 255, 0.14), transparent 60%);
+    display: flex;
+    align-items: flex-end;
+  }
+
+  .orb {
+    position: absolute;
+    top: -80px;
+    right: -80px;
+    width: 280px;
+    height: 280px;
+    border-radius: 50%;
+    border: 1px solid rgba(143, 162, 255, 0.25);
+    box-shadow:
+      0 0 0 40px rgba(143, 162, 255, 0.04),
+      0 0 0 80px rgba(143, 162, 255, 0.03);
+    pointer-events: none;
+  }
+
+  .metrics {
+    position: relative;
+    z-index: 1;
+    width: 100%;
+    margin: 0;
+    display: grid;
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+  }
+
+  .metrics div {
+    padding: 28px clamp(20px, 3vw, 32px);
+    border-top: 1px solid var(--line);
+  }
+
+  .metrics div:nth-child(odd) {
+    border-right: 1px solid var(--line);
+  }
+
+  .metrics dd {
+    margin: 0;
+    font-size: clamp(28px, 3.4vw, 40px);
+    font-weight: 650;
+    letter-spacing: -0.03em;
+    font-variant-numeric: tabular-nums;
+  }
+
+  .metrics dt {
+    font-size: 13px;
+    color: var(--text-3);
+  }
+
+  /* 流水线 */
+  .flow {
+    margin: 56px 0 0;
+    padding: 0;
+    list-style: none;
+    display: grid;
+    grid-template-columns: repeat(4, minmax(0, 1fr));
+    gap: 16px;
+  }
+
+  .step {
+    position: relative;
+    padding: 22px 22px 24px;
+    border: 1px solid var(--line);
+    border-radius: var(--radius);
+    background: var(--bg-card);
+    display: flex;
+    flex-direction: column;
+    gap: 10px;
+    transition: border-color 0.3s, background 0.3s;
+  }
+
+  .step:hover {
+    border-color: rgba(143, 162, 255, 0.35);
+    background: rgba(143, 162, 255, 0.04);
+  }
+
+  .step-head {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+  }
+
+  .no {
+    font-family: var(--font-mono);
+    font-size: 12px;
+    color: var(--accent);
+  }
+
+  .rail {
+    flex: 1;
+    height: 1px;
+    background: linear-gradient(90deg, rgba(143, 162, 255, 0.5), transparent);
+    position: relative;
+    overflow: hidden;
+  }
+
+  .rail::after {
+    content: '';
+    position: absolute;
+    inset: 0;
+    width: 40%;
+    background: linear-gradient(90deg, transparent, #fff, transparent);
+    animation: pulse 3.2s ease-in-out infinite;
+  }
+
+  .step:nth-child(2) .rail::after { animation-delay: 0.4s; }
+  .step:nth-child(3) .rail::after { animation-delay: 0.8s; }
+  .step:nth-child(4) .rail::after { animation-delay: 1.2s; }
+  .step:nth-child(5) .rail::after { animation-delay: 1.6s; }
+  .step:nth-child(6) .rail::after { animation-delay: 2s; }
+  .step:nth-child(7) .rail::after { animation-delay: 2.4s; }
+  .step:nth-child(8) .rail::after { animation-delay: 2.8s; }
+
+  @keyframes pulse {
+    0% { transform: translateX(-100%); opacity: 0; }
+    30% { opacity: 1; }
+    70% { transform: translateX(250%); opacity: 0; }
+    100% { transform: translateX(250%); opacity: 0; }
+  }
+
+  .step h3 {
+    font-size: 18px;
+    font-weight: 600;
+  }
+
+  .step p {
+    margin: 0;
+    flex: 1;
+    font-size: 14px;
+    color: var(--text-2);
+    line-height: 1.65;
+  }
+
+  .step .chips {
+    margin-top: 6px;
+  }
+
+  .step.human {
+    border-color: rgba(242, 196, 109, 0.35);
+    background: linear-gradient(180deg, rgba(242, 196, 109, 0.07), rgba(242, 196, 109, 0.01));
+  }
+
+  .step.human .no {
+    color: var(--warm);
+  }
+
+  .step.human .rail {
+    background: linear-gradient(90deg, rgba(242, 196, 109, 0.6), transparent);
+  }
+
+  .step.human .chip {
+    color: var(--warm);
+    border-color: rgba(242, 196, 109, 0.35);
+  }
+
+  /* 方法论 */
+  .principles {
+    margin: 48px 0 0;
+    padding: 0;
+    list-style: none;
+    display: grid;
+    grid-template-columns: repeat(5, minmax(0, 1fr));
+    border-top: 1px solid var(--line);
+  }
+
+  .principles li {
+    padding: 28px 22px 8px 0;
+  }
+
+  .principles li + li {
+    padding-left: 22px;
+    border-left: 1px solid var(--line);
+  }
+
+  .pi {
+    font-family: var(--font-mono);
+    font-size: 12px;
+    color: var(--text-3);
+  }
+
+  .principles h3 {
+    margin-top: 14px;
+    font-size: 17px;
+    font-weight: 600;
+  }
+
+  .principles p {
+    margin: 10px 0 0;
+    font-size: 14px;
+    color: var(--text-2);
+  }
+
+  @media (max-width: 1000px) {
+    .flow {
+      grid-template-columns: repeat(2, minmax(0, 1fr));
+    }
+    .principles {
+      grid-template-columns: repeat(2, minmax(0, 1fr));
+      border-top: 0;
+    }
+    .principles li,
+    .principles li + li {
+      padding: 24px 20px 24px 0;
+      border-left: 0;
+      border-top: 1px solid var(--line);
+    }
+    .principles li:nth-child(even) {
+      padding-left: 20px;
+      border-left: 1px solid var(--line);
+    }
+  }
+
+  @media (max-width: 760px) {
+    .case {
+      grid-template-columns: minmax(0, 1fr);
+    }
+    .case-side {
+      border-left: 0;
+      border-top: 1px solid var(--line);
+    }
+    .metrics div:nth-child(-n + 2) {
+      border-top: 0;
+    }
+  }
+
+  @media (max-width: 560px) {
+    .flow {
+      grid-template-columns: minmax(0, 1fr);
+    }
+    .principles {
+      grid-template-columns: minmax(0, 1fr);
+    }
+    .principles li:nth-child(even) {
+      padding-left: 0;
+      border-left: 0;
+    }
+  }
+</style>

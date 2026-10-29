@@ -1,0 +1,120 @@
+---
+import type { Content } from '../i18n/zh';
+
+interface Props {
+  t: Content;
+}
+
+const { t } = Astro.props;
+const links = [
+  { href: '#work', label: t.nav.work },
+  { href: '#method', label: t.nav.method },
+  { href: '#experience', label: t.nav.experience },
+  { href: '#contact', label: t.nav.contact },
+];
+---
+
+<header class="nav">
+  <div class="wrap nav-inner">
+    <a class="brand" href="#top" aria-label={t.hero.name}>
+      <span class="mark" aria-hidden="true">HG</span>
+      <span class="brand-name">{t.hero.name}</span>
+    </a>
+    <nav aria-label="primary">
+      <ul>
+        {
+          links.map((l) => (
+            <li class="link">
+              <a href={l.href}>{l.label}</a>
+            </li>
+          ))
+        }
+        <li>
+          <a class="lang" href={t.nav.switchHref} hreflang={t.nav.switchHref === '/' ? 'zh-CN' : 'en'}>
+            {t.nav.switchLabel}
+          </a>
+        </li>
+      </ul>
+    </nav>
+  </div>
+</header>
+
+<style>
+  .nav {
+    position: sticky;
+    top: 0;
+    z-index: 50;
+    backdrop-filter: saturate(1.4) blur(14px);
+    -webkit-backdrop-filter: saturate(1.4) blur(14px);
+    background: rgba(8, 9, 12, 0.66);
+    border-bottom: 1px solid var(--line);
+  }
+
+  .nav-inner {
+    height: 64px;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 16px;
+  }
+
+  .brand {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    font-weight: 600;
+    letter-spacing: -0.01em;
+  }
+
+  .mark {
+    display: grid;
+    place-items: center;
+    width: 30px;
+    height: 30px;
+    border-radius: 9px;
+    font-family: var(--font-mono);
+    font-size: 11px;
+    font-weight: 500;
+    color: var(--bg);
+    background: linear-gradient(135deg, #fff, var(--accent));
+  }
+
+  ul {
+    display: flex;
+    align-items: center;
+    gap: 4px;
+    margin: 0;
+    padding: 0;
+    list-style: none;
+  }
+
+  li a {
+    display: block;
+    padding: 8px 12px;
+    border-radius: 999px;
+    font-size: 14px;
+    color: var(--text-2);
+    transition:
+      color 0.2s,
+      background 0.2s;
+  }
+
+  li a:hover {
+    color: var(--text);
+    background: rgba(255, 255, 255, 0.05);
+  }
+
+  .lang {
+    margin-left: 6px;
+    font-family: var(--font-mono);
+    font-size: 12px;
+    border: 1px solid var(--line-strong);
+    color: var(--text);
+  }
+
+  @media (max-width: 640px) {
+    .link {
+      display: none;
+    }
+  }
+</style>
