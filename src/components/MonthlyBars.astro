@@ -3,17 +3,22 @@ import data from '../data/dnd.json';
 
 interface Props {
   lang: 'zh' | 'en';
+  /** 默认画每月合入的 PR；传入别的按月数据可复用同一种柱状图 */
+  series?: Record<string, number>;
+  label?: string;
+  note?: string;
 }
 
-const { lang } = Astro.props;
+const { lang, series, label: aria, note } = Astro.props;
 const zh = lang === 'zh';
-const months = Object.entries(data.monthlyPRs as Record<string, number>);
+const months = Object.entries(series ?? (data.monthlyPRs as Record<string, number>));
 const max = Math.max(...months.map(([, n]) => n));
-const label = (k: string) => (zh ? `${Number(k.slice(5))}月` : ['Jun', 'Jul', 'Aug', 'Sep', 'Oct'][Number(k.slice(5)) - 6] ?? k);
+const EN = ['Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun', 'Jul', 'Aug', 'Sep', 'Oct', 'Nov', 'Dec'];
+const label = (k: string) => (zh ? `${Number(k.slice(5))}月` : EN[Number(k.slice(5)) - 1] ?? k);
 ---
 
 <figure class="mb">
-  <ol class="bars" aria-label={zh ? '每月合入的 PR 数' : 'Merged PRs per month'}>
+  <ol class="bars" aria-label={aria ?? (zh ? '每月合入的 PR 数' : 'Merged PRs per month')}>
     {
       months.map(([k, n], i) => (
         <li style={`--h:${(n / max) * 100}%`} class={i === months.length - 1 ? 'last' : ''}>
@@ -24,7 +29,7 @@ const label = (k: string) => (zh ? `${Number(k.slice(5))}月` : ['Jun', 'Jul', '
       ))
     }
   </ol>
-  <figcaption>{zh ? '10 月统计到 29 日' : 'October counted through the 29th'}</figcaption>
+  <figcaption>{note ?? (zh ? '10 月统计到 29 日' : 'October counted through the 29th')}</figcaption>
 </figure>
 
 <style>

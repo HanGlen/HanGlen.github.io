@@ -3,6 +3,7 @@ import Base from '../../layouts/Base.astro';
 import CaseHeader from '../CaseHeader.astro';
 import Section from '../Section.astro';
 import NextWork from '../NextWork.astro';
+import Toc from '../Toc.astro';
 import type { Content } from '../../i18n/zh';
 
 interface Props {
@@ -12,6 +13,7 @@ interface Props {
 const { t } = Astro.props;
 const v = t.tavern;
 const base = t.lang === 'zh' ? '' : '/en';
+const toc = ['roles', 'gates', 'visuals'].map((id, i) => ({ id, label: v.toc[i] }));
 ---
 
 <Base lang={t.lang} title={v.title} description={v.description}>
@@ -24,7 +26,9 @@ const base = t.lang === 'zh' ? '' : '/en';
     </figure>
   </section>
 
-  <Section no="01" title={v.s1} lead={v.s1Lead}>
+  <Toc items={toc} label={t.lang === 'zh' ? '目录' : 'Contents'} />
+
+  <Section no="01" title={v.s1} lead={v.s1Lead} id="roles">
     <ul class="roles">
       {
         v.roles.map((r) => (
@@ -37,7 +41,7 @@ const base = t.lang === 'zh' ? '' : '/en';
     </ul>
   </Section>
 
-  <Section no="02" title={v.s2} lead={v.s2Lead}>
+  <Section no="02" title={v.s2} lead={v.s2Lead} id="gates">
     <ol class="gates reveal">
       {
         v.gates.map((g, i) => (
@@ -50,7 +54,7 @@ const base = t.lang === 'zh' ? '' : '/en';
     </ol>
   </Section>
 
-  <Section no="03" title={v.s3}>
+  <Section no="03" title={v.s3} id="visuals">
     <div class="gallery">
       {
         v.gallery.map((g) => (

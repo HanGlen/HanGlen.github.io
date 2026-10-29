@@ -46,7 +46,7 @@ const { no, title, lead, id, wide = false } = Astro.props;
 
   .sticky {
     position: sticky;
-    top: 92px;
+    top: calc(92px + var(--toc-h, 0px));
   }
 
   .no {

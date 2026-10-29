@@ -8,6 +8,9 @@ import Roles from '../Roles.astro';
 import MonthlyBars from '../MonthlyBars.astro';
 import UsageChart from '../UsageChart.astro';
 import NextWork from '../NextWork.astro';
+import Toc from '../Toc.astro';
+import Tabs from '../Tabs.astro';
+import data from '../../data/dnd.json';
 import type { Content } from '../../i18n/zh';
 
 interface Props {
@@ -18,6 +21,8 @@ const { t } = Astro.props;
 const d = t.dnd;
 const zh = t.lang === 'zh';
 const base = zh ? '' : '/en';
+const ids = ['case', 'pipeline', 'throughput', 'feature', 'metrics', 'checks'];
+const toc = ids.map((id, i) => ({ id, label: d.toc[i] }));
 ---
 
 <Base lang={t.lang} title={d.title} description={d.description}>
@@ -37,24 +42,26 @@ const base = zh ? '' : '/en';
     <p class="fine">{d.shotsNote}</p>
   </section>
 
+  <Toc items={toc} label={zh ? '目录' : 'Contents'} />
+
   <Section no="01" title={d.caseTitle} lead={d.caseBody} id="case">
     <div class="reveal">
       <Relay legs={d.relay as any} hint={d.relayHint} id="fb" />
     </div>
   </Section>
 
-  <Section no="02" title={d.roleTitle} lead={d.roleBody}>
+  <Section no="02" title={d.roleTitle} lead={d.roleBody} id="pipeline">
     <div class="reveal">
       <Roles start={d.roleStart} mid={d.roleMid} end={d.roleEnd} agents={d.agents} me={zh ? '我' : 'Me'} />
     </div>
   </Section>
 
-  <Section no="03" title={d.trendTitle} lead={d.trendBody}>
+  <Section no="03" title={d.trendTitle} lead={d.trendBody} id="throughput">
     <div class="panel reveal"><MonthlyBars lang={t.lang} /></div>
     <div class="panel reveal gap-top"><Heatmap lang={t.lang} /></div>
   </Section>
 
-  <Section no="04" title={d.dayTitle} lead={d.dayBody}>
+  <Section no="04" title={d.dayTitle} lead={d.dayBody} id="feature">
     <ol class="day">
       {
         d.day.map((x) => (
@@ -69,22 +76,58 @@ const base = zh ? '' : '/en';
     <p class="aside-note">{d.dayNote}</p>
   </Section>
 
-  <Section no="05" title={d.usageTitle} lead={d.usageNote}>
-    <div class="panel reveal"><UsageChart lang={t.lang} /></div>
-    <dl class="tiles reveal">
-      {
-        d.usageStats.map((s) => (
-          <div>
-            <dd>{s.v}</dd>
-            <dt>{s.k}</dt>
+  <Section no="05" title={d.opsTitle} lead={d.opsBody} id="metrics">
+    <div class="reveal">
+      <Tabs tabs={d.opsTabs} id="ops">
+        <Fragment slot="p0">
+          <div class="panel"><UsageChart lang={t.lang} /></div>
+          <p class="fine">{d.usageNote}</p>
+          <dl class="tiles">
+            {
+              d.usageStats.map((s) => (
+                <div>
+                  <dd>{s.v}</dd>
+                  <dt>{s.k}</dt>
+                </div>
+              ))
+            }
+          </dl>
+          <p class="fine">{d.usageSource}</p>
+        </Fragment>
+        <Fragment slot="p1">
+          <dl class="tiles">
+            {
+              d.feedbackStats.map((s) => (
+                <div>
+                  <dd>{s.v}</dd>
+                  <dt>{s.k}</dt>
+                </div>
+              ))
+            }
+          </dl>
+          <div class="panel gap-top">
+            <MonthlyBars lang={t.lang} series={data.feedback.monthly} label={d.feedbackChart} note={d.feedbackSource} />
           </div>
-        ))
-      }
-    </dl>
-    <p class="fine">{d.usageSource}</p>
+          <p class="fine">{d.feedbackNote}</p>
+        </Fragment>
+        <Fragment slot="p2">
+          <dl class="tiles three">
+            {
+              d.contentStats.map((s) => (
+                <div>
+                  <dd>{s.v}</dd>
+                  <dt>{s.k}</dt>
+                </div>
+              ))
+            }
+          </dl>
+          <p class="fine">{d.contentSource}</p>
+        </Fragment>
+      </Tabs>
+    </div>
   </Section>
 
-  <Section no="06" title={d.gateTitle} lead={d.gateBody}>
+  <Section no="06" title={d.gateTitle} lead={d.gateBody} id="checks">
     <ul class="gates">
       {
         d.gates.map((g) => (
@@ -170,6 +213,10 @@ const base = zh ? '' : '/en';
     display: grid;
     grid-template-columns: repeat(4, minmax(0, 1fr));
     gap: 10px;
+  }
+
+  .tiles.three {
+    grid-template-columns: repeat(3, minmax(0, 1fr));
   }
 
   .tiles div {
@@ -307,7 +354,8 @@ const base = zh ? '' : '/en';
     .shots figure {
       scroll-snap-align: start;
     }
-    .tiles {
+    .tiles,
+    .tiles.three {
       grid-template-columns: repeat(2, minmax(0, 1fr));
     }
   }
