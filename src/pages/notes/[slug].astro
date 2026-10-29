@@ -1,0 +1,160 @@
+---
+import { getCollection, render } from 'astro:content';
+import Base from '../../layouts/Base.astro';
+import { zh } from '../../i18n/zh';
+
+export async function getStaticPaths() {
+  const notes = await getCollection('notes');
+  return notes.map((note) => ({ params: { slug: note.id }, props: { note } }));
+}
+
+const { note } = Astro.props;
+const { Content } = await render(note);
+const n = zh.notes;
+---
+
+<Base lang="zh" title={`${note.data.title} · 李睿涵`} description={note.data.summary} altPath="/en/notes/">
+  <article class="wrap narrow post">
+    <a class="back" href="/notes/">{n.back}</a>
+    <p class="meta">
+      {note.data.date.toISOString().slice(0, 10)}
+      {note.data.draft && <span class="draft">{n.draft}</span>}
+      {
+        note.data.origin && (
+          <a class="link" href={note.data.origin} target="_blank" rel="noopener">
+            {n.origin} CSDN ↗
+          </a>
+        )
+      }
+    </p>
+    <h1 class="h-section">{note.data.title}</h1>
+    <div class="prose">
+      <Content />
+    </div>
+  </article>
+</Base>
+
+<style>
+  .post {
+    padding-top: clamp(40px, 7vw, 80px);
+  }
+
+  .back {
+    font-size: 14px;
+    color: var(--ink-3);
+  }
+
+  .back:hover {
+    color: var(--accent-ink);
+  }
+
+  .meta {
+    margin: 28px 0 10px;
+    display: flex;
+    flex-wrap: wrap;
+    gap: 10px;
+    align-items: center;
+    font-family: var(--mono);
+    font-size: 12px;
+    color: var(--ink-3);
+  }
+
+  .draft {
+    font-family: var(--sans);
+    font-size: 11px;
+    padding: 1px 7px;
+    border-radius: 999px;
+    border: 1px dashed var(--accent);
+    color: var(--accent-ink);
+  }
+
+  h1 {
+    font-size: clamp(30px, 4.4vw, 44px);
+  }
+
+  .prose {
+    margin-top: 32px;
+    font-size: 17px;
+    line-height: 1.85;
+  }
+
+  .prose :global(h2) {
+    margin: 2.2em 0 0.6em;
+    font-family: var(--serif);
+    font-size: 25px;
+    font-weight: 600;
+    line-height: 1.35;
+  }
+
+  .prose :global(h3) {
+    margin: 1.8em 0 0.4em;
+    font-family: var(--serif);
+    font-size: 20px;
+    font-weight: 600;
+  }
+
+  .prose :global(p),
+  .prose :global(ul),
+  .prose :global(ol) {
+    margin: 0 0 1em;
+  }
+
+  .prose :global(ul),
+  .prose :global(ol) {
+    padding-left: 1.3em;
+  }
+
+  .prose :global(li) {
+    margin: 0.3em 0;
+  }
+
+  .prose :global(blockquote) {
+    margin: 0 0 1.4em;
+    padding: 2px 0 2px 16px;
+    border-left: 3px solid var(--accent);
+    color: var(--ink-2);
+  }
+
+  .prose :global(blockquote p) {
+    margin: 0;
+  }
+
+  .prose :global(code) {
+    font-family: var(--mono);
+    font-size: 0.86em;
+    padding: 1px 5px;
+    border-radius: 5px;
+    background: var(--bg-2);
+  }
+
+  .prose :global(table) {
+    width: 100%;
+    margin: 0 0 1.4em;
+    border-collapse: collapse;
+    font-size: 15px;
+    display: block;
+    overflow-x: auto;
+  }
+
+  .prose :global(th),
+  .prose :global(td) {
+    text-align: left;
+    padding: 8px 14px 8px 0;
+    border-bottom: 1px solid var(--line);
+    vertical-align: top;
+  }
+
+  .prose :global(th) {
+    font-weight: 600;
+    border-bottom-color: var(--line-2);
+  }
+
+  .prose :global(strong) {
+    font-weight: 650;
+  }
+
+  .prose :global(a) {
+    color: var(--accent-ink);
+    border-bottom: 1px solid currentColor;
+  }
+</style>

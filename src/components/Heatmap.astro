@@ -1,0 +1,225 @@
+---
+import data from '../data/dnd.json';
+
+interface Props {
+  lang: 'zh' | 'en';
+  compact?: boolean;
+}
+
+const { lang, compact = false } = Astro.props;
+const zh = lang === 'zh';
+const daily = data.daily as Record<string, number>;
+
+// 从 2026-06-15（周一）排到数据最后一天，按周成列
+const start = new Date('2026-06-15T00:00:00Z');
+const end = new Date('2026-10-29T00:00:00Z');
+const days: { date: string; n: number; col: number; row: number }[] = [];
+for (let d = new Date(start), i = 0; d <= end; d.setUTCDate(d.getUTCDate() + 1), i++) {
+  const key = d.toISOString().slice(0, 10);
+  days.push({ date: key, n: daily[key] ?? 0, col: Math.floor(i / 7), row: i % 7 });
+}
+const cols = days[days.length - 1].col + 1;
+const level = (n: number) => (n === 0 ? 0 : n < 5 ? 1 : n < 12 ? 2 : n < 25 ? 3 : 4);
+const total = Object.values(daily).reduce((a, b) => a + b, 0);
+const peak = days.reduce((a, b) => (b.n > a.n ? b : a));
+const cell = 13;
+const gap = 3;
+const w = cols * (cell + gap);
+const h = 7 * (cell + gap);
+const en = ['Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun', 'Jul', 'Aug', 'Sep', 'Oct', 'Nov', 'Dec'];
+const monthCols: { col: number; label: string }[] = [];
+let lastMonth = -1;
+for (const d of days) {
+  const m = Number(d.date.slice(5, 7));
+  if (m !== lastMonth && d.row === 0) {
+    monthCols.push({ col: d.col, label: zh ? `${m}月` : en[m - 1] });
+    lastMonth = m;
+  }
+}
+const fmt = (date: string, n: number) =>
+  zh ? `${date.slice(5).replace('-', '月')}日 · 合入 ${n} 个 PR` : `${date} · ${n} PR${n === 1 ? '' : 's'} merged`;
+---
+
+<figure class={`heat ${compact ? 'compact' : ''}`}>
+  <div class="scroll">
+    <svg viewBox={`0 -18 ${w} ${h + 18}`} role="img" aria-labelledby="heat-title">
+      <title id="heat-title">{zh ? '每天合入的 PR 数量' : 'PRs merged per day'}</title>
+      {monthCols.map((m) => <text x={m.col * (cell + gap)} y="-6" class="mlabel">{m.label}</text>)}
+      {
+        days.map((d) => (
+          <rect
+            x={d.col * (cell + gap)}
+            y={d.row * (cell + gap)}
+            width={cell}
+            height={cell}
+            rx="3"
+            class={`l${level(d.n)}`}
+            data-tip={fmt(d.date, d.n)}
+            tabindex="-1"
+          >
+            <title>{fmt(d.date, d.n)}</title>
+          </rect>
+        ))
+      }
+    </svg>
+  </div>
+  <figcaption>
+    <span class="readout" aria-live="polite">
+      {
+        zh
+          ? `${total} 次合并 · 单日最多 ${peak.n} 个（${peak.date.slice(5).replace('-', '月')}日）`
+          : `${total} merges · busiest day ${peak.n} (${peak.date})`
+      }
+    </span>
+    <span class="legend" aria-hidden="true">
+      {zh ? '少' : 'Less'}
+      <i class="l0"></i><i class="l1"></i><i class="l2"></i><i class="l3"></i><i class="l4"></i>
+      {zh ? '多' : 'More'}
+    </span>
+  </figcaption>
+  <details class="table">
+    <summary>{zh ? '查看数据' : 'View data'}</summary>
+    <p class="src">{zh ? '来源：小程序仓库 dev 分支的合并记录。' : 'Source: merge history of the dev branch.'}</p>
+    <table>
+      <thead><tr><th>{zh ? '日期' : 'Date'}</th><th>PR</th></tr></thead>
+      <tbody>
+        {
+          days
+            .filter((d) => d.n > 0)
+            .reverse()
+            .map((d) => (
+              <tr>
+                <td>{d.date}</td>
+                <td>{d.n}</td>
+              </tr>
+            ))
+        }
+      </tbody>
+    </table>
+  </details>
+</figure>
+
+<script>
+  document.querySelectorAll<HTMLElement>('figure.heat').forEach((fig) => {
+    const readout = fig.querySelector<HTMLElement>('.readout');
+    if (!readout) return;
+    const initial = readout.textContent;
+    fig.querySelectorAll<SVGRectElement>('rect[data-tip]').forEach((r) => {
+      r.addEventListener('mouseenter', () => (readout.textContent = r.dataset.tip ?? ''));
+      r.addEventListener('mouseleave', () => (readout.textContent = initial));
+    });
+  });
+</script>
+
+<style>
+  .heat {
+    margin: 0;
+  }
+
+  .scroll {
+    overflow-x: auto;
+    padding-bottom: 4px;
+  }
+
+  svg {
+    display: block;
+    width: 100%;
+    max-width: 760px;
+    min-width: 300px;
+    height: auto;
+  }
+
+  rect {
+    stroke: var(--bg);
+    stroke-width: 0;
+    transition: stroke-width 0.1s;
+  }
+
+  rect:hover {
+    stroke: var(--ink);
+    stroke-width: 1.5;
+  }
+
+  .l0 { fill: var(--heat-0); background: var(--heat-0); }
+  .l1 { fill: var(--heat-1); background: var(--heat-1); }
+  .l2 { fill: var(--heat-2); background: var(--heat-2); }
+  .l3 { fill: var(--heat-3); background: var(--heat-3); }
+  .l4 { fill: var(--heat-4); background: var(--heat-4); }
+
+  .mlabel {
+    font-family: var(--mono);
+    font-size: 8px;
+    fill: var(--ink-3);
+  }
+
+  figcaption {
+    margin-top: 12px;
+    display: flex;
+    justify-content: space-between;
+    flex-wrap: wrap;
+    gap: 8px 16px;
+    font-size: 13px;
+    color: var(--ink-2);
+  }
+
+  .readout {
+    font-variant-numeric: tabular-nums;
+  }
+
+  .legend {
+    display: inline-flex;
+    align-items: center;
+    gap: 3px;
+    font-size: 12px;
+    color: var(--ink-3);
+  }
+
+  .legend i {
+    width: 11px;
+    height: 11px;
+    border-radius: 3px;
+  }
+
+  .legend i:first-child {
+    margin-left: 4px;
+  }
+
+  .legend i:last-child {
+    margin-right: 4px;
+  }
+
+  .table {
+    margin-top: 10px;
+    font-size: 13px;
+    color: var(--ink-3);
+  }
+
+  .compact .table {
+    display: none;
+  }
+
+  summary {
+    cursor: pointer;
+    width: fit-content;
+  }
+
+  .src {
+    margin: 8px 0;
+  }
+
+  table {
+    border-collapse: collapse;
+    font-family: var(--mono);
+    font-size: 12px;
+    max-height: 240px;
+    display: block;
+    overflow-y: auto;
+  }
+
+  th,
+  td {
+    text-align: left;
+    padding: 2px 16px 2px 0;
+    border-bottom: 1px solid var(--line);
+  }
+</style>

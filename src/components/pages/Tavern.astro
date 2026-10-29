@@ -1,0 +1,148 @@
+---
+import Base from '../../layouts/Base.astro';
+import CaseHeader from '../CaseHeader.astro';
+import Placeholder from '../Placeholder.astro';
+import NextWork from '../NextWork.astro';
+import type { Content } from '../../i18n/zh';
+
+interface Props {
+  t: Content;
+}
+
+const { t } = Astro.props;
+const v = t.tavern;
+const base = t.lang === 'zh' ? '' : '/en';
+---
+
+<Base lang={t.lang} title={v.title} description={v.description}>
+  <CaseHeader kind={v.kind} name={v.name} line={v.line} stats={[]} back={t.ui.backHome} backHref={`${base}/`} />
+
+  <section class="wrap section">
+    <div class="video reveal"><Placeholder kind="video" label={v.video} lang={t.lang} /></div>
+  </section>
+
+  <section class="wrap section">
+    <h2 class="h-section">{v.s1}</h2>
+    <ul class="roles">
+      {
+        v.roles.map((r) => (
+          <li class="reveal">
+            <strong class="serif">{r.k}</strong>
+            <span class="muted">{r.v}</span>
+          </li>
+        ))
+      }
+    </ul>
+  </section>
+
+  <section class="wrap section">
+    <h2 class="h-section">{v.s2}</h2>
+    <ol class="gates reveal">
+      {
+        v.gates.map((g, i) => (
+          <li>
+            <span class="n">{i + 1}</span>
+            <span class="serif">{g}</span>
+          </li>
+        ))
+      }
+    </ol>
+    <p class="body">{v.gatesNote}</p>
+    <div class="shots reveal">
+      {v.shots.map((s) => <Placeholder kind="wide" label={s} lang={t.lang} />)}
+    </div>
+  </section>
+
+  <NextWork t={t} current="tavern" />
+</Base>
+
+<style>
+  .video {
+    max-width: 900px;
+  }
+
+  .roles {
+    margin: 24px 0 0;
+    padding: 0;
+    list-style: none;
+    display: grid;
+    grid-template-columns: repeat(3, minmax(0, 1fr));
+    gap: 12px;
+  }
+
+  .roles li {
+    display: grid;
+    gap: 4px;
+    padding: 18px;
+    border-radius: var(--r);
+    background: var(--card);
+    border: 1px solid var(--line);
+  }
+
+  .roles strong {
+    font-size: 22px;
+  }
+
+  .gates {
+    margin: 28px 0 0;
+    padding: 0;
+    list-style: none;
+    display: grid;
+    grid-template-columns: repeat(5, minmax(0, 1fr));
+    counter-reset: g;
+  }
+
+  .gates li {
+    position: relative;
+    display: grid;
+    gap: 6px;
+    padding: 16px 12px 16px 0;
+    border-top: 3px solid var(--accent);
+    font-size: 20px;
+    font-weight: 600;
+  }
+
+  .gates li + li {
+    border-top-color: color-mix(in srgb, var(--accent) 60%, var(--bg));
+  }
+
+  .gates li:nth-child(n + 3) {
+    border-top-color: color-mix(in srgb, var(--accent) 40%, var(--bg));
+  }
+
+  .gates li:nth-child(n + 5) {
+    border-top-color: var(--ink);
+  }
+
+  .n {
+    font-family: var(--mono);
+    font-size: 12px;
+    font-weight: 400;
+    color: var(--ink-3);
+  }
+
+  .body {
+    margin: 16px 0 0;
+    max-width: var(--text);
+    font-size: 17px;
+    color: var(--ink-2);
+  }
+
+  .shots {
+    margin-top: 28px;
+    display: grid;
+    grid-template-columns: repeat(3, minmax(0, 1fr));
+    gap: 16px;
+  }
+
+  @media (max-width: 760px) {
+    .roles,
+    .shots {
+      grid-template-columns: minmax(0, 1fr);
+    }
+    .gates {
+      grid-template-columns: repeat(3, minmax(0, 1fr));
+      row-gap: 8px;
+    }
+  }
+</style>

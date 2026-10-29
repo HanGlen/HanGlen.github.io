@@ -1,0 +1,79 @@
+---
+import Base from '../../layouts/Base.astro';
+import type { Content } from '../../i18n/zh';
+
+interface Props {
+  t: Content;
+}
+
+const { t } = Astro.props;
+const n = t.now;
+---
+
+<Base lang={t.lang} title={n.title} description={n.description}>
+  <section class="wrap narrow page">
+    <p class="eyebrow">{n.updated}</p>
+    <h1 class="h-display">{t.home.nowTitle}</h1>
+    <p class="intro muted">{n.intro}</p>
+    <ul class="items">
+      {
+        n.items.map((it) => (
+          <li class="reveal">
+            <span class="tag">{it.tag}</span>
+            <p>{it.text}</p>
+          </li>
+        ))
+      }
+    </ul>
+  </section>
+</Base>
+
+<style>
+  .page {
+    padding-top: clamp(40px, 7vw, 88px);
+  }
+
+  h1 {
+    margin-top: 12px;
+  }
+
+  .intro {
+    margin: 16px 0 0;
+    font-size: 16px;
+  }
+
+  .items {
+    margin: 40px 0 0;
+    padding: 0;
+    list-style: none;
+  }
+
+  .items li {
+    display: grid;
+    grid-template-columns: 96px minmax(0, 1fr);
+    gap: 16px;
+    padding: 20px 0;
+    border-top: 1px solid var(--line);
+  }
+
+  .tag {
+    font-family: var(--mono);
+    font-size: 12px;
+    color: var(--accent-ink);
+    padding-top: 5px;
+  }
+
+  .items p {
+    margin: 0;
+    font-family: var(--serif);
+    font-size: 20px;
+    line-height: 1.6;
+  }
+
+  @media (max-width: 560px) {
+    .items li {
+      grid-template-columns: minmax(0, 1fr);
+      gap: 4px;
+    }
+  }
+</style>

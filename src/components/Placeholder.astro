@@ -1,0 +1,106 @@
+---
+/** 素材占位：等车主补图后，把 src 填上即可显示真图 */
+interface Props {
+  kind?: 'phone' | 'wide' | 'doc' | 'photo' | 'video';
+  label: string;
+  src?: string;
+  alt?: string;
+  lang?: 'zh' | 'en';
+}
+
+const { kind = 'wide', label, src, alt, lang = 'zh' } = Astro.props;
+const todo = lang === 'zh' ? '待补' : 'Coming soon';
+---
+
+<figure class={`ph ph-${kind}`}>
+  {
+    src ? (
+      <img src={src} alt={alt ?? label} loading="lazy" />
+    ) : (
+      <div class="ph-empty" role="img" aria-label={`${todo}：${label}`}>
+        {kind === 'phone' && <span class="notch" aria-hidden="true" />}
+        <span class="ph-tag">{todo}</span>
+        <span class="ph-label">{label}</span>
+      </div>
+    )
+  }
+</figure>
+
+<style>
+  .ph {
+    margin: 0;
+    border-radius: var(--r);
+    overflow: hidden;
+    background: var(--card);
+    border: 1px solid var(--line);
+    box-shadow: var(--shadow);
+  }
+
+  .ph-wide {
+    aspect-ratio: 16 / 10;
+  }
+
+  .ph-phone {
+    aspect-ratio: 9 / 19;
+    border-radius: 28px;
+    border-width: 6px;
+    border-color: var(--ink);
+  }
+
+  .ph-doc {
+    aspect-ratio: 3 / 4;
+  }
+
+  .ph-photo {
+    aspect-ratio: 4 / 5;
+  }
+
+  .ph-video {
+    aspect-ratio: 16 / 9;
+  }
+
+  .ph img {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+  }
+
+  .ph-empty {
+    position: relative;
+    height: 100%;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    gap: 8px;
+    padding: 16px;
+    text-align: center;
+    background: repeating-linear-gradient(-45deg, transparent 0 10px, var(--accent-soft) 10px 11px);
+  }
+
+  .notch {
+    position: absolute;
+    top: 10px;
+    width: 34%;
+    height: 14px;
+    border-radius: 999px;
+    background: var(--ink);
+  }
+
+  .ph-tag {
+    font-family: var(--mono);
+    font-size: 11px;
+    letter-spacing: 0.08em;
+    text-transform: uppercase;
+    color: var(--accent-ink);
+    padding: 3px 8px;
+    border: 1px dashed var(--accent);
+    border-radius: 999px;
+  }
+
+  .ph-label {
+    font-size: 13px;
+    color: var(--ink-2);
+    line-height: 1.5;
+  }
+</style>

@@ -1,0 +1,40 @@
+---
+import type { Content } from '../i18n/zh';
+
+interface Props {
+  t: Content;
+  current: string;
+}
+
+const { t, current } = Astro.props;
+const base = t.lang === 'zh' ? '' : '/en';
+const list = t.work;
+const i = list.findIndex((w) => w.slug === current);
+const next = list[(i + 1) % list.length];
+---
+
+<a class="wrap next" href={`${base}/work/${next.slug}/`}>
+  <span class="eyebrow">{t.ui.next}</span>
+  <span class="name serif">{next.name} →</span>
+  <span class="muted">{next.line}</span>
+</a>
+
+<style>
+  .next {
+    display: grid;
+    gap: 6px;
+    margin-top: var(--gap);
+    padding-top: 32px;
+    border-top: 1px solid var(--line);
+  }
+
+  .name {
+    font-size: clamp(26px, 3.4vw, 38px);
+    font-weight: 600;
+    transition: color 0.2s;
+  }
+
+  .next:hover .name {
+    color: var(--accent-ink);
+  }
+</style>

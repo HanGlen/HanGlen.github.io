@@ -1,0 +1,410 @@
+---
+import Base from '../../layouts/Base.astro';
+import CaseHeader from '../CaseHeader.astro';
+import Placeholder from '../Placeholder.astro';
+import Heatmap from '../Heatmap.astro';
+import Pipeline from '../Pipeline.astro';
+import NextWork from '../NextWork.astro';
+import data from '../../data/dnd.json';
+import type { Content } from '../../i18n/zh';
+
+interface Props {
+  t: Content;
+}
+
+const { t } = Astro.props;
+const d = t.dnd;
+const zh = t.lang === 'zh';
+const base = zh ? '' : '/en';
+const types = Object.entries(data.types as Record<string, number>);
+const maxType = Math.max(...types.map(([, n]) => n));
+const totalTypes = types.reduce((a, [, n]) => a + n, 0);
+const typeNames: Record<string, string> = d.typeNames;
+---
+
+<Base lang={t.lang} title={d.title} description={d.description}>
+  <CaseHeader kind={d.kind} name={d.name} line={d.line} stats={d.stats} back={t.ui.backHome} backHref={`${base}/`} />
+
+  <section class="wrap section">
+    <div class="shots reveal">
+      {d.shots.map((s) => <Placeholder kind="phone" label={s} lang={t.lang} />)}
+    </div>
+  </section>
+
+  <section class="wrap section"><div class="narrow-left">
+    <h2 class="h-section">{d.s1}</h2>
+    <p class="body">{d.s1Body}</p>
+    <div class="aside">
+      <Placeholder kind="doc" label={d.qr} lang={t.lang} />
+      <Placeholder kind="wide" label={d.growth} lang={t.lang} />
+    </div>
+  </div></section>
+
+  <section class="wrap section"><div class="narrow-left">
+    <h2 class="h-section">{d.s2}</h2>
+    <p class="body">{d.s2Body}</p>
+    <ol class="roles">
+      {
+        d.roles.map((r, i) => (
+          <li class="reveal">
+            <span class="n">{i + 1}</span>
+            <strong class="serif">{r.k}</strong>
+            <span class="muted">{r.v}</span>
+          </li>
+        ))
+      }
+    </ol>
+  </div></section>
+
+  <section class="wrap section" id="pipeline">
+    <div class="narrow-left">
+      <h2 class="h-section">{d.s3}</h2>
+      <p class="body">{d.s3Body}</p>
+    </div>
+    <div class="reveal">
+      <Pipeline steps={d.steps} recordLabel={d.recordLabel} hint={d.hint} />
+    </div>
+  </section>
+
+  <section class="wrap section day-wrap">
+    <div>
+      <h2 class="h-section">{d.s4}</h2>
+      <p class="body">{d.s4Body}</p>
+    </div>
+    <ol class="day">
+      {
+        d.day.map((x) => (
+          <li class={`reveal ${x.who === 'Claude' ? 'c' : 'x'}`}>
+            <time>{x.t}</time>
+            <span class="who">{x.who}</span>
+            <span>{x.v}</span>
+          </li>
+        ))
+      }
+    </ol>
+  </section>
+
+  <section class="wrap section">
+    <div class="narrow-left">
+      <h2 class="h-section">{d.s5}</h2>
+    </div>
+    <div class="charts">
+      <div class="chart reveal">
+        <p class="chart-title">{t.home.heatTitle}</p>
+        <Heatmap lang={t.lang} />
+      </div>
+      <div class="chart reveal">
+        <p class="chart-title">{d.typesTitle}</p>
+        <ul class="bars" role="list">
+          {
+            types.map(([k, n]) => (
+              <li>
+                <span class="bk">{typeNames[k] ?? k}</span>
+                <span class="bt">
+                  <span class="bf" style={`width:${(n / maxType) * 100}%`} />
+                </span>
+                <span class="bv">
+                  {n}
+                  <small>{Math.round((n / totalTypes) * 100)}%</small>
+                </span>
+              </li>
+            ))
+          }
+        </ul>
+        <p class="chart-note">{d.typesNote}</p>
+      </div>
+    </div>
+  </section>
+
+  <section class="wrap section">
+    <div class="narrow-left">
+      <h2 class="h-section">{d.s6}</h2>
+    </div>
+    <ol class="lessons">
+      {
+        d.lessons.map((l, i) => (
+          <li class="reveal">
+            <span class="n">{String(i + 1).padStart(2, '0')}</span>
+            <h3 class="serif">{l.k}</h3>
+            <p>{l.v}</p>
+          </li>
+        ))
+      }
+    </ol>
+    <p class="note-link">
+      <a class="link" href="/notes/five-ai-engineers/">{d.noteLink} →</a>
+    </p>
+    <ul class="chips stack">
+      {d.stack.map((s) => <li class="chip">{s}</li>)}
+    </ul>
+  </section>
+
+  <NextWork t={t} current="dnd" />
+</Base>
+
+<style>
+  .narrow-left {
+    max-width: var(--text);
+  }
+
+  .body {
+    margin: 16px 0 0;
+    font-size: 17px;
+    color: var(--ink-2);
+  }
+
+  .shots {
+    display: grid;
+    grid-template-columns: repeat(5, minmax(0, 1fr));
+    gap: clamp(10px, 2vw, 24px);
+  }
+
+  .shots > :global(:nth-child(even)) {
+    margin-top: 32px;
+  }
+
+  .aside {
+    margin-top: 28px;
+    display: grid;
+    grid-template-columns: 140px minmax(0, 1fr);
+    gap: 16px;
+    align-items: start;
+  }
+
+  .roles {
+    margin: 24px 0 0;
+    padding: 0;
+    list-style: none;
+    display: grid;
+    grid-template-columns: repeat(3, minmax(0, 1fr));
+    gap: 12px;
+  }
+
+  .roles li {
+    display: grid;
+    gap: 4px;
+    padding: 18px;
+    border-radius: var(--r);
+    background: var(--card);
+    border: 1px solid var(--line);
+    font-size: 14px;
+  }
+
+  .roles .n {
+    font-family: var(--mono);
+    font-size: 12px;
+    color: var(--accent-ink);
+  }
+
+  .roles strong {
+    font-size: 20px;
+  }
+
+  #pipeline .narrow-left {
+    margin-bottom: 32px;
+  }
+
+  .day-wrap {
+    display: grid;
+    grid-template-columns: minmax(0, 0.8fr) minmax(0, 1.2fr);
+    gap: clamp(24px, 5vw, 64px);
+    align-items: start;
+  }
+
+  .day {
+    margin: 0;
+    padding: 0 0 0 20px;
+    list-style: none;
+    border-left: 2px solid var(--line-2);
+  }
+
+  .day li {
+    position: relative;
+    display: grid;
+    grid-template-columns: 56px 64px minmax(0, 1fr);
+    gap: 8px;
+    padding: 9px 0;
+    font-size: 15px;
+  }
+
+  .day li::before {
+    content: '';
+    position: absolute;
+    left: -27px;
+    top: 17px;
+    width: 12px;
+    height: 12px;
+    border-radius: 50%;
+    background: var(--bg);
+    border: 2px solid var(--accent);
+  }
+
+  .day li.c::before {
+    background: var(--accent);
+  }
+
+  time {
+    font-family: var(--mono);
+    font-size: 13px;
+    color: var(--ink-3);
+    padding-top: 2px;
+  }
+
+  .who {
+    font-size: 12px;
+    font-weight: 600;
+    padding-top: 3px;
+    color: var(--accent-ink);
+  }
+
+  .day li.x .who {
+    color: var(--ink-2);
+  }
+
+  .charts {
+    margin-top: 28px;
+    display: grid;
+    grid-template-columns: minmax(0, 1.15fr) minmax(0, 0.85fr);
+    gap: 20px;
+  }
+
+  .chart {
+    padding: 22px;
+    border-radius: var(--r);
+    border: 1px solid var(--line);
+    background: var(--card);
+    min-width: 0;
+  }
+
+  .chart-title {
+    margin: 0 0 16px;
+    font-size: 14px;
+    font-weight: 600;
+  }
+
+  .chart-note {
+    margin: 14px 0 0;
+    font-size: 13px;
+    color: var(--ink-3);
+  }
+
+  .bars {
+    margin: 0;
+    padding: 0;
+    list-style: none;
+    display: grid;
+    gap: 8px;
+  }
+
+  .bars li {
+    display: grid;
+    grid-template-columns: 64px minmax(0, 1fr) 72px;
+    align-items: center;
+    gap: 10px;
+    font-size: 13px;
+  }
+
+  .bk {
+    color: var(--ink-2);
+  }
+
+  .bt {
+    height: 14px;
+  }
+
+  .bf {
+    display: block;
+    height: 100%;
+    min-width: 3px;
+    border-radius: 0 4px 4px 0;
+    background: var(--accent);
+  }
+
+  .bv {
+    font-family: var(--mono);
+    font-size: 12px;
+    text-align: right;
+    font-variant-numeric: tabular-nums;
+  }
+
+  .bv small {
+    margin-left: 6px;
+    color: var(--ink-3);
+  }
+
+  .lessons {
+    margin: 28px 0 0;
+    padding: 0;
+    list-style: none;
+    display: grid;
+    grid-template-columns: repeat(5, minmax(0, 1fr));
+    border-top: 1px solid var(--line-2);
+  }
+
+  .lessons li {
+    padding: 18px 18px 0 0;
+  }
+
+  .lessons .n {
+    font-family: var(--mono);
+    font-size: 12px;
+    color: var(--accent-ink);
+  }
+
+  .lessons h3 {
+    margin: 6px 0 6px;
+    font-size: 20px;
+    font-weight: 600;
+  }
+
+  .lessons p {
+    margin: 0;
+    font-size: 14px;
+    color: var(--ink-2);
+  }
+
+  .note-link {
+    margin: 32px 0 0;
+    font-size: 15px;
+  }
+
+  .stack {
+    margin-top: 20px;
+  }
+
+  @media (max-width: 900px) {
+    .shots {
+      grid-template-columns: none;
+      grid-auto-flow: column;
+      grid-auto-columns: 42%;
+      overflow-x: auto;
+      padding-bottom: 8px;
+      scroll-snap-type: x mandatory;
+    }
+    .shots > :global(*) {
+      scroll-snap-align: start;
+    }
+    .charts,
+    .day-wrap {
+      grid-template-columns: minmax(0, 1fr);
+    }
+    .lessons {
+      grid-template-columns: repeat(2, minmax(0, 1fr));
+      row-gap: 12px;
+    }
+  }
+
+  @media (max-width: 560px) {
+    .roles,
+    .lessons {
+      grid-template-columns: minmax(0, 1fr);
+    }
+    .aside {
+      grid-template-columns: 110px minmax(0, 1fr);
+    }
+    .day li {
+      grid-template-columns: 48px 52px minmax(0, 1fr);
+      font-size: 14px;
+    }
+  }
+</style>

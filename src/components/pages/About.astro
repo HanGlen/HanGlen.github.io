@@ -1,0 +1,254 @@
+---
+import Base from '../../layouts/Base.astro';
+import Placeholder from '../Placeholder.astro';
+import type { Content } from '../../i18n/zh';
+
+interface Props {
+  t: Content;
+}
+
+const { t } = Astro.props;
+const a = t.about;
+---
+
+<Base lang={t.lang} title={a.title} description={a.description}>
+  <section class="wrap intro">
+    <div class="photo reveal"><Placeholder kind="photo" label={a.photo} lang={t.lang} /></div>
+    <div>
+      <h1 class="h-display">{a.name}</h1>
+      {a.bio.map((p) => <p class="bio">{p}</p>)}
+      <div class="life">
+        {a.lifeShots.map((s) => <Placeholder kind="wide" label={s} lang={t.lang} />)}
+      </div>
+    </div>
+  </section>
+
+  <section class="wrap section cv" id="cv">
+    <div class="section-head">
+      <h2 class="h-section">{a.cvTitle}</h2>
+      <button type="button" class="print" onclick="window.print()">{a.print}</button>
+    </div>
+    <p class="open">{a.open}</p>
+
+    <ol class="exp">
+      {
+        a.exp.map((e) => (
+          <li>
+            <time>{e.t}</time>
+            <div>
+              <h3 class="serif">{e.org}</h3>
+              <p class="role">{e.role}</p>
+              {e.pts.length > 0 && (
+                <ul>
+                  {e.pts.map((p) => (
+                    <li>{p}</li>
+                  ))}
+                </ul>
+              )}
+            </div>
+          </li>
+        ))
+      }
+    </ol>
+
+    <h3 class="sub">{a.skillsTitle}</h3>
+    <dl class="skills">
+      {
+        a.skills.map((s) => (
+          <div>
+            <dt>{s.k}</dt>
+            <dd>
+              <ul class="chips">
+                {s.v.map((x) => (
+                  <li class="chip">{x}</li>
+                ))}
+              </ul>
+            </dd>
+          </div>
+        ))
+      }
+    </dl>
+
+    <h3 class="sub">{a.contactTitle}</h3>
+    <ul class="contact">
+      <li><span>Email</span><a class="link" href="mailto:494564549@qq.com">494564549@qq.com</a></li>
+      <li><span>GitHub</span><a class="link" href="https://github.com/HanGlen" target="_blank" rel="noopener">github.com/HanGlen</a></li>
+      <li><span>CSDN</span><a class="link" href="https://blog.csdn.net/qq_42325493" target="_blank" rel="noopener">blog.csdn.net/qq_42325493</a></li>
+    </ul>
+  </section>
+</Base>
+
+<style>
+  .intro {
+    padding-top: clamp(40px, 7vw, 88px);
+    display: grid;
+    grid-template-columns: 260px minmax(0, 1fr);
+    gap: clamp(28px, 5vw, 64px);
+    align-items: start;
+  }
+
+  .bio {
+    margin: 18px 0 0;
+    max-width: 36em;
+    font-size: 18px;
+    color: var(--ink-2);
+  }
+
+  .bio:first-of-type {
+    margin-top: 22px;
+  }
+
+  .life {
+    margin-top: 28px;
+    display: grid;
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+    gap: 14px;
+    max-width: 520px;
+  }
+
+  .print {
+    appearance: none;
+    font: inherit;
+    font-size: 13px;
+    padding: 6px 12px;
+    border-radius: 999px;
+    border: 1px solid var(--line-2);
+    background: var(--card);
+    color: var(--ink);
+    cursor: pointer;
+  }
+
+  .print:hover {
+    border-color: var(--accent);
+  }
+
+  .open {
+    margin: 0 0 24px;
+    color: var(--accent-ink);
+    font-size: 15px;
+  }
+
+  .exp {
+    margin: 0;
+    padding: 0;
+    list-style: none;
+  }
+
+  .exp > li {
+    display: grid;
+    grid-template-columns: 180px minmax(0, 1fr);
+    gap: 20px;
+    padding: 22px 0;
+    border-bottom: 1px solid var(--line);
+  }
+
+  time {
+    font-family: var(--mono);
+    font-size: 13px;
+    color: var(--ink-3);
+    padding-top: 4px;
+  }
+
+  .exp h3 {
+    margin: 0;
+    font-size: 21px;
+    font-weight: 600;
+  }
+
+  .role {
+    margin: 2px 0 0;
+    font-size: 14px;
+    color: var(--accent-ink);
+  }
+
+  .exp ul {
+    margin: 10px 0 0;
+    padding-left: 18px;
+    color: var(--ink-2);
+    font-size: 15px;
+  }
+
+  .sub {
+    margin: 48px 0 16px;
+    font-family: var(--serif);
+    font-size: 22px;
+    font-weight: 600;
+  }
+
+  .skills {
+    margin: 0;
+    display: grid;
+    gap: 14px;
+  }
+
+  .skills div {
+    display: grid;
+    grid-template-columns: 180px minmax(0, 1fr);
+    gap: 20px;
+    align-items: center;
+  }
+
+  dt {
+    font-size: 14px;
+    font-weight: 600;
+  }
+
+  dd {
+    margin: 0;
+  }
+
+  .contact {
+    margin: 0;
+    padding: 0;
+    list-style: none;
+    display: grid;
+    gap: 10px;
+  }
+
+  .contact li {
+    display: grid;
+    grid-template-columns: 180px minmax(0, 1fr);
+    gap: 20px;
+  }
+
+  .contact span {
+    font-size: 14px;
+    color: var(--ink-3);
+  }
+
+  @media (max-width: 760px) {
+    .intro {
+      grid-template-columns: minmax(0, 1fr);
+    }
+    .photo {
+      max-width: 200px;
+    }
+    .exp > li,
+    .skills div,
+    .contact li {
+      grid-template-columns: minmax(0, 1fr);
+      gap: 4px;
+    }
+  }
+
+  @media print {
+    :global(.top),
+    :global(.foot),
+    .intro,
+    .print {
+      display: none !important;
+    }
+    .cv {
+      margin-top: 0;
+    }
+    :global(body) {
+      background: #fff;
+      color: #000;
+      font-size: 12px;
+    }
+    :global(.reveal) {
+      opacity: 1 !important;
+      transform: none !important;
+    }
+  }
+</style>

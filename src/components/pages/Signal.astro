@@ -1,0 +1,248 @@
+---
+import Base from '../../layouts/Base.astro';
+import CaseHeader from '../CaseHeader.astro';
+import Placeholder from '../Placeholder.astro';
+import NextWork from '../NextWork.astro';
+import type { Content } from '../../i18n/zh';
+
+interface Props {
+  t: Content;
+}
+
+const { t } = Astro.props;
+const s = t.signal;
+const base = t.lang === 'zh' ? '' : '/en';
+---
+
+<Base lang={t.lang} title={s.title} description={s.description}>
+  <CaseHeader kind={s.kind} name={s.name} line={s.line} stats={s.stats} back={t.ui.backHome} backHref={`${base}/`} />
+
+  <section class="wrap section">
+    <div class="hero-shot reveal">
+      <Placeholder kind="wide" label={s.modules[0].shot} lang={t.lang} />
+    </div>
+  </section>
+
+  <section class="wrap section"><div class="first">
+    <h2 class="h-section">{s.s1}</h2>
+    <p class="body">{s.s1Body}</p>
+  </div></section>
+
+  <section class="wrap section">
+    <h2 class="h-section">{s.s2}</h2>
+    <ol class="arch reveal">
+      {
+        s.arch.map((a, i) => (
+          <li>
+            <span class="n">L{i + 1}</span>
+            <strong class="serif">{a.k}</strong>
+            <ul>
+              {a.v.map((x) => (
+                <li>{x}</li>
+              ))}
+            </ul>
+          </li>
+        ))
+      }
+    </ol>
+  </section>
+
+  <section class="wrap section">
+    <h2 class="h-section">{s.s3}</h2>
+    <div class="mods">
+      {
+        s.modules.map((m) => (
+          <article class="mod reveal">
+            <Placeholder kind="wide" label={m.shot} lang={t.lang} />
+            <div class="mod-top">
+              <h3 class="serif">{m.name}</h3>
+              {m.badge && <span class="badge">{m.badge}</span>}
+            </div>
+            <p>{m.v}</p>
+            <p class="mono">{m.stack}</p>
+          </article>
+        ))
+      }
+    </div>
+  </section>
+
+  <section class="wrap section">
+    <h2 class="h-section">{s.s4}</h2>
+    <div class="certs reveal">
+      {s.certs.map((c) => <Placeholder kind="doc" label={c} lang={t.lang} />)}
+    </div>
+    <div class="video reveal">
+      <Placeholder kind="video" label={s.videos} lang={t.lang} />
+    </div>
+    <p class="note-link">
+      <a class="link" href="/notes/biosignal-devlog/">{s.noteLink} →</a>
+    </p>
+    <ul class="chips">
+      {s.stack.map((x) => <li class="chip">{x}</li>)}
+    </ul>
+  </section>
+
+  <NextWork t={t} current="signal" />
+</Base>
+
+<style>
+  .hero-shot {
+    max-width: 880px;
+  }
+
+  .first {
+    max-width: var(--text);
+  }
+
+  .body {
+    margin: 16px 0 0;
+    font-size: 17px;
+    color: var(--ink-2);
+  }
+
+  .arch {
+    margin: 28px 0 0;
+    padding: 0;
+    list-style: none;
+    display: grid;
+    grid-template-columns: repeat(5, minmax(0, 1fr));
+    gap: 24px;
+    counter-reset: l;
+  }
+
+  .arch > li {
+    position: relative;
+    padding: 18px;
+    border-radius: var(--r);
+    background: var(--card);
+    border: 1px solid var(--line);
+    display: grid;
+    align-content: start;
+    gap: 4px;
+  }
+
+  .arch > li:not(:last-child)::after {
+    content: '→';
+    position: absolute;
+    right: -19px;
+    top: 50%;
+    transform: translateY(-50%);
+    color: var(--accent);
+    font-size: 14px;
+  }
+
+  .n {
+    font-family: var(--mono);
+    font-size: 11px;
+    color: var(--accent-ink);
+  }
+
+  .arch strong {
+    font-size: 20px;
+  }
+
+  .arch ul {
+    margin: 6px 0 0;
+    padding: 0;
+    list-style: none;
+    font-size: 13.5px;
+    color: var(--ink-2);
+    display: grid;
+    gap: 4px;
+  }
+
+  .mods {
+    margin-top: 28px;
+    display: grid;
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+    gap: 28px 20px;
+  }
+
+  .mod p {
+    margin: 6px 0 0;
+    font-size: 15px;
+    color: var(--ink-2);
+  }
+
+  .mod-top {
+    margin-top: 16px;
+    display: flex;
+    align-items: baseline;
+    gap: 10px;
+  }
+
+  .mod h3 {
+    margin: 0;
+    font-size: 21px;
+    font-weight: 600;
+  }
+
+  .badge {
+    font-size: 11px;
+    padding: 2px 8px;
+    border-radius: 999px;
+    color: var(--accent-ink);
+    background: var(--accent-soft);
+    white-space: nowrap;
+  }
+
+  .mono {
+    font-family: var(--mono);
+    font-size: 12px !important;
+    color: var(--ink-3) !important;
+  }
+
+  .certs {
+    margin-top: 28px;
+    display: grid;
+    grid-template-columns: repeat(4, minmax(0, 1fr));
+    gap: 16px;
+  }
+
+  .video {
+    margin-top: 20px;
+    max-width: 720px;
+  }
+
+  .note-link {
+    margin: 32px 0 20px;
+    font-size: 15px;
+  }
+
+  @media (max-width: 900px) {
+    .arch {
+      grid-template-columns: minmax(0, 1fr);
+      gap: 22px;
+    }
+    .arch > li:not(:last-child)::after {
+      content: '↓';
+      right: auto;
+      left: 24px;
+      top: auto;
+      bottom: -21px;
+      transform: none;
+    }
+    .arch > li {
+      grid-template-columns: 28px 80px minmax(0, 1fr);
+      align-items: baseline;
+    }
+    .arch ul {
+      margin: 0;
+    }
+    .certs {
+      grid-template-columns: repeat(2, minmax(0, 1fr));
+    }
+  }
+
+  @media (max-width: 640px) {
+    .mods {
+      grid-template-columns: minmax(0, 1fr);
+    }
+    .arch > li {
+      grid-template-columns: 28px minmax(0, 1fr);
+    }
+    .arch ul {
+      grid-column: 2;
+    }
+  }
+</style>

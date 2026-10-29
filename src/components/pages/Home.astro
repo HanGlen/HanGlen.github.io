@@ -1,0 +1,309 @@
+---
+import { getCollection } from 'astro:content';
+import Base from '../../layouts/Base.astro';
+import Placeholder from '../Placeholder.astro';
+import Heatmap from '../Heatmap.astro';
+import type { Content } from '../../i18n/zh';
+
+interface Props {
+  t: Content;
+}
+
+const { t } = Astro.props;
+const h = t.home;
+const zh = t.lang === 'zh';
+const base = zh ? '' : '/en';
+const notes = (await getCollection('notes')).sort((a, b) => b.data.date.valueOf() - a.data.date.valueOf()).slice(0, 3);
+const fmt = (d: Date) => d.toISOString().slice(0, 10);
+const [lead, ...rest] = t.work;
+---
+
+<Base lang={t.lang} title={h.title} description={h.description}>
+  <section class="wrap hero">
+    <p class="hello reveal">{h.hello}</p>
+    <h1 class="h-display reveal">{h.line}</h1>
+    <ul class="tags reveal">
+      {h.tags.map((x) => <li>{x}</li>)}
+    </ul>
+    <a class="open reveal" href={`${base}/about/#cv`}>
+      <span class="pulse" aria-hidden="true"></span>
+      {h.open}
+      <span class="arrow">{h.openLink} →</span>
+    </a>
+  </section>
+
+  <section class="wrap section" id="work">
+    <div class="section-head">
+      <h2 class="eyebrow">{h.workTitle}</h2>
+    </div>
+    <div class="works">
+      <a class="work lead reveal" href={`${base}/work/${lead.slug}/`}>
+        <div class="work-text">
+          <p class="eyebrow">{lead.kind}</p>
+          <h3 class="serif">{lead.name}</h3>
+          <p class="muted">{lead.line}</p>
+          <p class="stat serif">{lead.stat}</p>
+          <span class="more">{t.ui.readMore} →</span>
+        </div>
+        <div class="lead-shots">
+          <Placeholder kind="phone" label={lead.shot} lang={t.lang} />
+          <Placeholder kind="phone" label={zh ? '角色卡截图' : 'Character sheet'} lang={t.lang} />
+        </div>
+      </a>
+      {
+        rest.map((w) => (
+          <a class="work reveal" href={`${base}/work/${w.slug}/`}>
+            <Placeholder kind="wide" label={w.shot} lang={t.lang} />
+            <div class="work-text">
+              <p class="eyebrow">{w.kind}</p>
+              <h3 class="serif">{w.name}</h3>
+              <p class="muted">{w.line}</p>
+              <p class="stat serif">{w.stat}</p>
+            </div>
+          </a>
+        ))
+      }
+    </div>
+  </section>
+
+  <section class="wrap section">
+    <div class="section-head">
+      <h2 class="eyebrow">{h.heatTitle}</h2>
+      <a class="link small" href={`${base}/work/dnd/#pipeline`}>{h.heatMore} →</a>
+    </div>
+    <div class="reveal"><Heatmap lang={t.lang} compact /></div>
+  </section>
+
+  <section class="wrap section two">
+    <div class="reveal">
+      <div class="section-head">
+        <h2 class="eyebrow">{h.nowTitle}</h2>
+        <a class="link small" href={`${base}/now/`}>{h.nowMore} →</a>
+      </div>
+      <ul class="now">
+        {t.now.short.map((x) => <li>{x}</li>)}
+      </ul>
+    </div>
+    <div class="reveal">
+      <div class="section-head">
+        <h2 class="eyebrow">{h.notesTitle}</h2>
+        <a class="link small" href={`${base}/notes/`}>{h.notesMore} →</a>
+      </div>
+      <ul class="notes">
+        {
+          notes.map((n) => (
+            <li>
+              <a href={`/notes/${n.id}/`}>
+                <span class="nt serif">{n.data.title}</span>
+                <span class="nd">{fmt(n.data.date)}</span>
+              </a>
+            </li>
+          ))
+        }
+      </ul>
+    </div>
+  </section>
+</Base>
+
+<style>
+  .hero {
+    padding-top: clamp(56px, 11vw, 140px);
+  }
+
+  .hello {
+    margin: 0 0 14px;
+    font-size: 18px;
+    color: var(--ink-2);
+  }
+
+  h1 {
+    max-width: 15em;
+  }
+
+  :lang(en) h1 {
+    max-width: 18ch;
+  }
+
+  .tags {
+    margin: 26px 0 0;
+    padding: 0;
+    list-style: none;
+    display: flex;
+    flex-wrap: wrap;
+    gap: 4px 0;
+    color: var(--ink-2);
+    font-size: 16px;
+  }
+
+  .tags li:not(:last-child)::after {
+    content: '·';
+    margin: 0 12px;
+    color: var(--ink-3);
+  }
+
+  .open {
+    margin-top: 32px;
+    display: inline-flex;
+    flex-wrap: wrap;
+    align-items: center;
+    gap: 6px 10px;
+    padding: 10px 16px;
+    border-radius: 999px;
+    border: 1px solid var(--line-2);
+    background: var(--card);
+    font-size: 14px;
+    transition: border-color 0.2s;
+  }
+
+  .open:hover {
+    border-color: var(--accent);
+  }
+
+  .pulse {
+    width: 8px;
+    height: 8px;
+    border-radius: 50%;
+    background: #3f9b62;
+    box-shadow: 0 0 0 4px rgba(63, 155, 98, 0.18);
+  }
+
+  .arrow {
+    color: var(--accent-ink);
+  }
+
+  .works {
+    display: grid;
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+    gap: 20px;
+  }
+
+  .work {
+    display: grid;
+    gap: 18px;
+    align-content: start;
+    padding: 18px;
+    border-radius: calc(var(--r) + 6px);
+    border: 1px solid var(--line);
+    background: var(--card);
+    transition: border-color 0.25s, transform 0.25s;
+  }
+
+  .work:hover {
+    border-color: var(--line-2);
+    transform: translateY(-3px);
+  }
+
+  .work:hover h3 {
+    color: var(--accent-ink);
+  }
+
+  .lead {
+    grid-column: 1 / -1;
+    grid-template-columns: minmax(0, 1fr) minmax(0, 1fr);
+    align-items: center;
+    padding: clamp(20px, 4vw, 44px);
+  }
+
+  .lead-shots {
+    display: grid;
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+    gap: 16px;
+    max-width: 380px;
+    justify-self: center;
+    width: 100%;
+  }
+
+  .lead-shots > :global(*:last-child) {
+    margin-top: 40px;
+  }
+
+  .work-text p {
+    margin: 0;
+  }
+
+  .work h3 {
+    margin: 8px 0 6px;
+    font-size: clamp(24px, 2.8vw, 32px);
+    font-weight: 600;
+    line-height: 1.25;
+    transition: color 0.2s;
+  }
+
+  .lead h3 {
+    font-size: clamp(30px, 4vw, 44px);
+  }
+
+  .stat {
+    margin-top: 14px !important;
+    font-size: 20px;
+    font-weight: 600;
+    color: var(--accent-ink);
+  }
+
+  .more {
+    display: inline-block;
+    margin-top: 18px;
+    font-size: 14px;
+    color: var(--ink-2);
+  }
+
+  .small {
+    font-size: 13px;
+  }
+
+  .two {
+    display: grid;
+    grid-template-columns: minmax(0, 1fr) minmax(0, 1fr);
+    gap: clamp(32px, 6vw, 80px);
+  }
+
+  .now,
+  .notes {
+    margin: 0;
+    padding: 0;
+    list-style: none;
+  }
+
+  .now li {
+    padding: 10px 0;
+    border-bottom: 1px dashed var(--line);
+    font-size: 15px;
+  }
+
+  .notes a {
+    display: flex;
+    justify-content: space-between;
+    align-items: baseline;
+    gap: 16px;
+    padding: 10px 0;
+    border-bottom: 1px dashed var(--line);
+  }
+
+  .nt {
+    font-size: 17px;
+    font-weight: 600;
+    transition: color 0.2s;
+  }
+
+  .notes a:hover .nt {
+    color: var(--accent-ink);
+  }
+
+  .nd {
+    flex-shrink: 0;
+    font-family: var(--mono);
+    font-size: 12px;
+    color: var(--ink-3);
+  }
+
+  @media (max-width: 760px) {
+    .works,
+    .lead,
+    .two {
+      grid-template-columns: minmax(0, 1fr);
+    }
+    .lead-shots {
+      max-width: 300px;
+    }
+  }
+</style>
