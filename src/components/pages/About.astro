@@ -1,6 +1,7 @@
 ---
 import Base from '../../layouts/Base.astro';
 import Placeholder from '../Placeholder.astro';
+import { rich } from '../../lib/rich';
 import type { Content } from '../../i18n/zh';
 
 interface Props {
@@ -16,7 +17,7 @@ const a = t.about;
     <div class="photo reveal"><Placeholder kind="photo" label={a.photo} lang={t.lang} /></div>
     <div>
       <h1 class="h-display">{a.name}</h1>
-      {a.bio.map((p) => <p class="bio">{p}</p>)}
+      {a.bio.map((p) => <p class="bio" set:html={rich(p)} />)}
       <div class="life">
         {a.lifeShots.map((s) => <Placeholder kind="wide" label={s} lang={t.lang} />)}
       </div>
@@ -36,7 +37,15 @@ const a = t.about;
           <li>
             <time>{e.t}</time>
             <div>
-              <h3 class="serif">{e.org}</h3>
+              <h3 class="serif">
+                {e.href ? (
+                  <a class="org" href={e.href} target={e.href.startsWith('http') ? '_blank' : undefined} rel="noopener">
+                    {e.org} <span aria-hidden="true">{e.href.startsWith('http') ? '↗' : '→'}</span>
+                  </a>
+                ) : (
+                  e.org
+                )}
+              </h3>
               <p class="role">{e.role}</p>
               {e.pts.length > 0 && (
                 <ul>
@@ -153,6 +162,17 @@ const a = t.about;
     margin: 0;
     font-size: 21px;
     font-weight: 600;
+  }
+
+  .org span {
+    font-size: 0.7em;
+    color: var(--ink-3);
+    transition: color 0.2s;
+  }
+
+  .org:hover,
+  .org:hover span {
+    color: var(--accent-ink);
   }
 
   .role {

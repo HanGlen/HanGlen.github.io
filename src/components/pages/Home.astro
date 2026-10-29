@@ -1,7 +1,7 @@
 ---
 import { getCollection } from 'astro:content';
 import Base from '../../layouts/Base.astro';
-import Placeholder from '../Placeholder.astro';
+import Section from '../Section.astro';
 import Heatmap from '../Heatmap.astro';
 import type { Content } from '../../i18n/zh';
 
@@ -20,164 +20,154 @@ const [lead, ...rest] = t.work;
 
 <Base lang={t.lang} title={h.title} description={h.description}>
   <section class="wrap hero">
-    <p class="hello reveal">{h.hello}</p>
-    <h1 class="h-display reveal">{h.line}</h1>
-    <ul class="tags reveal">
-      {h.tags.map((x) => <li>{x}</li>)}
-    </ul>
-    <a class="open reveal" href={`${base}/about/#cv`}>
-      <span class="pulse" aria-hidden="true"></span>
-      {h.open}
-      <span class="arrow">{h.openLink} →</span>
-    </a>
-  </section>
-
-  <section class="wrap section" id="work">
-    <div class="section-head">
-      <h2 class="eyebrow">{h.workTitle}</h2>
+    <p class="eyebrow reveal">{h.hello}</p>
+    <h1 class="reveal">{h.line}</h1>
+    <p class="sub reveal">{h.sub}</p>
+    <div class="cta reveal">
+      <a class="btn primary" href={`${base}/work/dnd/#case`}>{h.cta} →</a>
+      <a class="btn" href={`${base}/about/#cv`}>{h.openLink}</a>
+      <span class="open"><span class="pulse" aria-hidden="true"></span>{h.open}</span>
     </div>
-    <div class="works">
-      <a class="work lead reveal" href={`${base}/work/${lead.slug}/`}>
-        <div class="work-text">
-          <p class="eyebrow">{lead.kind}</p>
-          <h3 class="serif">{lead.name}</h3>
-          <p class="muted">{lead.line}</p>
-          <p class="stat serif">{lead.stat}</p>
-          <span class="more">{t.ui.readMore} →</span>
-        </div>
-        <div class="lead-shots">
-          <img class="phone" src={lead.shot} alt="" loading="lazy" width="455" height="983" />
-          <img class="phone" src={lead.shot2} alt="" loading="lazy" width="455" height="983" />
-        </div>
-      </a>
+    <dl class="proof reveal">
       {
-        rest.map((w) => (
-          <a class="work reveal" href={`${base}/work/${w.slug}/`}>
-            {w.shot ? (
-              <img class="wide" src={w.shot} alt="" loading="lazy" />
-            ) : (
-              <Placeholder kind="wide" label={zh ? '短片画面' : 'Episode still'} lang={t.lang} />
-            )}
-            <div class="work-text">
-              <p class="eyebrow">{w.kind}</p>
-              <h3 class="serif">{w.name}</h3>
-              <p class="muted">{w.line}</p>
-              <p class="stat serif">{w.stat}</p>
-            </div>
-          </a>
-        ))
-      }
-    </div>
-  </section>
-
-  <section class="wrap section">
-    <div class="section-head">
-      <h2 class="eyebrow">{h.statsTitle}</h2>
-      <span class="small muted">{h.statsNote}</span>
-    </div>
-    <dl class="usage reveal">
-      {
-        t.usage.map((u) => (
+        h.proof.map((p) => (
           <div>
-            <dd class="serif">{u.v}</dd>
-            <dt>{u.k}</dt>
+            <dd>{p.v}</dd>
+            <dt>{p.k}</dt>
           </div>
         ))
       }
     </dl>
   </section>
 
-  <section class="wrap section">
-    <div class="section-head">
-      <h2 class="eyebrow">{h.heatTitle}</h2>
-      <a class="link small" href={`${base}/work/dnd/#pipeline`}>{h.heatMore} →</a>
-    </div>
-    <div class="reveal"><Heatmap lang={t.lang} compact /></div>
-  </section>
+  <Section no="01" title={h.workTitle} lead={h.workLead} id="work">
+    <a class="feature reveal" href={`${base}/work/${lead.slug}/`}>
+      <div class="f-text">
+        <p class="eyebrow">{lead.kind}</p>
+        <h3>{lead.name}</h3>
+        <p class="muted">{lead.line}</p>
+        <p class="stat">{lead.stat}</p>
+        <span class="more">{t.ui.readMore} →</span>
+      </div>
+      <div class="f-shots" aria-hidden="true">
+        <img src={lead.shot} alt="" loading="lazy" width="455" height="983" />
+        <img src={lead.shot2} alt="" loading="lazy" width="455" height="983" />
+      </div>
+    </a>
+    {
+      rest.map((w) => (
+        <a class="row reveal" href={`${base}/work/${w.slug}/`}>
+          <img src={w.shot} alt="" loading="lazy" />
+          <div>
+            <p class="eyebrow">{w.kind}</p>
+            <h3>{w.name}</h3>
+            <p class="muted">{w.line}</p>
+            <p class="stat">{w.stat}</p>
+          </div>
+        </a>
+      ))
+    }
+  </Section>
 
-  <section class="wrap section two">
-    <div class="reveal">
-      <div class="section-head">
-        <h2 class="eyebrow">{h.nowTitle}</h2>
-        <a class="link small" href={`${base}/now/`}>{h.nowMore} →</a>
-      </div>
-      <ul class="now">
-        {t.now.short.map((x) => <li>{x}</li>)}
-      </ul>
-    </div>
-    <div class="reveal">
-      <div class="section-head">
-        <h2 class="eyebrow">{h.notesTitle}</h2>
-        <a class="link small" href={`${base}/notes/`}>{h.notesMore} →</a>
-      </div>
-      <ul class="notes">
-        {
-          notes.map((n) => (
-            <li>
-              <a href={`/notes/${n.id}/`}>
-                <span class="nt serif">{n.data.title}</span>
-                <span class="nd">{fmt(n.data.date)}</span>
-              </a>
-            </li>
-          ))
-        }
-      </ul>
-    </div>
-  </section>
+  <Section no="02" title={h.heatTitle} lead={h.dataLead}>
+    <div class="panel reveal"><Heatmap lang={t.lang} compact /></div>
+    <a class="link small" href={`${base}/work/dnd/#case`}>{h.heatMore} →</a>
+  </Section>
+
+  <Section no="03" title={h.nowTitle}>
+    <ul class="now reveal">
+      {t.now.short.map((x) => <li>{x}</li>)}
+    </ul>
+    <a class="link small" href={`${base}/now/`}>{h.nowMore} →</a>
+  </Section>
+
+  <Section no="04" title={h.notesTitle}>
+    <ul class="notes reveal">
+      {
+        notes.map((n) => (
+          <li>
+            <a href={`/notes/${n.id}/`}>
+              <span class="nt">{n.data.title}</span>
+              <span class="nd">{fmt(n.data.date)}</span>
+            </a>
+          </li>
+        ))
+      }
+    </ul>
+    <a class="link small" href={`${base}/notes/`}>{h.notesMore} →</a>
+  </Section>
 </Base>
 
 <style>
   .hero {
-    padding-top: clamp(56px, 11vw, 140px);
-  }
-
-  .hello {
-    margin: 0 0 14px;
-    font-size: 18px;
-    color: var(--ink-2);
+    padding-top: clamp(64px, 12vw, 160px);
   }
 
   h1 {
-    max-width: 15em;
+    margin: 18px 0 0;
+    font-family: var(--serif);
+    font-weight: 600;
+    font-size: clamp(42px, 8vw, 96px);
+    line-height: 1.06;
+    letter-spacing: -0.03em;
+    max-width: 12em;
+    white-space: pre-line;
   }
 
-  :lang(en) h1 {
-    max-width: 18ch;
+  :lang(zh-CN) h1 {
+    letter-spacing: -0.01em;
+    font-size: clamp(30px, 8.2vw, 88px);
   }
 
-  .tags {
-    margin: 26px 0 0;
-    padding: 0;
-    list-style: none;
+  .sub {
+    margin: 28px 0 0;
+    max-width: 34em;
+    font-size: clamp(17px, 1.8vw, 20px);
+    line-height: 1.7;
+    color: var(--ink-2);
+  }
+
+  .cta {
+    margin-top: 36px;
     display: flex;
     flex-wrap: wrap;
-    gap: 4px 0;
-    color: var(--ink-2);
-    font-size: 16px;
+    align-items: center;
+    gap: 12px 14px;
   }
 
-  .tags li:not(:last-child)::after {
-    content: '·';
-    margin: 0 12px;
-    color: var(--ink-3);
+  .btn {
+    display: inline-flex;
+    align-items: center;
+    height: 46px;
+    padding: 0 22px;
+    border-radius: 999px;
+    border: 1px solid var(--line-2);
+    font-size: 15px;
+    transition: transform 0.2s, background 0.2s, border-color 0.2s;
+  }
+
+  .btn:hover {
+    transform: translateY(-1px);
+    border-color: var(--ink-3);
+  }
+
+  .primary {
+    background: var(--accent);
+    border-color: var(--accent);
+    color: #fff;
+  }
+
+  .primary:hover {
+    background: var(--accent-ink);
+    border-color: var(--accent-ink);
   }
 
   .open {
-    margin-top: 32px;
     display: inline-flex;
-    flex-wrap: wrap;
     align-items: center;
-    gap: 6px 10px;
-    padding: 10px 16px;
-    border-radius: 999px;
-    border: 1px solid var(--line-2);
-    background: var(--card);
+    gap: 8px;
     font-size: 14px;
-    transition: border-color 0.2s;
-  }
-
-  .open:hover {
-    border-color: var(--accent);
+    color: var(--ink-2);
   }
 
   .pulse {
@@ -188,119 +178,73 @@ const [lead, ...rest] = t.work;
     box-shadow: 0 0 0 4px rgba(63, 155, 98, 0.18);
   }
 
-  .arrow {
-    color: var(--accent-ink);
-  }
-
-  .works {
-    display: grid;
-    grid-template-columns: repeat(2, minmax(0, 1fr));
-    gap: 20px;
-  }
-
-  .work {
-    display: grid;
-    gap: 18px;
-    align-content: start;
-    padding: 18px;
-    border-radius: calc(var(--r) + 6px);
-    border: 1px solid var(--line);
-    background: var(--card);
-    transition: border-color 0.25s, transform 0.25s;
-  }
-
-  .work:hover {
-    border-color: var(--line-2);
-    transform: translateY(-3px);
-  }
-
-  .work:hover h3 {
-    color: var(--accent-ink);
-  }
-
-  .lead {
-    grid-column: 1 / -1;
-    grid-template-columns: minmax(0, 1fr) minmax(0, 1fr);
-    align-items: center;
-    padding: clamp(20px, 4vw, 44px);
-  }
-
-  .lead-shots {
-    display: grid;
-    grid-template-columns: repeat(2, minmax(0, 1fr));
-    gap: 16px;
-    max-width: 380px;
-    justify-self: center;
-    width: 100%;
-  }
-
-  .lead-shots > :last-child {
-    margin-top: 40px;
-  }
-
-  .phone {
-    width: 100%;
-    height: auto;
-    border-radius: 24px;
-    border: 5px solid var(--ink);
-    background: var(--ink);
-    box-shadow: var(--shadow);
-  }
-
-  .wide {
-    width: 100%;
-    aspect-ratio: 16 / 10;
-    object-fit: cover;
-    object-position: top left;
-    border-radius: var(--r);
-    border: 1px solid var(--line);
-  }
-
-  .usage {
-    margin: 0;
+  .proof {
+    margin: clamp(56px, 8vw, 96px) 0 0;
     display: grid;
     grid-template-columns: repeat(4, minmax(0, 1fr));
-    gap: 12px;
+    border-top: 1px solid var(--line-2);
   }
 
-  .usage div {
-    padding: 18px 20px;
-    border-radius: var(--r);
-    background: var(--card);
-    border: 1px solid var(--line);
+  .proof div {
+    padding: 18px 20px 0 0;
   }
 
-  .usage dd {
+  .proof dd {
     margin: 0;
-    font-size: clamp(26px, 3.4vw, 38px);
+    font-family: var(--serif);
+    font-size: clamp(30px, 3.8vw, 46px);
     font-weight: 600;
-    line-height: 1.2;
+    line-height: 1.15;
+    font-variant-numeric: tabular-nums;
   }
 
-  .usage dt {
-    font-size: 13px;
+  .proof dt {
+    margin-top: 4px;
+    font-size: 13.5px;
     color: var(--ink-3);
   }
 
-  .work-text p {
-    margin: 0;
+  .feature {
+    display: grid;
+    grid-template-columns: minmax(0, 1fr) minmax(0, 0.9fr);
+    gap: 24px;
+    align-items: center;
+    padding: clamp(22px, 3vw, 36px);
+    border-radius: 22px;
+    border: 1px solid var(--line);
+    background: var(--card);
+    overflow: hidden;
+    transition: border-color 0.25s, transform 0.25s;
   }
 
-  .work h3 {
-    margin: 8px 0 6px;
-    font-size: clamp(24px, 2.8vw, 32px);
+  .feature:hover,
+  .row:hover {
+    border-color: var(--line-2);
+    transform: translateY(-2px);
+  }
+
+  .feature:hover h3,
+  .row:hover h3 {
+    color: var(--accent-ink);
+  }
+
+  h3 {
+    margin: 8px 0 8px;
+    font-family: var(--serif);
+    font-size: clamp(26px, 3vw, 36px);
     font-weight: 600;
-    line-height: 1.25;
+    line-height: 1.2;
     transition: color 0.2s;
   }
 
-  .lead h3 {
-    font-size: clamp(30px, 4vw, 44px);
+  .f-text p {
+    margin: 0;
   }
 
   .stat {
     margin-top: 14px !important;
-    font-size: 20px;
+    font-family: var(--serif);
+    font-size: 18px;
     font-weight: 600;
     color: var(--accent-ink);
   }
@@ -312,14 +256,70 @@ const [lead, ...rest] = t.work;
     color: var(--ink-2);
   }
 
-  .small {
-    font-size: 13px;
+  .f-shots {
+    display: grid;
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+    gap: 14px;
+    margin-bottom: -60px;
   }
 
-  .two {
+  .f-shots img,
+  .row img {
+    width: 100%;
+    height: auto;
+  }
+
+  .f-shots img {
+    border-radius: 22px;
+    border: 4px solid #1c1a17;
+    background: #1c1a17;
+    box-shadow: var(--shadow);
+  }
+
+  .f-shots img:last-child {
+    margin-top: 48px;
+  }
+
+  .row {
+    margin-top: 16px;
     display: grid;
-    grid-template-columns: minmax(0, 1fr) minmax(0, 1fr);
-    gap: clamp(32px, 6vw, 80px);
+    grid-template-columns: minmax(0, 0.9fr) minmax(0, 1fr);
+    gap: 24px;
+    align-items: center;
+    padding: 18px;
+    border-radius: 22px;
+    border: 1px solid var(--line);
+    background: var(--card);
+    transition: border-color 0.25s, transform 0.25s;
+  }
+
+  .row img {
+    aspect-ratio: 16 / 10;
+    object-fit: cover;
+    object-position: top left;
+    border-radius: 12px;
+    border: 1px solid var(--line);
+  }
+
+  .row p {
+    margin: 0;
+  }
+
+  .row h3 {
+    font-size: clamp(22px, 2.4vw, 28px);
+  }
+
+  .panel {
+    padding: 22px;
+    border-radius: var(--r);
+    border: 1px solid var(--line);
+    background: var(--card);
+  }
+
+  .small {
+    display: inline-block;
+    margin-top: 16px;
+    font-size: 14px;
   }
 
   .now,
@@ -327,12 +327,14 @@ const [lead, ...rest] = t.work;
     margin: 0;
     padding: 0;
     list-style: none;
+    border-top: 1px solid var(--line);
   }
 
   .now li {
-    padding: 10px 0;
-    border-bottom: 1px dashed var(--line);
-    font-size: 15px;
+    padding: 14px 0;
+    border-bottom: 1px solid var(--line);
+    font-family: var(--serif);
+    font-size: 19px;
   }
 
   .notes a {
@@ -340,12 +342,13 @@ const [lead, ...rest] = t.work;
     justify-content: space-between;
     align-items: baseline;
     gap: 16px;
-    padding: 10px 0;
-    border-bottom: 1px dashed var(--line);
+    padding: 14px 0;
+    border-bottom: 1px solid var(--line);
   }
 
   .nt {
-    font-size: 17px;
+    font-family: var(--serif);
+    font-size: 19px;
     font-weight: 600;
     transition: color 0.2s;
   }
@@ -362,16 +365,17 @@ const [lead, ...rest] = t.work;
   }
 
   @media (max-width: 760px) {
-    .usage {
+    .proof {
       grid-template-columns: repeat(2, minmax(0, 1fr));
+      row-gap: 10px;
     }
-    .works,
-    .lead,
-    .two {
+    .feature,
+    .row {
       grid-template-columns: minmax(0, 1fr);
     }
-    .lead-shots {
-      max-width: 300px;
+    .f-shots {
+      max-width: 320px;
+      margin: 0 auto -80px;
     }
   }
 </style>

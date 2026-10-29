@@ -6,15 +6,25 @@ export const en: Content = {
   home: {
     title: 'Ruihan Li',
     description: 'Ruihan Li built a tabletop RPG mini program used by 14,000 people. Today most of its code is written by AI.',
-    hello: "Hi, I'm Ruihan Li.",
-    line: 'I built a tabletop RPG app that 14,000 people have used. Most of its code is now written by AI: 555 pull requests merged last month.',
+    hello: 'Ruihan Li · AI application engineer',
+    line: 'One person.\nAn AI engineering team.',
+    sub: 'I built a tabletop RPG mini program that 14,000 people have used. Since June its code has been written by AI (Claude, Codex and others); I handle ideas, plans and releases.',
+    proof: [
+      { v: '1,326', k: 'PRs written and merged by AI' },
+      { v: '555', k: 'merged in the last 30 days' },
+      { v: '2.5 h', k: 'from player feedback to merged fix' },
+      { v: '13.9k', k: 'total visitors' },
+    ],
+    cta: 'See how it runs',
     tags: ['B.Eng. & M.Eng., Xidian University', 'Ex-BYD backend', 'D&D player'],
     open: 'Looking for roles in AI applications and AI engineering',
     openLink: 'CV',
     workTitle: 'Work',
+    workLead: 'A product running today, a full-stack graduate project, and a content experiment.',
+    dataLead: 'Since June 2026. Each square is a day; darker means more merged PRs.',
     statsTitle: 'The mini program today',
     statsNote: 'As of 2026-10-23, exported from the WeChat console',
-    heatTitle: 'Pull requests merged per day (since June 2026)',
+    heatTitle: 'PRs merged per day',
     heatMore: 'Where these PRs come from',
     nowTitle: 'Now',
     nowMore: 'More',
@@ -45,9 +55,9 @@ export const en: Content = {
       slug: 'tavern',
       name: 'Dawn Tavern',
       kind: 'Tabletop animation channel · 2026',
-      stat: 'Every episode in Chinese and English',
-      line: 'The same AI team setup, used for short videos.',
-      shot: '',
+      stat: 'Script, art, voice and edit split across AIs',
+      line: 'The same AI team setup, used for tabletop short videos.',
+      shot: '/shots/tavern/cover.jpg',
       shot2: '',
     },
   ],
@@ -60,7 +70,7 @@ export const en: Content = {
     items: [
       { tag: 'App', text: 'Session scheduling: the DM offers a few times, players vote, and the result can be pasted into the group chat. Backend done, frontend in progress.' },
       { tag: 'AI', text: 'Splitting work more finely: Codex on backend only, Claude on frontend and planning. Throughput is now limited by compute, not by ideas; 99 requests are waiting in the queue.' },
-      { tag: 'Video', text: 'Editing Dawn Tavern episode 3: a rough cut with old assets first to check timing, then decide what new art to make.' },
+      { tag: 'Video', text: 'Running a tabletop animation channel, Dawn Tavern, with script, art, voice and editing split across AIs. Episode 3 is in editing.' },
       { tag: 'Work', text: 'Looking for roles in AI applications and AI engineering.' },
     ],
     short: ['Scheduling: backend done, frontend next', 'Dawn Tavern episode 3 in editing', 'Looking for AI application / engineering roles'],
@@ -106,10 +116,10 @@ export const en: Content = {
     usageSource: 'Data from the WeChat console and We Analytics, as of 2026-10-23.',
 
     roleTitle: 'What I do in it',
-    roleBody: 'I only work at the two ends. Triage, planning, coding, testing, review and merging in between are done by AI.',
+    roleBody: 'I only work at the two ends. Everything from triage to merge is AI.',
     roleStart: { k: 'start', v: ['Ideas', 'Approve plans'] },
     roleMid: { k: 'AI', v: ['Triage', 'Plan', 'Code', 'Checks', 'Review', 'Merge'] },
-    roleEnd: { k: 'end', v: ['Release by hand'] },
+    roleEnd: { k: 'end', v: ['Weekday evening release'] },
     agents: [
       { k: 'Grok', v: 'reads player feedback, files the real ones' },
       { k: 'Claude', v: 'plans, UI, frontend' },
@@ -119,26 +129,74 @@ export const en: Content = {
     ],
 
     caseTitle: 'How one piece of player feedback got fixed',
-    caseBody: 'On October 29 a player said "Inspiration" on the character sheet was mistranslated. Here is everything from issue to merge. No human touched it.',
+    caseBody: 'On October 29 a player reported that "Inspiration" on the character sheet was mistranslated. Two and a half hours from issue to merge, with no human involved.',
     quote: 'The translation is wrong: 灵感 should be 激励.',
     quoteWho: "Player's words (translated)",
+    relayHint: 'Click each step to see the original record it left behind.',
     relay: [
-      { t: '08:50', who: 'Grok', role: 'ai', v: 'Reads the feedback, checks it, files issue #2593', d: '' },
-      { t: '10:58', who: 'Claude', role: 'ai', v: 'A scheduled run picks it up', d: 'queued 2h' },
-      { t: '10:59', who: 'Claude', role: 'ai', v: 'Fixes the button, toast and aria label, scans the repo, opens PR #2598', d: '1 min' },
-      { t: '11:00', who: 'Codex', role: 'ai', v: 'Code review, no findings', d: '1 min' },
-      { t: '11:15', who: 'CI', role: 'gate', v: 'Tests and gates pass', d: '15 min' },
-      { t: '11:21', who: 'Cursor', role: 'ai', v: 'Sees all checks green, merges; issue closes itself', d: '6 min' },
-      { t: 'Later', who: 'Me', role: 'me', v: 'Release by hand with other changes', d: '' },
+      {
+        t: '08:50', who: 'Grok', role: 'ai', v: 'Checks the report, files an issue', d: '',
+        detail: {
+          kind: 'issue', head: 'Issue filed by Grok (translated)', ref: '#2593',
+          lines: [
+            '"The translation is wrong: 灵感 should be 激励."',
+            '[Actual] character-sheet/index.wxml lines 94 and 178 use 灵感.',
+            '[Judgment] Valid, copy-only, low impact, P2.',
+            '[Careful] Feat names like 舞动灵感 are official; do not change them.',
+          ],
+          aside: 'It even wrote down what must not be changed.',
+        },
+      },
+      {
+        t: '10:58', who: 'Claude', role: 'ai', v: 'Scheduled run claims it', d: '2 h',
+        detail: {
+          kind: 'comment', head: 'Claim comment by Claude Opus (translated)', ref: '#2593',
+          lines: ['Claimed: this run will unify the Inspiration translation on the character sheet to 激励 and scan the repo for other mistranslations (keeping existing feat names like 舞动灵感).'],
+          aside: 'The two hours were queue time until the next scheduled run.',
+        },
+      },
+      {
+        t: '10:59', who: 'Claude', role: 'ai', v: 'Edits code, opens PR', d: '1 min',
+        detail: {
+          kind: 'diff', head: 'Changes in the PR (excerpt)', ref: 'PR #2598',
+          diff: [
+            { file: 'pkgCharacter/pages/character-sheet/index.wxml', rows: [['-', '<text class="sh-act-text">灵感</text>'], ['+', '<text class="sh-act-text">激励</text>']] },
+            { file: 'pkgCharacter/pages/character-sheet/index.js', rows: [['-', "title: cur ? '移除灵感' : '获得灵感！'"], ['+', "title: cur ? '移除激励' : '获得激励！'"]] },
+          ],
+          aside: 'It found one more 灵感 in a cloud-function comment and left it alone: changing it would trigger a pointless cloud deployment.',
+        },
+      },
+      {
+        t: '11:00', who: 'Codex', role: 'ai', v: 'Code review', d: '1 min',
+        detail: {
+          kind: 'checks', head: 'Codex review', ref: 'PR #2598',
+          checks: [['Code Review · 4c1a2e6', 'ok', 'no findings']],
+          aside: 'Claude wrote it, Codex reviewed it. No model reviews its own work.',
+        },
+      },
+      {
+        t: '11:15', who: 'CI', role: 'gate', v: 'Tests and gates', d: '15 min',
+        detail: {
+          kind: 'checks', head: 'GitHub Actions', ref: 'PR #2598',
+          checks: [['probe-fallback', 'ok', '10 s'], ['test (183 checks)', 'ok', '15 m 52 s'], ['gate', 'ok', '15 s']],
+        },
+      },
+      {
+        t: '11:21', who: 'Cursor', role: 'ai', v: 'Auto-merge', d: '6 min',
+        detail: {
+          kind: 'checks', head: 'Merge and close', ref: 'dev',
+          checks: [['Cursor Automation: maintain & auto-merge PR', 'ok', '11:21'], ['close-linked-issues → #2593 closed', 'ok', '11:28']],
+        },
+      },
+      {
+        t: 'Evening', who: 'Me', role: 'me', v: 'Release', d: '',
+        detail: {
+          kind: 'note', head: 'Weekday evening release', ref: 'changes/unreleased',
+          lines: ["The player-facing note in the PR is rolled into that day's release notes:", '"Character sheet: 灵感 button renamed to the official 激励."'],
+          aside: 'This is the only step in the whole flow I do by hand.',
+        },
+      },
     ],
-    issueCard: {
-      who: 'Issue filed by Grok (excerpt, translated)',
-      lines: [
-        '[Actual] character-sheet/index.wxml lines 94 and 178 use 灵感.',
-        '[Careful] Feat names like 舞动灵感 are official; do not change them.',
-      ],
-    },
-
     trendTitle: 'More PRs every month',
     trendBody: 'Merged PRs per month. 555 in the last 30 days, 214 in the busiest week. 99 requests are still waiting: the bottleneck is compute, not ideas.',
 
@@ -173,7 +231,7 @@ export const en: Content = {
     description: 'A graduate project with the Fourth Military Medical University: desktop, cloud, web and mobile software for physiological signals.',
     kind: 'Graduate project · 2022 – 2025 · technical lead',
     name: 'Bio-signal Analysis Platform',
-    line: 'A Xidian × Fourth Military Medical University project. A wristband records ECG, pulse and skin conductance; I wrote all the software: desktop, cloud, web and mobile.',
+    line: 'A [Xidian](https://www.xidian.edu.cn) × [Fourth Military Medical University](https://www.fmmu.edu.cn) project. A wristband records ECG, pulse and skin conductance; I wrote all the software: desktop, cloud, web and mobile.',
     stats: [
       { v: '3', k: 'software copyrights' },
       { v: '3rd prize', k: 'national BME competition' },
@@ -209,21 +267,30 @@ export const en: Content = {
 
   tavern: {
     title: 'Dawn Tavern · Ruihan Li',
-    description: 'A tabletop-themed motion-comic channel where different AIs write, draw, voice and edit.',
+    description: 'A tabletop-themed animation channel where different AIs write, draw, voice and edit.',
     kind: 'Animation channel · 2026 · experiment',
     name: 'Dawn Tavern',
-    line: 'A tabletop-themed motion-comic channel. I reused the AI team setup from the mini program.',
+    line: 'A tabletop-themed animation channel set in the Dawn Tavern, in a fictional town on Faerûn. Characters, money and timelines are kept as consistent as a real adventure module. For production I reused the AI team setup from the mini program.',
+    hero: '/shots/tavern/cover.jpg',
+    heroCap: 'Cover of episode 1, "The Dawn Tavern opens today"',
     s1: 'Who does what',
+    s1Lead: 'As with the mini program, I only pick topics and review cuts.',
     roles: [
       { k: 'Claude', v: 'topics, scripts, storyboards, editing' },
-      { k: 'Codex', v: 'art, and text-to-speech on my machine' },
-      { k: 'Me', v: 'pick topics, watch the cut' },
+      { k: 'Codex', v: 'characters and scenes; voices with Qwen3-TTS on my machine' },
+      { k: 'Me', v: 'pick topics, review rough and final cuts' },
     ],
     s2: 'Five gates per episode',
+    s2Lead: 'Once the script is locked, a rough cut with old assets checks timing and jokes before any new art is drawn. Every episode ships in Chinese and English, with automated QC before delivery.',
     gates: ['Topic', 'Script', 'Animatic', 'Assets', 'Final cut'],
-    gatesNote: 'Once the script is locked, a rough cut with old assets checks timing and jokes before any new art is made. Every episode ships in Chinese and English, with an automated QC script before delivery.',
-    shots: ['Episode 1 still', 'Episode 2 still', 'Storyboard & asset board'],
-    video: 'Final cut',
+    s3: 'Visuals',
+    gallery: [
+      { src: '/shots/tavern/cast.jpg', cap: 'Main cast reference', wide: true },
+      { src: '/shots/tavern/frame-hook.jpg', cap: 'Episode 1 key frame', wide: false },
+      { src: '/shots/tavern/frame-door.jpg', cap: 'Walking in', wide: false },
+      { src: '/shots/tavern/trpg-cover.jpg', cap: 'Episode 2, "What is a TTRPG in one minute"', wide: false },
+      { src: '/shots/tavern/sheet.jpg', cap: 'Episode 2 storyboard sheet', wide: false },
+    ],
   },
 
   about: {
@@ -232,8 +299,8 @@ export const en: Content = {
     name: 'Ruihan Li',
     photo: 'Portrait',
     bio: [
-      'B.Eng. in Electronic Information Engineering and M.Eng. in Electronic Information, both from Xidian University. I wrote Java backends at Huawei OD and spent a year as a senior systems engineer at BYD.',
-      'In 2022 I started a tabletop RPG mini program. Since June 2026 AI agents maintain it; I bring ideas, approve plans and ship releases.',
+      'B.Eng. in Electronic Information Engineering and M.Eng. in Electronic Information, both from [Xidian University](https://www.xidian.edu.cn). I wrote Java backends at Huawei OD and spent a year as a senior systems engineer at [BYD](https://www.byd.com).',
+      'In 2022 I started a tabletop RPG mini program, the [D&D Assistant](/en/work/dnd/). Since June 2026 AI agents maintain it; I bring ideas, approve plans and ship releases.',
       'I play D&D, own a Bambu Lab 3D printer, and run a small tabletop animation channel.',
     ],
     lifeShots: ['At the table', '3D prints'],
@@ -241,11 +308,11 @@ export const en: Content = {
     print: 'Print / save as PDF',
     open: 'Looking for roles in AI applications and AI engineering.',
     exp: [
-      { t: '2025.07 – 2026.07', org: 'BYD Company Limited', role: 'Senior Systems Engineer', pts: ['Backend of the global quality management system, millions of users', 'Group- and division-level OA workflows, 20%+ efficiency gain', 'Cut several slow APIs from ~10 s to under 2 s', 'Owned the color-matching module: 30+ APIs from build to launch', 'Brought AI tools such as Trae into the team, with shared skills and guidelines'] },
-      { t: '2022.07 – now', org: 'Lathander D&D Assistant', role: 'Own project', pts: ['13.9k total visitors, 252 daily active (30-day average)', 'Built a multi-agent dev workflow: 1,326 PRs merged in 4.5 months', 'Paid features live; AI text and image items run at 78%+ gross margin'] },
-      { t: '2022.09 – 2025.06', org: 'Xidian University', role: 'M.Eng., Electronic Information', pts: ['Technical lead of a project with the Fourth Military Medical University, 3 software copyrights', 'Third Prize, graduate track, National BME Innovation Design Competition'] },
+      { t: '2025.07 – 2026.07', org: 'BYD Company Limited', href: 'https://www.byd.com', role: 'Senior Systems Engineer', pts: ['Backend of the global quality management system, millions of users', 'Group- and division-level OA workflows, 20%+ efficiency gain', 'Cut several slow APIs from ~10 s to under 2 s', 'Owned the color-matching module: 30+ APIs from build to launch', 'Brought AI tools such as Trae into the team, with shared skills and guidelines'] },
+      { t: '2022.07 – now', org: 'Lathander D&D Assistant', href: '/en/work/dnd/', role: 'Own project', pts: ['13.9k total visitors, 252 daily active (30-day average)', 'Built a multi-agent dev workflow: 1,326 PRs merged in 4.5 months', 'Paid features live; AI text and image items run at 78%+ gross margin'] },
+      { t: '2022.09 – 2025.06', org: 'Xidian University', href: 'https://www.xidian.edu.cn', role: 'M.Eng., Electronic Information', pts: ['Technical lead of a project with the Fourth Military Medical University, 3 software copyrights', 'Third Prize, graduate track, National BME Innovation Design Competition'] },
       { t: '2021.04 – 2021.09', org: 'FESCO Adecco (Huawei OD)', role: 'Java Developer', pts: ['Backend development and integration testing for Huawei'] },
-      { t: '2016.09 – 2020.06', org: 'Xidian University', role: 'B.Eng., Electronic Information Engineering', pts: [] },
+      { t: '2016.09 – 2020.06', org: 'Xidian University', href: 'https://www.xidian.edu.cn', role: 'B.Eng., Electronic Information Engineering', pts: [] },
     ],
     skillsTitle: 'Skills',
     skills: [

@@ -56,13 +56,18 @@ const { start, mid, end, agents, me } = Astro.props;
   }
 
   .me {
-    border: 2px solid var(--ink);
+    border: 1px solid var(--line-2);
     background: var(--card);
   }
 
   .ai {
-    background: var(--ink);
-    color: var(--bg);
+    border: 1px solid color-mix(in srgb, var(--accent) 35%, transparent);
+    background: var(--accent-soft);
+  }
+
+  .ai .who {
+    color: var(--accent-ink);
+    opacity: 1;
   }
 
   .who {
@@ -98,15 +103,15 @@ const { start, mid, end, agents, me } = Astro.props;
     font-size: 15px;
     padding: 8px 12px;
     border-radius: 10px;
-    background: color-mix(in srgb, var(--bg) 12%, transparent);
-    border: 1px solid color-mix(in srgb, var(--bg) 22%, transparent);
+    background: var(--card);
+    border: 1px solid var(--line);
   }
 
   .ai li::before {
     content: counter(s) ' ';
     font-family: var(--mono);
     font-size: 11px;
-    opacity: 0.6;
+    color: var(--accent-ink);
   }
 
   .arrow {
@@ -124,7 +129,7 @@ const { start, mid, end, agents, me } = Astro.props;
     padding: 0;
     list-style: none;
     display: grid;
-    grid-template-columns: repeat(5, minmax(0, 1fr));
+    grid-template-columns: repeat(auto-fit, minmax(118px, 1fr));
     gap: 10px;
   }
 

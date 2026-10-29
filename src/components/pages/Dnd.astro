@@ -1,6 +1,7 @@
 ---
 import Base from '../../layouts/Base.astro';
 import CaseHeader from '../CaseHeader.astro';
+import Section from '../Section.astro';
 import Heatmap from '../Heatmap.astro';
 import Relay from '../Relay.astro';
 import Roles from '../Roles.astro';
@@ -22,7 +23,7 @@ const base = zh ? '' : '/en';
 <Base lang={t.lang} title={d.title} description={d.description}>
   <CaseHeader kind={d.kind} name={d.name} line={d.line} stats={d.stats} back={t.ui.backHome} backHref={`${base}/`} />
 
-  <section class="wrap section">
+  <section class="wrap shots-wrap">
     <div class="shots reveal">
       {
         d.shots.map((s) => (
@@ -36,75 +37,24 @@ const base = zh ? '' : '/en';
     <p class="fine">{d.shotsNote}</p>
   </section>
 
-  <section class="wrap section">
-    <h2 class="h-section">{d.usageTitle}</h2>
-    <div class="usage reveal">
-      <div class="panel">
-        <UsageChart lang={t.lang} />
-        <p class="fine">{d.usageNote}</p>
-      </div>
-      <dl class="tiles">
-        {
-          d.usageStats.map((s) => (
-            <div>
-              <dd class="serif">{s.v}</dd>
-              <dt>{s.k}</dt>
-            </div>
-          ))
-        }
-      </dl>
+  <Section no="01" title={d.caseTitle} lead={d.caseBody} id="case">
+    <div class="reveal">
+      <Relay legs={d.relay as any} hint={d.relayHint} id="fb" />
     </div>
-    <p class="fine">{d.usageSource}</p>
-  </section>
+  </Section>
 
-  <section class="wrap section">
-    <h2 class="h-section">{d.roleTitle}</h2>
-    <p class="body">{d.roleBody}</p>
-    <div class="reveal gap-top">
+  <Section no="02" title={d.roleTitle} lead={d.roleBody}>
+    <div class="reveal">
       <Roles start={d.roleStart} mid={d.roleMid} end={d.roleEnd} agents={d.agents} me={zh ? '我' : 'Me'} />
     </div>
-  </section>
+  </Section>
 
-  <section class="wrap section" id="pipeline">
-    <h2 class="h-section">{d.caseTitle}</h2>
-    <p class="body">{d.caseBody}</p>
-    <div class="case-top reveal">
-      <blockquote class="quote">
-        <p class="serif">“{d.quote}”</p>
-        <cite>{d.quoteWho}</cite>
-      </blockquote>
-      <article class="card-rec">
-        <header>{d.issueCard.who}</header>
-        {d.issueCard.lines.map((l) => <p>{l}</p>)}
-      </article>
-    </div>
-    <div class="reveal relay-wrap">
-      <Relay legs={d.relay} />
-    </div>
-  </section>
+  <Section no="03" title={d.trendTitle} lead={d.trendBody}>
+    <div class="panel reveal"><MonthlyBars lang={t.lang} /></div>
+    <div class="panel reveal gap-top"><Heatmap lang={t.lang} /></div>
+  </Section>
 
-  <section class="wrap section two">
-    <div>
-      <h2 class="h-section">{d.trendTitle}</h2>
-      <p class="body">{d.trendBody}</p>
-    </div>
-    <div class="panel reveal">
-      <MonthlyBars lang={t.lang} />
-    </div>
-  </section>
-
-  <section class="wrap section">
-    <div class="panel reveal">
-      <Heatmap lang={t.lang} />
-    </div>
-  </section>
-
-  <section class="wrap section two">
-    <div>
-      <h2 class="h-section">{d.dayTitle}</h2>
-      <p class="body">{d.dayBody}</p>
-      <p class="aside-note">{d.dayNote}</p>
-    </div>
+  <Section no="04" title={d.dayTitle} lead={d.dayBody}>
     <ol class="day">
       {
         d.day.map((x) => (
@@ -116,11 +66,25 @@ const base = zh ? '' : '/en';
         ))
       }
     </ol>
-  </section>
+    <p class="aside-note">{d.dayNote}</p>
+  </Section>
 
-  <section class="wrap section">
-    <h2 class="h-section">{d.gateTitle}</h2>
-    <p class="body">{d.gateBody}</p>
+  <Section no="05" title={d.usageTitle} lead={d.usageNote}>
+    <div class="panel reveal"><UsageChart lang={t.lang} /></div>
+    <dl class="tiles reveal">
+      {
+        d.usageStats.map((s) => (
+          <div>
+            <dd>{s.v}</dd>
+            <dt>{s.k}</dt>
+          </div>
+        ))
+      }
+    </dl>
+    <p class="fine">{d.usageSource}</p>
+  </Section>
+
+  <Section no="06" title={d.gateTitle} lead={d.gateBody}>
     <ul class="gates">
       {
         d.gates.map((g) => (
@@ -138,19 +102,12 @@ const base = zh ? '' : '/en';
     <ul class="chips">
       {d.stack.map((s) => <li class="chip">{s}</li>)}
     </ul>
-  </section>
+  </Section>
 
   <NextWork t={t} current="dnd" />
 </Base>
 
 <style>
-  .body {
-    margin: 14px 0 0;
-    max-width: var(--text);
-    font-size: 17px;
-    color: var(--ink-2);
-  }
-
   .fine {
     margin: 12px 0 0;
     font-size: 12.5px;
@@ -158,7 +115,11 @@ const base = zh ? '' : '/en';
   }
 
   .gap-top {
-    margin-top: 28px;
+    margin-top: 16px;
+  }
+
+  .shots-wrap {
+    margin-top: clamp(48px, 7vw, 88px);
   }
 
   .shots {
@@ -169,19 +130,24 @@ const base = zh ? '' : '/en';
 
   .shots figure {
     margin: 0;
+    transition: transform 0.3s;
   }
 
   .shots figure:nth-child(even) {
     margin-top: 28px;
   }
 
+  .shots figure:hover {
+    transform: translateY(-6px);
+  }
+
   .shots img {
     width: 100%;
     height: auto;
     border-radius: 22px;
-    border: 5px solid var(--ink);
+    border: 5px solid #1c1a17;
     box-shadow: var(--shadow);
-    background: var(--ink);
+    background: #1c1a17;
   }
 
   .shots figcaption {
@@ -199,22 +165,15 @@ const base = zh ? '' : '/en';
     min-width: 0;
   }
 
-  .usage {
-    margin-top: 24px;
-    display: grid;
-    grid-template-columns: minmax(0, 1.6fr) minmax(0, 0.7fr);
-    gap: 20px;
-  }
-
   .tiles {
-    margin: 0;
+    margin: 16px 0 0;
     display: grid;
-    grid-template-columns: minmax(0, 1fr);
+    grid-template-columns: repeat(4, minmax(0, 1fr));
     gap: 10px;
   }
 
   .tiles div {
-    padding: 14px 18px;
+    padding: 14px 16px;
     border-radius: var(--r);
     border: 1px solid var(--line);
     background: var(--card);
@@ -222,90 +181,24 @@ const base = zh ? '' : '/en';
 
   .tiles dd {
     margin: 0;
-    font-size: 28px;
+    font-family: var(--serif);
+    font-size: 26px;
     font-weight: 600;
     line-height: 1.2;
   }
 
   .tiles dt {
-    font-size: 13px;
-    color: var(--ink-3);
-  }
-
-  .case-top {
-    margin: 28px 0 36px;
-    display: grid;
-    grid-template-columns: minmax(0, 0.8fr) minmax(0, 1.2fr);
-    gap: 20px;
-    align-items: stretch;
-  }
-
-  .quote {
-    margin: 0;
-    padding: 22px 24px;
-    border-radius: var(--r);
-    background: var(--accent-soft);
-    border-left: 4px solid var(--accent);
-    display: grid;
-    align-content: center;
-    gap: 8px;
-  }
-
-  .quote p {
-    margin: 0;
-    font-size: clamp(22px, 2.6vw, 28px);
-    font-weight: 600;
-    line-height: 1.4;
-  }
-
-  cite {
-    font-style: normal;
-    font-size: 13px;
-    color: var(--ink-3);
-  }
-
-  .card-rec {
-    border-radius: var(--r);
-    border: 1px solid var(--line);
-    background: var(--card);
-    padding: 0 0 8px;
-    overflow: hidden;
-    font-size: 14px;
-    color: var(--ink-2);
-  }
-
-  .card-rec header {
-    padding: 10px 16px;
     font-size: 12.5px;
-    font-weight: 600;
-    background: var(--bg-2);
-    color: var(--ink);
-  }
-
-  .card-rec p {
-    margin: 10px 16px 0;
-    font-family: var(--mono);
-    font-size: 12.5px;
-    line-height: 1.7;
-  }
-
-  .relay-wrap {
-    padding: 8px 0 0;
-  }
-
-  .two {
-    display: grid;
-    grid-template-columns: minmax(0, 0.85fr) minmax(0, 1.15fr);
-    gap: clamp(24px, 5vw, 64px);
-    align-items: start;
+    color: var(--ink-3);
   }
 
   .aside-note {
-    margin: 22px 0 0;
+    margin: 24px 0 0;
     padding: 14px 16px;
     border-radius: 12px;
-    background: var(--bg-2);
-    font-size: 14px;
+    border-left: 3px solid var(--accent);
+    background: var(--accent-soft);
+    font-size: 14.5px;
     color: var(--ink-2);
   }
 
@@ -360,11 +253,11 @@ const base = zh ? '' : '/en';
   }
 
   .gates {
-    margin: 24px 0 0;
+    margin: 0;
     padding: 0;
     list-style: none;
     display: grid;
-    grid-template-columns: repeat(4, minmax(0, 1fr));
+    grid-template-columns: repeat(2, minmax(0, 1fr));
     gap: 12px;
   }
 
@@ -387,8 +280,8 @@ const base = zh ? '' : '/en';
     place-items: center;
     border-radius: 50%;
     font-size: 12px;
-    color: var(--bg);
-    background: var(--accent);
+    color: var(--accent-ink);
+    background: var(--accent-soft);
   }
 
   .gates strong {
@@ -398,7 +291,7 @@ const base = zh ? '' : '/en';
   }
 
   .note-link {
-    margin: 28px 0 18px;
+    margin: 24px 0 16px;
     font-size: 15px;
   }
 
@@ -414,15 +307,7 @@ const base = zh ? '' : '/en';
     .shots figure {
       scroll-snap-align: start;
     }
-    .usage,
-    .case-top,
-    .two {
-      grid-template-columns: minmax(0, 1fr);
-    }
     .tiles {
-      grid-template-columns: repeat(2, minmax(0, 1fr));
-    }
-    .gates {
       grid-template-columns: repeat(2, minmax(0, 1fr));
     }
   }

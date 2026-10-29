@@ -1,4 +1,6 @@
 ---
+import { rich } from '../lib/rich';
+
 interface Props {
   kind: string;
   name: string;
@@ -15,7 +17,7 @@ const { kind, name, line, stats, back, backHref } = Astro.props;
   <a class="back" href={backHref}>{back}</a>
   <p class="eyebrow">{kind}</p>
   <h1 class="h-display">{name}</h1>
-  <p class="line">{line}</p>
+  <p class="line" set:html={rich(line)} />
   {
     stats.length > 0 && (
       <dl class="stats">
