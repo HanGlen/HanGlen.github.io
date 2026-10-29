@@ -462,5 +462,14 @@
  "feedbackCase": {
   "issue": 2593,
   "pr": 2598
+ },
+ "feedback": {
+  "source": "HanGlen/dnd-miniprogram「用户反馈」标签的 Issue（不含 PR），截至 2026-10-29",
+  "monthly": { "2026-06": 1, "2026-07": 6, "2026-08": 59, "2026-09": 25, "2026-10": 38 },
+  "total": 129,
+  "completed": 116,
+  "notPlanned": 1,
+  "open": 12,
+  "medianHoursToClose": 19.9
  }
 }
