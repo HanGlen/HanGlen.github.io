@@ -1,5 +1,6 @@
 ---
 import '../styles/global.css';
+import Lightbox from '../components/Lightbox.astro';
 
 type Lang = 'zh' | 'en';
 
@@ -87,6 +88,8 @@ const canonical = new URL(path, Astro.site);
         <li><a href="https://blog.csdn.net/qq_42325493" target="_blank" rel="noopener">CSDN</a></li>
       </ul>
     </footer>
+
+    <Lightbox lang={lang} />
 
     <script>
       const els = document.querySelectorAll('.reveal');

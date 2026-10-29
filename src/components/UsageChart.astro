@@ -25,7 +25,12 @@ const tip = (p: { d: string; uv: number; new: number }) =>
 ---
 
 <figure class="uc">
-  <svg viewBox={`0 0 ${W} ${H}`} role="img" aria-label={zh ? '近 60 天每日活跃用户' : 'Daily active users, last 60 days'}>
+  <svg
+    viewBox={`0 0 ${W} ${H}`}
+    role="img"
+    tabindex="0"
+    aria-label={zh ? '近 60 天每日活跃用户，聚焦后用方向键逐日查看' : 'Daily active users, last 60 days; focus and use arrow keys to step through days'}
+  >
     <rect
       x={x(holiday[0])}
       y={pad.t}
@@ -73,7 +78,7 @@ const tip = (p: { d: string; uv: number; new: number }) =>
     <circle r="4.5" class="dot" cx="-10" cy="-10" />
   </svg>
   <figcaption>
-    <span class="readout" aria-live="polite">{zh ? '鼠标移到图上看每天的数字' : 'Hover to see each day'}</span>
+    <span class="readout" aria-live="polite">{zh ? '鼠标移到图上（手机上按住拖动）看每天的数字' : 'Hover (or drag on mobile) to see each day'}</span>
     <span class="legend">
       <i class="k1"></i>{zh ? '活跃用户' : 'Active users'}
       <i class="k2"></i>{zh ? '新用户' : 'New users'}
@@ -83,20 +88,42 @@ const tip = (p: { d: string; uv: number; new: number }) =>
 
 <script>
   document.querySelectorAll<HTMLElement>('figure.uc').forEach((fig) => {
+    const svg = fig.querySelector<SVGSVGElement>('svg');
     const readout = fig.querySelector<HTMLElement>('.readout');
     const dot = fig.querySelector<SVGCircleElement>('.dot');
-    if (!readout || !dot) return;
+    if (!svg || !readout || !dot) return;
     const initial = readout.textContent;
-    fig.querySelectorAll<SVGRectElement>('.hit').forEach((r) => {
-      r.addEventListener('mouseenter', () => {
-        readout.textContent = r.dataset.tip ?? '';
-        dot.setAttribute('cx', r.dataset.x ?? '-10');
-        dot.setAttribute('cy', r.dataset.y ?? '-10');
-      });
-    });
-    fig.querySelector('svg')?.addEventListener('mouseleave', () => {
+    const hits = [...fig.querySelectorAll<SVGRectElement>('.hit')];
+    let cur = -1;
+    const show = (i: number) => {
+      cur = Math.max(0, Math.min(hits.length - 1, i));
+      const r = hits[cur];
+      readout.textContent = r.dataset.tip ?? '';
+      dot.setAttribute('cx', r.dataset.x ?? '-10');
+      dot.setAttribute('cy', r.dataset.y ?? '-10');
+    };
+    const hide = () => {
+      cur = -1;
       readout.textContent = initial;
       dot.setAttribute('cx', '-10');
+    };
+    // 鼠标和手指拖动都按横坐标找最近的一天
+    svg.addEventListener('pointermove', (e) => {
+      const box = svg.getBoundingClientRect();
+      const first = hits[0].getBoundingClientRect();
+      const step = first.width || box.width / hits.length;
+      show(Math.floor((e.clientX - first.left) / step));
+    });
+    svg.addEventListener('pointerleave', (e) => e.pointerType === 'mouse' && hide());
+    svg.addEventListener('focus', () => cur < 0 && show(hits.length - 1));
+    svg.addEventListener('blur', hide);
+    svg.addEventListener('keydown', (e) => {
+      const d = ({ ArrowRight: 1, ArrowLeft: -1, ArrowUp: 7, ArrowDown: -7 } as Record<string, number>)[e.key];
+      if (e.key === 'Home') show(0);
+      else if (e.key === 'End') show(hits.length - 1);
+      else if (d) show(cur + d);
+      else return;
+      e.preventDefault();
     });
   });
 </script>
@@ -110,6 +137,8 @@ const tip = (p: { d: string; uv: number; new: number }) =>
     display: block;
     width: 100%;
     height: auto;
+    touch-action: pan-y;
+    border-radius: 6px;
   }
 
   .grid {
