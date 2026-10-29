@@ -2,6 +2,7 @@
 import Base from '../../layouts/Base.astro';
 import CaseHeader from '../CaseHeader.astro';
 import Placeholder from '../Placeholder.astro';
+import Section from '../Section.astro';
 import NextWork from '../NextWork.astro';
 import type { Content } from '../../i18n/zh';
 
@@ -17,20 +18,18 @@ const base = t.lang === 'zh' ? '' : '/en';
 <Base lang={t.lang} title={s.title} description={s.description}>
   <CaseHeader kind={s.kind} name={s.name} line={s.line} stats={s.stats} back={t.ui.backHome} backHref={`${base}/`} />
 
-  <section class="wrap section">
+  <section class="wrap hero-wrap">
     <figure class="hero-shot reveal">
       <img src={s.heroShot} alt={s.heroCap} width="1550" height="1020" />
       <figcaption>{s.heroCap}</figcaption>
     </figure>
   </section>
 
-  <section class="wrap section"><div class="first">
-    <h2 class="h-section">{s.s1}</h2>
+  <Section no="01" title={s.s1}>
     <p class="body">{s.s1Body}</p>
-  </div></section>
+  </Section>
 
-  <section class="wrap section">
-    <h2 class="h-section">{s.s2}</h2>
+  <Section no="02" title={s.s2}>
     <ol class="arch reveal">
       {
         s.arch.map((a, i) => (
@@ -46,10 +45,9 @@ const base = t.lang === 'zh' ? '' : '/en';
         ))
       }
     </ol>
-  </section>
+  </Section>
 
-  <section class="wrap section">
-    <h2 class="h-section">{s.s3}</h2>
+  <Section no="03" title={s.s3}>
     <div class="mods">
       {
         s.modules.map((m) => (
@@ -69,10 +67,9 @@ const base = t.lang === 'zh' ? '' : '/en';
         ))
       }
     </div>
-  </section>
+  </Section>
 
-  <section class="wrap section">
-    <h2 class="h-section">{s.s4}</h2>
+  <Section no="04" title={s.s4}>
     <div class="honors reveal">
       <figure class="photo">
         <img src={s.photo} alt={s.photoCap} loading="lazy" width="1080" height="1440" />
@@ -88,12 +85,16 @@ const base = t.lang === 'zh' ? '' : '/en';
     <ul class="chips">
       {s.stack.map((x) => <li class="chip">{x}</li>)}
     </ul>
-  </section>
+  </Section>
 
   <NextWork t={t} current="signal" />
 </Base>
 
 <style>
+  .hero-wrap {
+    margin-top: clamp(48px, 7vw, 88px);
+  }
+
   .hero-shot {
     margin: 0;
   }
@@ -137,12 +138,10 @@ const base = t.lang === 'zh' ? '' : '/en';
     border-radius: var(--r);
   }
 
-  .first {
-    max-width: var(--text);
-  }
+
 
   .body {
-    margin: 16px 0 0;
+    margin: 0;
     font-size: 17px;
     color: var(--ink-2);
   }
@@ -153,7 +152,7 @@ const base = t.lang === 'zh' ? '' : '/en';
     list-style: none;
     display: grid;
     grid-template-columns: repeat(5, minmax(0, 1fr));
-    gap: 24px;
+    gap: 20px;
     counter-reset: l;
   }
 

@@ -1,7 +1,7 @@
 ---
 import Base from '../../layouts/Base.astro';
 import CaseHeader from '../CaseHeader.astro';
-import Placeholder from '../Placeholder.astro';
+import Section from '../Section.astro';
 import NextWork from '../NextWork.astro';
 import type { Content } from '../../i18n/zh';
 
@@ -17,52 +17,79 @@ const base = t.lang === 'zh' ? '' : '/en';
 <Base lang={t.lang} title={v.title} description={v.description}>
   <CaseHeader kind={v.kind} name={v.name} line={v.line} stats={[]} back={t.ui.backHome} backHref={`${base}/`} />
 
-  <section class="wrap section">
-    <div class="video reveal"><Placeholder kind="video" label={v.video} lang={t.lang} /></div>
+  <section class="wrap hero-wrap">
+    <figure class="hero reveal">
+      <img src={v.hero} alt={v.heroCap} width="1600" height="900" />
+      <figcaption>{v.heroCap}</figcaption>
+    </figure>
   </section>
 
-  <section class="wrap section">
-    <h2 class="h-section">{v.s1}</h2>
+  <Section no="01" title={v.s1} lead={v.s1Lead}>
     <ul class="roles">
       {
         v.roles.map((r) => (
           <li class="reveal">
-            <strong class="serif">{r.k}</strong>
-            <span class="muted">{r.v}</span>
+            <strong>{r.k}</strong>
+            <span>{r.v}</span>
           </li>
         ))
       }
     </ul>
-  </section>
+  </Section>
 
-  <section class="wrap section">
-    <h2 class="h-section">{v.s2}</h2>
+  <Section no="02" title={v.s2} lead={v.s2Lead}>
     <ol class="gates reveal">
       {
         v.gates.map((g, i) => (
           <li>
-            <span class="n">{i + 1}</span>
-            <span class="serif">{g}</span>
+            <span class="n">{String(i + 1).padStart(2, '0')}</span>
+            <span class="g">{g}</span>
           </li>
         ))
       }
     </ol>
-    <p class="body">{v.gatesNote}</p>
-    <div class="shots reveal">
-      {v.shots.map((s) => <Placeholder kind="wide" label={s} lang={t.lang} />)}
+  </Section>
+
+  <Section no="03" title={v.s3}>
+    <div class="gallery">
+      {
+        v.gallery.map((g) => (
+          <figure class={`reveal ${g.wide ? 'wide' : ''}`}>
+            <img src={g.src} alt={g.cap} loading="lazy" />
+            <figcaption>{g.cap}</figcaption>
+          </figure>
+        ))
+      }
     </div>
-  </section>
+  </Section>
 
   <NextWork t={t} current="tavern" />
 </Base>
 
 <style>
-  .video {
-    max-width: 900px;
+  .hero-wrap {
+    margin-top: clamp(48px, 7vw, 88px);
+  }
+
+  .hero {
+    margin: 0;
+  }
+
+  .hero img {
+    width: 100%;
+    height: auto;
+    border-radius: var(--r);
+    box-shadow: var(--shadow);
+  }
+
+  figcaption {
+    margin-top: 10px;
+    font-size: 13px;
+    color: var(--ink-3);
   }
 
   .roles {
-    margin: 24px 0 0;
+    margin: 0;
     padding: 0;
     list-style: none;
     display: grid;
@@ -75,74 +102,81 @@ const base = t.lang === 'zh' ? '' : '/en';
     gap: 4px;
     padding: 18px;
     border-radius: var(--r);
-    background: var(--card);
     border: 1px solid var(--line);
+    background: var(--card);
+    font-size: 14px;
+    color: var(--ink-2);
   }
 
   .roles strong {
-    font-size: 22px;
+    font-family: var(--serif);
+    font-size: 21px;
+    color: var(--ink);
   }
 
   .gates {
-    margin: 28px 0 0;
+    margin: 0;
     padding: 0;
     list-style: none;
     display: grid;
     grid-template-columns: repeat(5, minmax(0, 1fr));
-    counter-reset: g;
   }
 
   .gates li {
-    position: relative;
     display: grid;
     gap: 6px;
-    padding: 16px 12px 16px 0;
-    border-top: 3px solid var(--accent);
-    font-size: 20px;
-    font-weight: 600;
+    padding: 14px 10px 0 0;
+    border-top: 3px solid color-mix(in srgb, var(--accent) 35%, var(--bg));
   }
 
-  .gates li + li {
-    border-top-color: color-mix(in srgb, var(--accent) 60%, var(--bg));
-  }
-
-  .gates li:nth-child(n + 3) {
-    border-top-color: color-mix(in srgb, var(--accent) 40%, var(--bg));
-  }
-
-  .gates li:nth-child(n + 5) {
-    border-top-color: var(--ink);
+  .gates li:last-child {
+    border-top-color: var(--accent);
   }
 
   .n {
     font-family: var(--mono);
     font-size: 12px;
-    font-weight: 400;
     color: var(--ink-3);
   }
 
-  .body {
-    margin: 16px 0 0;
-    max-width: var(--text);
-    font-size: 17px;
-    color: var(--ink-2);
+  .g {
+    font-family: var(--serif);
+    font-size: 20px;
+    font-weight: 600;
   }
 
-  .shots {
-    margin-top: 28px;
+  .gallery {
     display: grid;
-    grid-template-columns: repeat(3, minmax(0, 1fr));
+    grid-template-columns: repeat(4, minmax(0, 1fr));
     gap: 16px;
+    align-items: start;
+  }
+
+  .gallery figure {
+    margin: 0;
+  }
+
+  .gallery .wide {
+    grid-column: 1 / -1;
+  }
+
+  .gallery img {
+    width: 100%;
+    height: auto;
+    border-radius: 12px;
+    border: 1px solid var(--line);
   }
 
   @media (max-width: 760px) {
-    .roles,
-    .shots {
+    .roles {
       grid-template-columns: minmax(0, 1fr);
     }
     .gates {
       grid-template-columns: repeat(3, minmax(0, 1fr));
-      row-gap: 8px;
+      row-gap: 12px;
+    }
+    .gallery {
+      grid-template-columns: repeat(2, minmax(0, 1fr));
     }
   }
 </style>
