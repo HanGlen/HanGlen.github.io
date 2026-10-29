@@ -1,9 +1,10 @@
 ---
 import data from '../data/dnd.json';
+import { prTypes } from '../lib/prtype';
 
 interface Props {
   lang: 'zh' | 'en';
-  /** 默认画每月合入的 PR；传入别的按月数据可复用同一种柱状图 */
+  /** 默认画每月合入的 PR（按新功能 / 修复分段）；传入别的按月数据可复用同一种柱状图，不分段 */
   series?: Record<string, number>;
   label?: string;
   note?: string;
@@ -11,26 +12,83 @@ interface Props {
 
 const { lang, series, label: aria, note } = Astro.props;
 const zh = lang === 'zh';
-const months = Object.entries(series ?? (data.monthlyPRs as Record<string, number>));
-const max = Math.max(...months.map(([, n]) => n));
+const L = prTypes[lang];
+const stacked = !series;
+const types = data.monthlyTypes as Record<string, { feat: number; fix: number }>;
+const months = Object.entries(series ?? (data.monthlyPRs as Record<string, number>)).map(([k, n]) => {
+  const { feat = 0, fix = 0 } = (stacked && types[k]) || {};
+  return { k, n, feat, fix, other: n - feat - fix };
+});
+const max = Math.max(...months.map((m) => m.n));
 const EN = ['Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun', 'Jul', 'Aug', 'Sep', 'Oct', 'Nov', 'Dec'];
 const label = (k: string) => (zh ? `${Number(k.slice(5))}月` : EN[Number(k.slice(5)) - 1] ?? k);
+const other = zh ? '其他' : 'Other';
+const tip = (m: (typeof months)[number]) =>
+  !stacked
+    ? zh
+      ? `${label(m.k)}：${m.n}`
+      : `${label(m.k)}: ${m.n}`
+    : zh
+      ? `${label(m.k)}合入 ${m.n} 个：${L.feat} ${m.feat} · ${L.fix} ${m.fix} · ${other} ${m.other}`
+      : `${label(m.k)}: ${m.n} merged · ${m.feat} features · ${m.fix} fixes · ${m.other} other`;
+const initial = stacked
+  ? zh
+    ? '鼠标移到柱子上，看每个月新功能和修复各占多少'
+    : 'Hover a bar to split features from fixes'
+  : zh
+    ? '鼠标移到柱子上看数字'
+    : 'Hover a bar to read it';
+const fine =
+  note ??
+  (zh ? '按提交标题的 feat / fix 前缀分类；10 月统计到 29 日' : 'Split by the feat / fix prefix in each title; October counted through the 29th');
 ---
 
-<figure class="mb">
+<figure class={`mb ${stacked ? '' : 'plain'}`} data-mb>
   <ol class="bars" aria-label={aria ?? (zh ? '每月合入的 PR 数' : 'Merged PRs per month')}>
     {
-      months.map(([k, n], i) => (
-        <li style={`--h:${(n / max) * 100}%`} class={i === months.length - 1 ? 'last' : ''}>
-          <span class="val">{n}</span>
-          <span class="bar" />
-          <span class="m">{label(k)}</span>
+      months.map((m, i) => (
+        <li style={`--h:${(m.n / max) * 100}%`} class={i === months.length - 1 ? 'last' : ''}>
+          <span class="val" aria-hidden="true">{m.n}</span>
+          <button type="button" class="bar" data-tip={tip(m)} aria-label={tip(m)}>
+            <span class="seg other" style={`flex-grow:${m.other}`} />
+            <span class="seg fix" style={`flex-grow:${m.fix}`} />
+            <span class="seg feat" style={`flex-grow:${m.feat}`} />
+          </button>
+          <span class="m" aria-hidden="true">{label(m.k)}</span>
         </li>
       ))
     }
   </ol>
-  <figcaption>{note ?? (zh ? '10 月统计到 29 日' : 'October counted through the 29th')}</figcaption>
+  <figcaption>
+    <span class="readout" aria-live="polite">{initial}</span>
+    {
+      stacked && (
+        <span class="legend" aria-hidden="true">
+          <i class="feat"></i>{L.feat}
+          <i class="fix"></i>{L.fix}
+          <i class="other"></i>{other}
+        </span>
+      )
+    }
+    <span class="fine">{fine}</span>
+  </figcaption>
 </figure>
+
+<script>
+  document.querySelectorAll<HTMLElement>('[data-mb]').forEach((fig) => {
+    const readout = fig.querySelector<HTMLElement>('.readout')!;
+    const initial = readout.textContent;
+    fig.querySelectorAll<HTMLButtonElement>('.bar').forEach((b) => {
+      const show = () => (readout.textContent = b.dataset.tip ?? '');
+      const hide = () => (readout.textContent = initial);
+      b.addEventListener('mouseenter', show);
+      b.addEventListener('focus', show);
+      b.addEventListener('click', show);
+      b.addEventListener('mouseleave', () => document.activeElement !== b && hide());
+      b.addEventListener('blur', hide);
+    });
+  });
+</script>
 
 <style>
   .mb {
@@ -60,20 +118,50 @@ const label = (k: string) => (zh ? `${Number(k.slice(5))}月` : EN[Number(k.slic
   }
 
   .bar {
-    display: block;
+    display: flex;
+    flex-direction: column;
+    width: 100%;
     height: var(--h);
     min-height: 3px;
+    padding: 0;
+    border: 0;
     border-radius: 6px 6px 0 0;
-    background: var(--heat-2);
-    transition: background 0.2s;
+    overflow: hidden;
+    background: none;
+    cursor: pointer;
+    transition: transform 0.2s;
   }
 
-  .last .bar {
+  .bar:hover,
+  .bar:focus-visible {
+    transform: translateY(-3px);
+  }
+
+  .seg {
+    display: block;
+    min-height: 0;
+    flex-basis: 0;
+  }
+
+  .feat {
     background: var(--accent);
   }
 
-  li:hover .bar {
-    background: var(--accent-ink);
+  .fix {
+    background: var(--heat-2);
+  }
+
+  .other {
+    background: var(--heat-1);
+  }
+
+  /* 不分段时画成一种颜色，最后一个月用强调色 */
+  .plain .seg {
+    background: var(--heat-2);
+  }
+
+  .plain .last .seg {
+    background: var(--accent);
   }
 
   .val {
@@ -99,7 +187,35 @@ const label = (k: string) => (zh ? `${Number(k.slice(5))}月` : EN[Number(k.slic
   }
 
   figcaption {
-    margin-top: 36px;
+    margin-top: 40px;
+    display: flex;
+    flex-wrap: wrap;
+    justify-content: space-between;
+    gap: 6px 16px;
+    font-size: 13px;
+    color: var(--ink-2);
+  }
+
+  .legend {
+    display: inline-flex;
+    align-items: center;
+    gap: 5px;
+    font-size: 12px;
+    color: var(--ink-3);
+  }
+
+  .legend i {
+    width: 10px;
+    height: 10px;
+    border-radius: 3px;
+  }
+
+  .legend i:not(:first-child) {
+    margin-left: 8px;
+  }
+
+  .fine {
+    flex-basis: 100%;
     font-size: 12px;
     color: var(--ink-3);
   }

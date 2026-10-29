@@ -1,0 +1,203 @@
+---
+/**
+ * 看大图：给 <img> 加 data-zoom="组名"，点一下放大；同组的图可以用方向键或左右按钮翻。
+ * 说明文字取所在 figure 的 figcaption，没有就用 alt。
+ */
+interface Props {
+  lang: 'zh' | 'en';
+}
+
+const zh = Astro.props.lang === 'zh';
+---
+
+<dialog class="lb" aria-label={zh ? '查看大图' : 'Image viewer'}>
+  <figure>
+    <img alt="" />
+    <figcaption>
+      <span class="cap"></span>
+      <span class="count"></span>
+    </figcaption>
+  </figure>
+  <button type="button" class="nav prev" aria-label={zh ? '上一张' : 'Previous'}>‹</button>
+  <button type="button" class="nav next" aria-label={zh ? '下一张' : 'Next'}>›</button>
+  <button type="button" class="close" autofocus aria-label={zh ? '关闭' : 'Close'}>✕</button>
+</dialog>
+
+<script>
+  const dlg = document.querySelector<HTMLDialogElement>('dialog.lb');
+  const imgs = [...document.querySelectorAll<HTMLImageElement>('img[data-zoom]')];
+  if (dlg && imgs.length) {
+    const big = dlg.querySelector('img')!;
+    const cap = dlg.querySelector<HTMLElement>('.cap')!;
+    const count = dlg.querySelector<HTMLElement>('.count')!;
+    const prev = dlg.querySelector<HTMLButtonElement>('.prev')!;
+    const next = dlg.querySelector<HTMLButtonElement>('.next')!;
+    let group: HTMLImageElement[] = [];
+    let cur = 0;
+    let opener: HTMLElement | null = null;
+
+    const show = (i: number) => {
+      cur = (i + group.length) % group.length;
+      const src = group[cur];
+      big.src = src.currentSrc || src.src;
+      big.alt = src.alt;
+      cap.textContent = src.closest('figure')?.querySelector('figcaption')?.textContent?.trim() || src.alt;
+      count.textContent = group.length > 1 ? `${cur + 1} / ${group.length}` : '';
+      prev.hidden = next.hidden = group.length < 2;
+    };
+
+    imgs.forEach((img) => {
+      img.tabIndex = 0;
+      img.setAttribute('role', 'button');
+      img.setAttribute('aria-haspopup', 'dialog');
+      const open = () => {
+        group = imgs.filter((x) => x.dataset.zoom === img.dataset.zoom);
+        opener = img;
+        show(group.indexOf(img));
+        dlg.showModal();
+      };
+      img.addEventListener('click', open);
+      img.addEventListener('keydown', (e) => {
+        if (e.key === 'Enter' || e.key === ' ') {
+          e.preventDefault();
+          open();
+        }
+      });
+    });
+
+    prev.addEventListener('click', () => show(cur - 1));
+    next.addEventListener('click', () => show(cur + 1));
+    dlg.querySelector('.close')!.addEventListener('click', () => dlg.close());
+    dlg.addEventListener('click', (e) => e.target === dlg && dlg.close());
+    dlg.addEventListener('keydown', (e) => {
+      if (e.key === 'ArrowLeft') show(cur - 1);
+      else if (e.key === 'ArrowRight') show(cur + 1);
+    });
+    dlg.addEventListener('close', () => opener?.focus());
+  }
+</script>
+
+<style>
+  .lb {
+    width: min(1200px, calc(100vw - 32px));
+    max-width: none;
+    max-height: calc(100vh - 32px);
+    padding: 0;
+    border: 0;
+    background: transparent;
+    overflow: visible;
+  }
+
+  .lb::backdrop {
+    background: color-mix(in srgb, var(--bg) 88%, transparent);
+    backdrop-filter: blur(6px);
+    -webkit-backdrop-filter: blur(6px);
+  }
+
+  .lb[open] {
+    animation: lb-in 0.2s ease-out;
+  }
+
+  @keyframes lb-in {
+    from {
+      opacity: 0;
+      transform: scale(0.98);
+    }
+  }
+
+  figure {
+    margin: 0;
+    display: grid;
+    justify-items: center;
+    gap: 12px;
+  }
+
+  img {
+    display: block;
+    max-width: 100%;
+    max-height: calc(100vh - 120px);
+    width: auto;
+    height: auto;
+    border-radius: var(--r);
+    border: 1px solid var(--line);
+    background: var(--card);
+    box-shadow: var(--shadow);
+  }
+
+  figcaption {
+    display: flex;
+    gap: 16px;
+    font-size: 14px;
+    color: var(--ink-2);
+  }
+
+  .count {
+    font-family: var(--mono);
+    font-size: 12px;
+    color: var(--ink-3);
+  }
+
+  button {
+    position: fixed;
+    width: 44px;
+    height: 44px;
+    display: grid;
+    place-items: center;
+    border-radius: 50%;
+    border: 1px solid var(--line-2);
+    background: var(--card);
+    color: var(--ink);
+    font-size: 22px;
+    line-height: 1;
+    cursor: pointer;
+  }
+
+  button:hover {
+    border-color: var(--ink-3);
+  }
+
+  button[hidden] {
+    display: none;
+  }
+
+  .close {
+    top: 16px;
+    right: 16px;
+    font-size: 15px;
+  }
+
+  .prev,
+  .next {
+    top: 50%;
+    transform: translateY(-50%);
+  }
+
+  .prev {
+    left: 16px;
+  }
+
+  .next {
+    right: 16px;
+  }
+
+  @media (max-width: 640px) {
+    .prev,
+    .next {
+      top: auto;
+      bottom: 16px;
+      transform: none;
+    }
+  }
+
+  @media (prefers-reduced-motion: reduce) {
+    .lb[open] {
+      animation: none;
+    }
+  }
+</style>
+
+<style is:global>
+  img[data-zoom] {
+    cursor: zoom-in;
+  }
+</style>

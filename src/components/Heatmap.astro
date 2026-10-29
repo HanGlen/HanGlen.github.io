@@ -1,14 +1,26 @@
 ---
 import data from '../data/dnd.json';
+import { prTypes, type PrType } from '../lib/prtype';
+
+interface Case {
+  date: string;
+  label: string;
+  refs: string;
+  href: string;
+}
 
 interface Props {
   lang: 'zh' | 'en';
+  cases: Case[];
   compact?: boolean;
 }
 
-const { lang, compact = false } = Astro.props;
+const { lang, cases, compact = false } = Astro.props;
 const zh = lang === 'zh';
 const daily = data.daily as Record<string, number>;
+const dailyTypes = data.dailyTypes as Record<string, Partial<Record<PrType, number>>>;
+const labels = prTypes[lang];
+const order = Object.keys(labels) as PrType[];
 
 // 从 2026-06-15（周一）排到数据最后一天，按周成列
 const start = new Date('2026-06-15T00:00:00Z');
@@ -22,6 +34,8 @@ const cols = days[days.length - 1].col + 1;
 const level = (n: number) => (n === 0 ? 0 : n < 5 ? 1 : n < 12 ? 2 : n < 25 ? 3 : 4);
 const total = Object.values(daily).reduce((a, b) => a + b, 0);
 const peak = days.reduce((a, b) => (b.n > a.n ? b : a));
+const caseDates = new Set(cases.map((c) => c.date));
+const initial = cases.find((c) => c.href.endsWith('#case'))?.date ?? peak.date;
 const cell = 13;
 const gap = 3;
 const w = cols * (cell + gap);
@@ -37,28 +51,44 @@ for (const d of days) {
   }
 }
 const fmt = (date: string, n: number) =>
-  zh ? `${date.slice(5).replace('-', '月')}日 · 合入 ${n} 个 PR` : `${date} · ${n} PR${n === 1 ? '' : 's'} merged`;
+  zh ? `${Number(date.slice(5, 7))}月${Number(date.slice(8))}日 · 合入 ${n} 个 PR` : `${date} · ${n} PR${n === 1 ? '' : 's'} merged`;
+
+// 每天各类型的数量；统计口径漏掉的几条算进「其他」
+const breakdown = (date: string, n: number) => {
+  const t = { ...dailyTypes[date] };
+  const counted = Object.values(t).reduce((a, b) => a + (b ?? 0), 0);
+  if (n > counted) t.other = (t.other ?? 0) + n - counted;
+  return order.filter((k) => t[k]).map((k) => [k, t[k]!] as const);
+};
+const enc = (date: string, n: number) => breakdown(date, n).map(([k, v]) => `${k}:${v}`).join(',');
+const init = days.find((d) => d.date === initial)!;
 ---
 
-<figure class={`heat ${compact ? 'compact' : ''}`}>
+<figure class={`heat ${compact ? 'compact' : ''}`} data-heat>
   <div class="scroll">
-    <svg viewBox={`0 -18 ${w} ${h + 18}`} role="img" aria-labelledby="heat-title">
-      <title id="heat-title">{zh ? '每天合入的 PR 数量' : 'PRs merged per day'}</title>
-      {monthCols.map((m) => <text x={m.col * (cell + gap)} y="-6" class="mlabel">{m.label}</text>)}
+    <svg viewBox={`0 -18 ${w} ${h + 18}`} role="group" aria-label={zh ? '每天合入的 PR 数量，方向键切换日期' : 'PRs merged per day; use arrow keys to move'}>
+      {monthCols.map((m) => <text x={m.col * (cell + gap)} y="-6" class="mlabel" aria-hidden="true">{m.label}</text>)}
       {
         days.map((d) => (
-          <rect
-            x={d.col * (cell + gap)}
-            y={d.row * (cell + gap)}
-            width={cell}
-            height={cell}
-            rx="3"
-            class={`l${level(d.n)}`}
-            data-tip={fmt(d.date, d.n)}
-            tabindex="-1"
-          >
-            <title>{fmt(d.date, d.n)}</title>
-          </rect>
+          <g>
+            <rect
+              x={d.col * (cell + gap)}
+              y={d.row * (cell + gap)}
+              width={cell}
+              height={cell}
+              rx="3"
+              class={`l${level(d.n)} ${d.date === initial ? 'sel' : ''}`}
+              data-date={d.date}
+              data-t={enc(d.date, d.n)}
+              data-tip={fmt(d.date, d.n)}
+              aria-label={fmt(d.date, d.n) + (caseDates.has(d.date) ? (zh ? '，有案例' : ', has a case study') : '')}
+              role="button"
+              tabindex={d.date === initial ? 0 : -1}
+            />
+            {caseDates.has(d.date) && (
+              <circle cx={d.col * (cell + gap) + cell / 2} cy={d.row * (cell + gap) + cell / 2} r="2.2" class="mark" aria-hidden="true" />
+            )}
+          </g>
         ))
       }
     </svg>
@@ -67,7 +97,7 @@ const fmt = (date: string, n: number) =>
     <span class="readout" aria-live="polite">
       {
         zh
-          ? `${total} 次合并 · 单日最多 ${peak.n} 个（${peak.date.slice(5).replace('-', '月')}日）`
+          ? `${total} 次合并 · 单日最多 ${peak.n} 个（${Number(peak.date.slice(5, 7))}月${Number(peak.date.slice(8))}日）`
           : `${total} merges · busiest day ${peak.n} (${peak.date})`
       }
     </span>
@@ -75,38 +105,110 @@ const fmt = (date: string, n: number) =>
       {zh ? '少' : 'Less'}
       <i class="l0"></i><i class="l1"></i><i class="l2"></i><i class="l3"></i><i class="l4"></i>
       {zh ? '多' : 'More'}
+      <b class="mark-key"></b>{zh ? '有案例' : 'Case study'}
     </span>
   </figcaption>
-  <details class="table">
-    <summary>{zh ? '查看数据' : 'View data'}</summary>
-    <p class="src">{zh ? '来源：小程序仓库 dev 分支的合并记录。' : 'Source: merge history of the dev branch.'}</p>
-    <table>
-      <thead><tr><th>{zh ? '日期' : 'Date'}</th><th>PR</th></tr></thead>
-      <tbody>
-        {
-          days
-            .filter((d) => d.n > 0)
-            .reverse()
-            .map((d) => (
-              <tr>
-                <td>{d.date}</td>
-                <td>{d.n}</td>
-              </tr>
-            ))
-        }
-      </tbody>
-    </table>
-  </details>
+
+  <section class="picked" aria-live="polite">
+    <header>
+      <strong class="day-head">{fmt(init.date, init.n)}</strong>
+      <span class="day-hint">{zh ? '点格子换一天' : 'Click a square to pick a day'}</span>
+    </header>
+    <ul class="types">
+      {
+        breakdown(init.date, init.n).map(([k, v]) => (
+          <li style={`--w:${(v / init.n) * 100}%`} class={`t-${k}`}>
+            <span class="tk">{labels[k]}</span>
+            <span class="tb" />
+            <span class="tv">{v}</span>
+          </li>
+        ))
+      }
+    </ul>
+    <p class="empty" hidden={init.n > 0}>{zh ? '这天没有合入。' : 'Nothing merged this day.'}</p>
+    <ul class="cases">
+      {
+        cases.map((c) => (
+          <li data-date={c.date} hidden={c.date !== init.date}>
+            <a class="link" href={c.href}>
+              {c.label} →
+            </a>
+            <span class="refs">{c.refs}</span>
+          </li>
+        ))
+      }
+    </ul>
+    <p class="src">
+      {
+        zh
+          ? '按提交标题的类型前缀统计，来自小程序仓库 dev 分支的合并记录，日期按提交时间（UTC−7）。'
+          : 'Counted by the type prefix of each title in the dev branch merge log; dates follow commit time (UTC−7).'
+      }
+    </p>
+  </section>
 </figure>
 
-<script>
-  document.querySelectorAll<HTMLElement>('figure.heat').forEach((fig) => {
-    const readout = fig.querySelector<HTMLElement>('.readout');
-    if (!readout) return;
-    const initial = readout.textContent;
-    fig.querySelectorAll<SVGRectElement>('rect[data-tip]').forEach((r) => {
-      r.addEventListener('mouseenter', () => (readout.textContent = r.dataset.tip ?? ''));
-      r.addEventListener('mouseleave', () => (readout.textContent = initial));
+<script define:vars={{ labels }}>
+  document.querySelectorAll('figure[data-heat]').forEach((fig) => {
+    const readout = fig.querySelector('.readout');
+    const head = fig.querySelector('.day-head');
+    const list = fig.querySelector('.types');
+    const empty = fig.querySelector('.empty');
+    const caseItems = [...fig.querySelectorAll('.cases li')];
+    const rects = [...fig.querySelectorAll('rect[data-date]')];
+    const scroller = fig.querySelector('.scroll');
+    const initialText = readout.textContent;
+    let cur = rects.findIndex((r) => r.classList.contains('sel'));
+    scroller.scrollLeft = scroller.scrollWidth; // 先露出最近几周
+
+    const render = (r) => {
+      head.textContent = r.dataset.tip;
+      const pairs = r.dataset.t ? r.dataset.t.split(',').map((x) => x.split(':')) : [];
+      const n = pairs.reduce((a, [, v]) => a + Number(v), 0);
+      list.replaceChildren(
+        ...pairs.map(([k, v]) => {
+          const li = document.createElement('li');
+          li.className = `t-${k}`;
+          li.style.setProperty('--w', `${(Number(v) / n) * 100}%`);
+          for (const [cls, text] of [['tk', labels[k]], ['tb', ''], ['tv', v]]) {
+            const s = document.createElement('span');
+            s.className = cls;
+            s.textContent = text;
+            li.append(s);
+          }
+          return li;
+        }),
+      );
+      empty.hidden = n > 0;
+      caseItems.forEach((li) => (li.hidden = li.dataset.date !== r.dataset.date));
+    };
+
+    const select = (i, focus = false) => {
+      rects[cur]?.classList.remove('sel');
+      rects[cur]?.setAttribute('tabindex', '-1');
+      cur = i;
+      const r = rects[i];
+      r.classList.add('sel');
+      r.setAttribute('tabindex', '0');
+      if (focus) r.focus();
+      render(r);
+    };
+
+    const step = { ArrowRight: 7, ArrowLeft: -7, ArrowDown: 1, ArrowUp: -1 };
+    rects.forEach((r, i) => {
+      r.addEventListener('mouseenter', () => (readout.textContent = r.dataset.tip));
+      r.addEventListener('mouseleave', () => (readout.textContent = initialText));
+      r.addEventListener('click', () => select(i));
+      r.addEventListener('keydown', (e) => {
+        let n;
+        if (e.key === 'Enter' || e.key === ' ') n = i;
+        else if (e.key === 'Home') n = 0;
+        else if (e.key === 'End') n = rects.length - 1;
+        else if (e.key in step) n = i + step[e.key];
+        else return;
+        e.preventDefault();
+        select(Math.max(0, Math.min(rects.length - 1, n)), true);
+      });
     });
   });
 </script>
@@ -118,7 +220,7 @@ const fmt = (date: string, n: number) =>
 
   .scroll {
     overflow-x: auto;
-    padding-bottom: 4px;
+    padding: 2px 2px 4px;
   }
 
   svg {
@@ -127,17 +229,41 @@ const fmt = (date: string, n: number) =>
     max-width: 760px;
     min-width: 300px;
     height: auto;
+    overflow: visible;
+  }
+
+  @media (max-width: 640px) {
+    /* 手机上格子太小点不中：图放宽，在框里横向滑动 */
+    .heat:not(.compact) svg {
+      min-width: 600px;
+    }
   }
 
   rect {
-    stroke: var(--bg);
+    cursor: pointer;
+    stroke: var(--ink);
     stroke-width: 0;
+    outline: none;
     transition: stroke-width 0.1s;
   }
 
   rect:hover {
-    stroke: var(--ink);
     stroke-width: 1.5;
+  }
+
+  rect.sel {
+    stroke: var(--accent-ink);
+    stroke-width: 2;
+  }
+
+  rect:focus-visible {
+    stroke: var(--ink);
+    stroke-width: 2.5;
+  }
+
+  .mark {
+    fill: var(--bg);
+    pointer-events: none;
   }
 
   .l0 { fill: var(--heat-0); background: var(--heat-0); }
@@ -184,42 +310,104 @@ const fmt = (date: string, n: number) =>
     margin-left: 4px;
   }
 
-  .legend i:last-child {
+  .legend i:last-of-type {
     margin-right: 4px;
   }
 
-  .table {
-    margin-top: 10px;
-    font-size: 13px;
+  .mark-key {
+    margin-left: 10px;
+    width: 11px;
+    height: 11px;
+    border-radius: 3px;
+    background: radial-gradient(circle, var(--bg) 0 2px, var(--heat-3) 2.5px);
+  }
+
+  .picked {
+    margin-top: 18px;
+    padding-top: 16px;
+    border-top: 1px solid var(--line);
+  }
+
+  .picked header {
+    display: flex;
+    justify-content: space-between;
+    align-items: baseline;
+    flex-wrap: wrap;
+    gap: 4px 16px;
+  }
+
+  .day-head {
+    font-family: var(--serif);
+    font-size: 18px;
+    font-weight: 600;
+  }
+
+  .day-hint {
+    font-size: 12px;
     color: var(--ink-3);
   }
 
-  .compact .table {
+  .types,
+  .cases {
+    margin: 12px 0 0;
+    padding: 0;
+    list-style: none;
+  }
+
+  .types :global(li) {
+    display: grid;
+    grid-template-columns: 64px minmax(0, 1fr) 32px;
+    gap: 10px;
+    align-items: center;
+    padding: 3px 0;
+    font-size: 13.5px;
+  }
+
+  .types :global(.tk) {
+    color: var(--ink-2);
+  }
+
+  .types :global(.tb) {
+    height: 10px;
+    border-radius: 3px;
+    background: linear-gradient(to right, var(--heat-2) var(--w), var(--bg-2) var(--w));
+  }
+
+  .types :global(.t-feat .tb) {
+    background: linear-gradient(to right, var(--accent) var(--w), var(--bg-2) var(--w));
+  }
+
+  .types :global(.tv) {
+    text-align: right;
+    font-family: var(--mono);
+    font-size: 12.5px;
+    font-variant-numeric: tabular-nums;
+  }
+
+  .cases li {
+    display: flex;
+    flex-wrap: wrap;
+    align-items: baseline;
+    gap: 2px 12px;
+    padding: 8px 0;
+    border-top: 1px dashed var(--line-2);
+    font-size: 14.5px;
+  }
+
+  .cases li[hidden] {
     display: none;
   }
 
-  summary {
-    cursor: pointer;
-    width: fit-content;
-  }
-
-  .src {
-    margin: 8px 0;
-  }
-
-  table {
-    border-collapse: collapse;
+  .refs {
     font-family: var(--mono);
     font-size: 12px;
-    max-height: 240px;
-    display: block;
-    overflow-y: auto;
+    color: var(--ink-3);
   }
 
-  th,
-  td {
-    text-align: left;
-    padding: 2px 16px 2px 0;
-    border-bottom: 1px solid var(--line);
+  .empty,
+  .src {
+    margin: 10px 0 0;
+    font-size: 12.5px;
+    color: var(--ink-3);
   }
 </style>

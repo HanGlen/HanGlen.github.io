@@ -3,6 +3,7 @@ import Base from '../../layouts/Base.astro';
 import CaseHeader from '../CaseHeader.astro';
 import Section from '../Section.astro';
 import NextWork from '../NextWork.astro';
+import Relay from '../Relay.astro';
 import Toc from '../Toc.astro';
 import type { Content } from '../../i18n/zh';
 
@@ -21,7 +22,7 @@ const toc = ['roles', 'gates', 'visuals'].map((id, i) => ({ id, label: v.toc[i] 
 
   <section class="wrap hero-wrap">
     <figure class="hero reveal">
-      <img src={v.hero} alt={v.heroCap} width="1600" height="900" />
+      <img src={v.hero} alt={v.heroCap} width="1600" height="900" data-zoom="tavern" />
       <figcaption>{v.heroCap}</figcaption>
     </figure>
   </section>
@@ -42,16 +43,9 @@ const toc = ['roles', 'gates', 'visuals'].map((id, i) => ({ id, label: v.toc[i] 
   </Section>
 
   <Section no="02" title={v.s2} lead={v.s2Lead} id="gates">
-    <ol class="gates reveal">
-      {
-        v.gates.map((g, i) => (
-          <li>
-            <span class="n">{String(i + 1).padStart(2, '0')}</span>
-            <span class="g">{g}</span>
-          </li>
-        ))
-      }
-    </ol>
+    <div class="reveal">
+      <Relay legs={v.relay as any} hint={v.relayHint} id="flow" />
+    </div>
   </Section>
 
   <Section no="03" title={v.s3} id="visuals">
@@ -59,7 +53,7 @@ const toc = ['roles', 'gates', 'visuals'].map((id, i) => ({ id, label: v.toc[i] 
       {
         v.gallery.map((g) => (
           <figure class={`reveal ${g.wide ? 'wide' : ''}`}>
-            <img src={g.src} alt={g.cap} loading="lazy" />
+            <img src={g.src} alt={g.cap} loading="lazy" data-zoom="tavern" />
             <figcaption>{g.cap}</figcaption>
           </figure>
         ))
@@ -118,37 +112,6 @@ const toc = ['roles', 'gates', 'visuals'].map((id, i) => ({ id, label: v.toc[i] 
     color: var(--ink);
   }
 
-  .gates {
-    margin: 0;
-    padding: 0;
-    list-style: none;
-    display: grid;
-    grid-template-columns: repeat(5, minmax(0, 1fr));
-  }
-
-  .gates li {
-    display: grid;
-    gap: 6px;
-    padding: 14px 10px 0 0;
-    border-top: 3px solid color-mix(in srgb, var(--accent) 35%, var(--bg));
-  }
-
-  .gates li:last-child {
-    border-top-color: var(--accent);
-  }
-
-  .n {
-    font-family: var(--mono);
-    font-size: 12px;
-    color: var(--ink-3);
-  }
-
-  .g {
-    font-family: var(--serif);
-    font-size: 20px;
-    font-weight: 600;
-  }
-
   .gallery {
     display: grid;
     grid-template-columns: repeat(4, minmax(0, 1fr));
@@ -174,10 +137,6 @@ const toc = ['roles', 'gates', 'visuals'].map((id, i) => ({ id, label: v.toc[i] 
   @media (max-width: 760px) {
     .roles {
       grid-template-columns: minmax(0, 1fr);
-    }
-    .gates {
-      grid-template-columns: repeat(3, minmax(0, 1fr));
-      row-gap: 12px;
     }
     .gallery {
       grid-template-columns: repeat(2, minmax(0, 1fr));

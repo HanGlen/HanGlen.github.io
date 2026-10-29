@@ -22,7 +22,7 @@ const toc = ids.map((id, i) => ({ id, label: s.toc[i] }));
 
   <section class="wrap hero-wrap">
     <figure class="hero-shot reveal">
-      <img src={s.heroShot} alt={s.heroCap} width="1550" height="1020" />
+      <img src={s.heroShot} alt={s.heroCap} width="1550" height="1020" data-zoom="signal" />
       <figcaption>{s.heroCap}</figcaption>
     </figure>
   </section>
@@ -56,7 +56,7 @@ const toc = ids.map((id, i) => ({ id, label: s.toc[i] }));
       {
         s.modules.map((m) => (
           <article class={`mod reveal ${m.span ? 'span' : ''}`}>
-            {m.shot && <img class="mod-img" src={m.shot} alt={m.name} loading="lazy" />}
+            {m.shot && <img class="mod-img" src={m.shot} alt={m.name} loading="lazy" data-zoom="signal" />}
             <div class="mod-top">
               <h3 class="serif">{m.name}</h3>
               {m.badge && <span class="badge">{m.badge}</span>}
@@ -74,7 +74,7 @@ const toc = ids.map((id, i) => ({ id, label: s.toc[i] }));
       {
         s.reports.map((r) => (
           <figure>
-            <img src={r.src} alt={r.cap} loading="lazy" width="557" height="786" />
+            <img src={r.src} alt={r.cap} loading="lazy" width="557" height="786" data-zoom="signal" />
             <figcaption>{r.cap}</figcaption>
           </figure>
         ))
@@ -85,7 +85,7 @@ const toc = ids.map((id, i) => ({ id, label: s.toc[i] }));
   <Section no="05" title={s.s4} id="competition">
     <div class="honors reveal">
       <figure class="photo">
-        <img src={s.photo} alt={s.photoCap} loading="lazy" width="1080" height="1440" />
+        <img src={s.photo} alt={s.photoCap} loading="lazy" width="1080" height="1440" data-zoom="signal" />
         <figcaption>{s.photoCap}</figcaption>
       </figure>
       <div>

@@ -15,6 +15,7 @@ npm run build    # 输出到 dist/
 - 文案：`src/i18n/zh.ts`（中文）和 `src/i18n/en.ts`（英文），两边结构一致。
 - 笔记：`src/content/notes/*.md`，`draft: true` 会显示「草稿」标记。
 - 图表数据：`src/data/dnd.json`（来自小程序仓库 dev 分支合并记录）。
+- 每天、每月各类型 PR 的数量：`dnd.json` 的 `dailyTypes`、`monthlyTypes`，先更新 `daily`，再跑 `node scripts/count-pr-types.cjs <小程序仓库路径>`。只存数量，不存标题。
 - 补图：图片放进 `public/shots/`，再给对应的 `<Placeholder>` 填上 `src`，「待补」框就会换成真图。
 - 页面组件在 `src/components/pages/`，样式令牌在 `src/styles/global.css` 的 `:root`（含深色模式）。
 

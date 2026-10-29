@@ -31,9 +31,10 @@ const [lead, ...rest] = t.work;
     <dl class="proof reveal">
       {
         h.proof.map((p) => (
-          <div>
+          <div class="sourced" tabindex="0">
             <dd>{p.v}</dd>
             <dt>{p.k}</dt>
+            <dd class="src" role="note">{p.src}</dd>
           </div>
         ))
       }
@@ -70,7 +71,7 @@ const [lead, ...rest] = t.work;
   </Section>
 
   <Section no="02" title={h.heatTitle} lead={h.dataLead}>
-    <div class="panel reveal"><Heatmap lang={t.lang} compact /></div>
+    <div class="panel reveal"><Heatmap lang={t.lang} cases={t.home.heatCases} compact /></div>
     <a class="link small" href={`${base}/work/dnd/#case`}>{h.heatMore} →</a>
   </Section>
 
@@ -189,7 +190,7 @@ const [lead, ...rest] = t.work;
     padding: 18px 20px 0 0;
   }
 
-  .proof dd {
+  .proof dd:not(.src) {
     margin: 0;
     font-family: var(--serif);
     font-size: clamp(30px, 3.8vw, 46px);
