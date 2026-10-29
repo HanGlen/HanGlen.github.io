@@ -1,6 +1,6 @@
 # 工作记录
 
-这个网站由 Claude 搭建和维护。每次改版的决定、数据来源和待办都记在这里。
+这个网站由 Claude 搭建和维护。每次改版的决定和数据来源记在这里；日常进度和待办在 [#1](https://github.com/HanGlen/HanGlen.github.io/issues/1) 跟进。
 
 ## 数据来源
 
