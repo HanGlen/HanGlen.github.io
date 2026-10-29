@@ -1,0 +1,159 @@
+---
+/** 分工图：我在头尾，中间是 AI */
+interface Props {
+  start: { k: string; v: string[] };
+  mid: { k: string; v: string[] };
+  end: { k: string; v: string[] };
+  agents: { k: string; v: string }[];
+  me: string;
+}
+
+const { start, mid, end, agents, me } = Astro.props;
+---
+
+<div class="roles">
+  <div class="flow">
+    <div class="box me">
+      <span class="who">{me} · {start.k}</span>
+      <ul>{start.v.map((x) => <li>{x}</li>)}</ul>
+    </div>
+    <span class="arrow" aria-hidden="true"></span>
+    <div class="box ai">
+      <span class="who">{mid.k}</span>
+      <ol>{mid.v.map((x) => <li>{x}</li>)}</ol>
+    </div>
+    <span class="arrow" aria-hidden="true"></span>
+    <div class="box me">
+      <span class="who">{me} · {end.k}</span>
+      <ul>{end.v.map((x) => <li>{x}</li>)}</ul>
+    </div>
+  </div>
+  <ul class="agents">
+    {
+      agents.map((a) => (
+        <li>
+          <strong>{a.k}</strong>
+          <span>{a.v}</span>
+        </li>
+      ))
+    }
+  </ul>
+</div>
+
+<style>
+  .flow {
+    display: grid;
+    grid-template-columns: minmax(0, 0.8fr) 28px minmax(0, 2.4fr) 28px minmax(0, 0.8fr);
+    align-items: stretch;
+  }
+
+  .box {
+    border-radius: var(--r);
+    padding: 18px;
+    display: grid;
+    align-content: start;
+    gap: 10px;
+  }
+
+  .me {
+    border: 2px solid var(--ink);
+    background: var(--card);
+  }
+
+  .ai {
+    background: var(--ink);
+    color: var(--bg);
+  }
+
+  .who {
+    font-family: var(--mono);
+    font-size: 12px;
+    letter-spacing: 0.04em;
+    opacity: 0.75;
+  }
+
+  .box ul,
+  .box ol {
+    margin: 0;
+    padding: 0;
+    list-style: none;
+    display: flex;
+    flex-wrap: wrap;
+    gap: 8px;
+  }
+
+  .me li {
+    font-family: var(--serif);
+    font-size: 20px;
+    font-weight: 600;
+    width: 100%;
+  }
+
+  .ai ol {
+    counter-reset: s;
+  }
+
+  .ai li {
+    counter-increment: s;
+    font-size: 15px;
+    padding: 8px 12px;
+    border-radius: 10px;
+    background: color-mix(in srgb, var(--bg) 12%, transparent);
+    border: 1px solid color-mix(in srgb, var(--bg) 22%, transparent);
+  }
+
+  .ai li::before {
+    content: counter(s) ' ';
+    font-family: var(--mono);
+    font-size: 11px;
+    opacity: 0.6;
+  }
+
+  .arrow {
+    align-self: center;
+    justify-self: center;
+    width: 14px;
+    height: 14px;
+    border-top: 2px solid var(--ink-3);
+    border-right: 2px solid var(--ink-3);
+    transform: rotate(45deg);
+  }
+
+  .agents {
+    margin: 14px 0 0;
+    padding: 0;
+    list-style: none;
+    display: grid;
+    grid-template-columns: repeat(5, minmax(0, 1fr));
+    gap: 10px;
+  }
+
+  .agents li {
+    display: grid;
+    gap: 2px;
+    padding: 12px 14px;
+    border-radius: 12px;
+    border: 1px solid var(--line);
+    background: var(--card);
+    font-size: 13px;
+    color: var(--ink-2);
+  }
+
+  .agents strong {
+    font-size: 15px;
+    color: var(--ink);
+  }
+
+  @media (max-width: 860px) {
+    .flow {
+      grid-template-columns: minmax(0, 1fr);
+      grid-template-rows: auto 24px auto 24px auto;
+    }
+    .arrow {
+      transform: rotate(135deg);
+    }
+    .agents {
+      grid-template-columns: repeat(2, minmax(0, 1fr));
+    }
+  }
+</style>

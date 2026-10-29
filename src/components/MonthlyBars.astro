@@ -1,0 +1,101 @@
+---
+import data from '../data/dnd.json';
+
+interface Props {
+  lang: 'zh' | 'en';
+}
+
+const { lang } = Astro.props;
+const zh = lang === 'zh';
+const months = Object.entries(data.monthlyPRs as Record<string, number>);
+const max = Math.max(...months.map(([, n]) => n));
+const label = (k: string) => (zh ? `${Number(k.slice(5))}月` : ['Jun', 'Jul', 'Aug', 'Sep', 'Oct'][Number(k.slice(5)) - 6] ?? k);
+---
+
+<figure class="mb">
+  <ol class="bars" aria-label={zh ? '每月合入的 PR 数' : 'Merged PRs per month'}>
+    {
+      months.map(([k, n], i) => (
+        <li style={`--h:${(n / max) * 100}%`} class={i === months.length - 1 ? 'last' : ''}>
+          <span class="val">{n}</span>
+          <span class="bar" />
+          <span class="m">{label(k)}</span>
+        </li>
+      ))
+    }
+  </ol>
+  <figcaption>{zh ? '10 月统计到 29 日' : 'October counted through the 29th'}</figcaption>
+</figure>
+
+<style>
+  .mb {
+    margin: 0;
+    padding-top: 34px;
+  }
+
+  .bars {
+    margin: 0;
+    padding: 0;
+    list-style: none;
+    height: 240px;
+    display: grid;
+    grid-auto-flow: column;
+    grid-auto-columns: minmax(0, 1fr);
+    gap: clamp(10px, 3vw, 28px);
+    align-items: end;
+    border-bottom: 1px solid var(--line-2);
+  }
+
+  li {
+    height: 100%;
+    display: grid;
+    grid-template-rows: 1fr auto;
+    align-items: end;
+    position: relative;
+  }
+
+  .bar {
+    display: block;
+    height: var(--h);
+    min-height: 3px;
+    border-radius: 6px 6px 0 0;
+    background: var(--heat-2);
+    transition: background 0.2s;
+  }
+
+  .last .bar {
+    background: var(--accent);
+  }
+
+  li:hover .bar {
+    background: var(--accent-ink);
+  }
+
+  .val {
+    position: absolute;
+    left: 0;
+    right: 0;
+    bottom: calc(var(--h) + 6px);
+    text-align: center;
+    font-family: var(--serif);
+    font-size: clamp(16px, 2vw, 22px);
+    font-weight: 600;
+    font-variant-numeric: tabular-nums;
+  }
+
+  .m {
+    position: absolute;
+    left: 0;
+    right: 0;
+    bottom: -26px;
+    text-align: center;
+    font-size: 13px;
+    color: var(--ink-3);
+  }
+
+  figcaption {
+    margin-top: 36px;
+    font-size: 12px;
+    color: var(--ink-3);
+  }
+</style>

@@ -18,9 +18,10 @@ const base = t.lang === 'zh' ? '' : '/en';
   <CaseHeader kind={s.kind} name={s.name} line={s.line} stats={s.stats} back={t.ui.backHome} backHref={`${base}/`} />
 
   <section class="wrap section">
-    <div class="hero-shot reveal">
-      <Placeholder kind="wide" label={s.modules[0].shot} lang={t.lang} />
-    </div>
+    <figure class="hero-shot reveal">
+      <img src={s.heroShot} alt={s.heroCap} width="1550" height="1020" />
+      <figcaption>{s.heroCap}</figcaption>
+    </figure>
   </section>
 
   <section class="wrap section"><div class="first">
@@ -53,7 +54,11 @@ const base = t.lang === 'zh' ? '' : '/en';
       {
         s.modules.map((m) => (
           <article class="mod reveal">
-            <Placeholder kind="wide" label={m.shot} lang={t.lang} />
+            {m.shot ? (
+              <img class="mod-img" src={m.shot} alt={m.name} loading="lazy" />
+            ) : m.badge ? null : (
+              <Placeholder kind="wide" label={t.lang === 'zh' ? 'App 界面截图' : 'App screens'} lang={t.lang} />
+            )}
             <div class="mod-top">
               <h3 class="serif">{m.name}</h3>
               {m.badge && <span class="badge">{m.badge}</span>}
@@ -68,11 +73,14 @@ const base = t.lang === 'zh' ? '' : '/en';
 
   <section class="wrap section">
     <h2 class="h-section">{s.s4}</h2>
-    <div class="certs reveal">
-      {s.certs.map((c) => <Placeholder kind="doc" label={c} lang={t.lang} />)}
-    </div>
-    <div class="video reveal">
-      <Placeholder kind="video" label={s.videos} lang={t.lang} />
+    <div class="honors reveal">
+      <figure class="photo">
+        <img src={s.photo} alt={s.photoCap} loading="lazy" width="1080" height="1440" />
+        <figcaption>{s.photoCap}</figcaption>
+      </figure>
+      <div class="certs">
+        {s.certs.map((c) => <Placeholder kind="doc" label={c} lang={t.lang} />)}
+      </div>
     </div>
     <p class="note-link">
       <a class="link" href="/notes/biosignal-devlog/">{s.noteLink} →</a>
@@ -87,7 +95,46 @@ const base = t.lang === 'zh' ? '' : '/en';
 
 <style>
   .hero-shot {
-    max-width: 880px;
+    margin: 0;
+  }
+
+  .hero-shot img,
+  .mod-img {
+    width: 100%;
+    height: auto;
+    border-radius: var(--r);
+    border: 1px solid var(--line);
+    box-shadow: var(--shadow);
+  }
+
+  .mod-img {
+    aspect-ratio: 16 / 10;
+    object-fit: cover;
+    object-position: top left;
+  }
+
+  figcaption {
+    margin-top: 10px;
+    font-size: 13px;
+    color: var(--ink-3);
+  }
+
+  .honors {
+    margin-top: 28px;
+    display: grid;
+    grid-template-columns: minmax(0, 0.9fr) minmax(0, 1.1fr);
+    gap: 20px;
+    align-items: start;
+  }
+
+  .photo {
+    margin: 0;
+  }
+
+  .photo img {
+    width: 100%;
+    height: auto;
+    border-radius: var(--r);
   }
 
   .first {
@@ -193,15 +240,9 @@ const base = t.lang === 'zh' ? '' : '/en';
   }
 
   .certs {
-    margin-top: 28px;
     display: grid;
-    grid-template-columns: repeat(4, minmax(0, 1fr));
+    grid-template-columns: repeat(2, minmax(0, 1fr));
     gap: 16px;
-  }
-
-  .video {
-    margin-top: 20px;
-    max-width: 720px;
   }
 
   .note-link {
@@ -229,8 +270,8 @@ const base = t.lang === 'zh' ? '' : '/en';
     .arch ul {
       margin: 0;
     }
-    .certs {
-      grid-template-columns: repeat(2, minmax(0, 1fr));
+    .honors {
+      grid-template-columns: minmax(0, 1fr);
     }
   }
 

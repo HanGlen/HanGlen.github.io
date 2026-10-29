@@ -1,0 +1,167 @@
+---
+/** 接力图：一条反馈从开单到合入，每一棒是谁、隔了多久 */
+interface Leg {
+  t: string;
+  who: string;
+  role: string;
+  v: string;
+  d: string;
+}
+
+interface Props {
+  legs: Leg[];
+}
+
+const { legs } = Astro.props;
+---
+
+<ol class="relay">
+  {
+    legs.map((l) => (
+      <li class={`leg ${l.role}`}>
+        {l.d && (
+          <span class="gap">
+            <span>{l.d}</span>
+          </span>
+        )}
+        <span class="node" aria-hidden="true" />
+        <time>{l.t}</time>
+        <strong>{l.who}</strong>
+        <span class="v">{l.v}</span>
+      </li>
+    ))
+  }
+</ol>
+
+<style>
+  .relay {
+    --n: 7;
+    margin: 0;
+    padding: 0;
+    list-style: none;
+    display: grid;
+    grid-auto-flow: column;
+    grid-auto-columns: minmax(0, 1fr);
+    position: relative;
+  }
+
+  .relay::before {
+    content: '';
+    position: absolute;
+    left: 6px;
+    right: 0;
+    top: 37px;
+    height: 2px;
+    background: linear-gradient(90deg, var(--accent), var(--accent) 85%, var(--ink));
+    opacity: 0.35;
+  }
+
+  .leg {
+    position: relative;
+    display: grid;
+    align-content: start;
+    gap: 2px;
+    padding: 0 12px 0 0;
+  }
+
+  .gap {
+    position: absolute;
+    top: 0;
+    left: -50%;
+    right: 50%;
+    display: flex;
+    justify-content: center;
+    pointer-events: none;
+  }
+
+  .gap span {
+    font-family: var(--mono);
+    font-size: 11px;
+    white-space: nowrap;
+    color: var(--accent-ink);
+    background: var(--accent-soft);
+    padding: 2px 8px;
+    border-radius: 999px;
+  }
+
+  .node {
+    margin-top: 30px;
+    width: 16px;
+    height: 16px;
+    border-radius: 50%;
+    background: var(--bg);
+    border: 3px solid var(--accent);
+    position: relative;
+    z-index: 1;
+  }
+
+  .gate .node {
+    border-color: var(--ink-3);
+  }
+
+  .me .node {
+    background: var(--ink);
+    border-color: var(--ink);
+  }
+
+  time {
+    margin-top: 12px;
+    font-family: var(--mono);
+    font-size: 13px;
+    color: var(--ink-3);
+  }
+
+  strong {
+    font-family: var(--serif);
+    font-size: 19px;
+    font-weight: 600;
+    line-height: 1.3;
+  }
+
+  .ai strong {
+    color: var(--accent-ink);
+  }
+
+  .v {
+    font-size: 13.5px;
+    line-height: 1.55;
+    color: var(--ink-2);
+  }
+
+  @media (max-width: 860px) {
+    .relay {
+      grid-auto-flow: row;
+      padding-left: 30px;
+    }
+    .relay::before {
+      left: 7px;
+      right: auto;
+      top: 8px;
+      bottom: 8px;
+      width: 2px;
+      height: auto;
+      background: linear-gradient(180deg, var(--accent), var(--accent) 85%, var(--ink));
+    }
+    .leg {
+      padding: 0 0 18px;
+    }
+    .node {
+      position: absolute;
+      left: -30px;
+      top: 4px;
+      margin: 0;
+    }
+    .leg:has(.gap) .node {
+      top: 34px;
+    }
+    time {
+      margin-top: 0;
+    }
+    .gap {
+      position: static;
+      justify-content: flex-start;
+      order: -1;
+      margin: -6px 0 8px -6px;
+    }
+  }
+</style>

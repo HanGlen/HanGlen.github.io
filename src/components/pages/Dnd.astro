@@ -1,11 +1,12 @@
 ---
 import Base from '../../layouts/Base.astro';
 import CaseHeader from '../CaseHeader.astro';
-import Placeholder from '../Placeholder.astro';
 import Heatmap from '../Heatmap.astro';
-import Pipeline from '../Pipeline.astro';
+import Relay from '../Relay.astro';
+import Roles from '../Roles.astro';
+import MonthlyBars from '../MonthlyBars.astro';
+import UsageChart from '../UsageChart.astro';
 import NextWork from '../NextWork.astro';
-import data from '../../data/dnd.json';
 import type { Content } from '../../i18n/zh';
 
 interface Props {
@@ -16,10 +17,6 @@ const { t } = Astro.props;
 const d = t.dnd;
 const zh = t.lang === 'zh';
 const base = zh ? '' : '/en';
-const types = Object.entries(data.types as Record<string, number>);
-const maxType = Math.max(...types.map(([, n]) => n));
-const totalTypes = types.reduce((a, [, n]) => a + n, 0);
-const typeNames: Record<string, string> = d.typeNames;
 ---
 
 <Base lang={t.lang} title={d.title} description={d.description}>
@@ -27,49 +24,86 @@ const typeNames: Record<string, string> = d.typeNames;
 
   <section class="wrap section">
     <div class="shots reveal">
-      {d.shots.map((s) => <Placeholder kind="phone" label={s} lang={t.lang} />)}
-    </div>
-  </section>
-
-  <section class="wrap section"><div class="narrow-left">
-    <h2 class="h-section">{d.s1}</h2>
-    <p class="body">{d.s1Body}</p>
-    <div class="aside">
-      <Placeholder kind="doc" label={d.qr} lang={t.lang} />
-      <Placeholder kind="wide" label={d.growth} lang={t.lang} />
-    </div>
-  </div></section>
-
-  <section class="wrap section"><div class="narrow-left">
-    <h2 class="h-section">{d.s2}</h2>
-    <p class="body">{d.s2Body}</p>
-    <ol class="roles">
       {
-        d.roles.map((r, i) => (
-          <li class="reveal">
-            <span class="n">{i + 1}</span>
-            <strong class="serif">{r.k}</strong>
-            <span class="muted">{r.v}</span>
-          </li>
+        d.shots.map((s) => (
+          <figure>
+            <img src={s.src} alt={s.cap} loading="lazy" width="455" height="983" />
+            <figcaption>{s.cap}</figcaption>
+          </figure>
         ))
       }
-    </ol>
-  </div></section>
-
-  <section class="wrap section" id="pipeline">
-    <div class="narrow-left">
-      <h2 class="h-section">{d.s3}</h2>
-      <p class="body">{d.s3Body}</p>
     </div>
-    <div class="reveal">
-      <Pipeline steps={d.steps} recordLabel={d.recordLabel} hint={d.hint} />
+    <p class="fine">{d.shotsNote}</p>
+  </section>
+
+  <section class="wrap section">
+    <h2 class="h-section">{d.usageTitle}</h2>
+    <div class="usage reveal">
+      <div class="panel">
+        <UsageChart lang={t.lang} />
+        <p class="fine">{d.usageNote}</p>
+      </div>
+      <dl class="tiles">
+        {
+          d.usageStats.map((s) => (
+            <div>
+              <dd class="serif">{s.v}</dd>
+              <dt>{s.k}</dt>
+            </div>
+          ))
+        }
+      </dl>
+    </div>
+    <p class="fine">{d.usageSource}</p>
+  </section>
+
+  <section class="wrap section">
+    <h2 class="h-section">{d.roleTitle}</h2>
+    <p class="body">{d.roleBody}</p>
+    <div class="reveal gap-top">
+      <Roles start={d.roleStart} mid={d.roleMid} end={d.roleEnd} agents={d.agents} me={zh ? '我' : 'Me'} />
     </div>
   </section>
 
-  <section class="wrap section day-wrap">
+  <section class="wrap section" id="pipeline">
+    <h2 class="h-section">{d.caseTitle}</h2>
+    <p class="body">{d.caseBody}</p>
+    <div class="case-top reveal">
+      <blockquote class="quote">
+        <p class="serif">“{d.quote}”</p>
+        <cite>{d.quoteWho}</cite>
+      </blockquote>
+      <article class="card-rec">
+        <header>{d.issueCard.who}</header>
+        {d.issueCard.lines.map((l) => <p>{l}</p>)}
+      </article>
+    </div>
+    <div class="reveal relay-wrap">
+      <Relay legs={d.relay} />
+    </div>
+  </section>
+
+  <section class="wrap section two">
     <div>
-      <h2 class="h-section">{d.s4}</h2>
-      <p class="body">{d.s4Body}</p>
+      <h2 class="h-section">{d.trendTitle}</h2>
+      <p class="body">{d.trendBody}</p>
+    </div>
+    <div class="panel reveal">
+      <MonthlyBars lang={t.lang} />
+    </div>
+  </section>
+
+  <section class="wrap section">
+    <div class="panel reveal">
+      <Heatmap lang={t.lang} />
+    </div>
+  </section>
+
+  <section class="wrap section two">
+    <div>
+      <h2 class="h-section">{d.dayTitle}</h2>
+      <p class="body">{d.dayBody}</p>
+      <p class="aside-note">{d.dayNote}</p>
     </div>
     <ol class="day">
       {
@@ -85,56 +119,23 @@ const typeNames: Record<string, string> = d.typeNames;
   </section>
 
   <section class="wrap section">
-    <div class="narrow-left">
-      <h2 class="h-section">{d.s5}</h2>
-    </div>
-    <div class="charts">
-      <div class="chart reveal">
-        <p class="chart-title">{t.home.heatTitle}</p>
-        <Heatmap lang={t.lang} />
-      </div>
-      <div class="chart reveal">
-        <p class="chart-title">{d.typesTitle}</p>
-        <ul class="bars" role="list">
-          {
-            types.map(([k, n]) => (
-              <li>
-                <span class="bk">{typeNames[k] ?? k}</span>
-                <span class="bt">
-                  <span class="bf" style={`width:${(n / maxType) * 100}%`} />
-                </span>
-                <span class="bv">
-                  {n}
-                  <small>{Math.round((n / totalTypes) * 100)}%</small>
-                </span>
-              </li>
-            ))
-          }
-        </ul>
-        <p class="chart-note">{d.typesNote}</p>
-      </div>
-    </div>
-  </section>
-
-  <section class="wrap section">
-    <div class="narrow-left">
-      <h2 class="h-section">{d.s6}</h2>
-    </div>
-    <ol class="lessons">
+    <h2 class="h-section">{d.gateTitle}</h2>
+    <p class="body">{d.gateBody}</p>
+    <ul class="gates">
       {
-        d.lessons.map((l, i) => (
+        d.gates.map((g) => (
           <li class="reveal">
-            <span class="n">{String(i + 1).padStart(2, '0')}</span>
-            <h3 class="serif">{l.k}</h3>
-            <p>{l.v}</p>
+            <span class="x" aria-hidden="true">✕</span>
+            <strong>{g.k}</strong>
+            <span>{g.v}</span>
           </li>
         ))
       }
-    </ol>
+    </ul>
     <p class="note-link">
       <a class="link" href="/notes/five-ai-engineers/">{d.noteLink} →</a>
     </p>
-    <ul class="chips stack">
+    <ul class="chips">
       {d.stack.map((s) => <li class="chip">{s}</li>)}
     </ul>
   </section>
@@ -143,72 +144,169 @@ const typeNames: Record<string, string> = d.typeNames;
 </Base>
 
 <style>
-  .narrow-left {
-    max-width: var(--text);
-  }
-
   .body {
-    margin: 16px 0 0;
+    margin: 14px 0 0;
+    max-width: var(--text);
     font-size: 17px;
     color: var(--ink-2);
   }
 
+  .fine {
+    margin: 12px 0 0;
+    font-size: 12.5px;
+    color: var(--ink-3);
+  }
+
+  .gap-top {
+    margin-top: 28px;
+  }
+
   .shots {
     display: grid;
-    grid-template-columns: repeat(5, minmax(0, 1fr));
-    gap: clamp(10px, 2vw, 24px);
+    grid-template-columns: repeat(6, minmax(0, 1fr));
+    gap: clamp(10px, 1.6vw, 20px);
   }
 
-  .shots > :global(:nth-child(even)) {
-    margin-top: 32px;
+  .shots figure {
+    margin: 0;
   }
 
-  .aside {
+  .shots figure:nth-child(even) {
     margin-top: 28px;
-    display: grid;
-    grid-template-columns: 140px minmax(0, 1fr);
-    gap: 16px;
-    align-items: start;
   }
 
-  .roles {
-    margin: 24px 0 0;
-    padding: 0;
-    list-style: none;
-    display: grid;
-    grid-template-columns: repeat(3, minmax(0, 1fr));
-    gap: 12px;
+  .shots img {
+    width: 100%;
+    height: auto;
+    border-radius: 22px;
+    border: 5px solid var(--ink);
+    box-shadow: var(--shadow);
+    background: var(--ink);
   }
 
-  .roles li {
-    display: grid;
-    gap: 4px;
-    padding: 18px;
+  .shots figcaption {
+    margin-top: 10px;
+    font-size: 13px;
+    color: var(--ink-2);
+    text-align: center;
+  }
+
+  .panel {
+    padding: 22px;
     border-radius: var(--r);
-    background: var(--card);
     border: 1px solid var(--line);
-    font-size: 14px;
+    background: var(--card);
+    min-width: 0;
   }
 
-  .roles .n {
-    font-family: var(--mono);
-    font-size: 12px;
-    color: var(--accent-ink);
+  .usage {
+    margin-top: 24px;
+    display: grid;
+    grid-template-columns: minmax(0, 1.6fr) minmax(0, 0.7fr);
+    gap: 20px;
   }
 
-  .roles strong {
-    font-size: 20px;
+  .tiles {
+    margin: 0;
+    display: grid;
+    grid-template-columns: minmax(0, 1fr);
+    gap: 10px;
   }
 
-  #pipeline .narrow-left {
-    margin-bottom: 32px;
+  .tiles div {
+    padding: 14px 18px;
+    border-radius: var(--r);
+    border: 1px solid var(--line);
+    background: var(--card);
   }
 
-  .day-wrap {
+  .tiles dd {
+    margin: 0;
+    font-size: 28px;
+    font-weight: 600;
+    line-height: 1.2;
+  }
+
+  .tiles dt {
+    font-size: 13px;
+    color: var(--ink-3);
+  }
+
+  .case-top {
+    margin: 28px 0 36px;
     display: grid;
     grid-template-columns: minmax(0, 0.8fr) minmax(0, 1.2fr);
+    gap: 20px;
+    align-items: stretch;
+  }
+
+  .quote {
+    margin: 0;
+    padding: 22px 24px;
+    border-radius: var(--r);
+    background: var(--accent-soft);
+    border-left: 4px solid var(--accent);
+    display: grid;
+    align-content: center;
+    gap: 8px;
+  }
+
+  .quote p {
+    margin: 0;
+    font-size: clamp(22px, 2.6vw, 28px);
+    font-weight: 600;
+    line-height: 1.4;
+  }
+
+  cite {
+    font-style: normal;
+    font-size: 13px;
+    color: var(--ink-3);
+  }
+
+  .card-rec {
+    border-radius: var(--r);
+    border: 1px solid var(--line);
+    background: var(--card);
+    padding: 0 0 8px;
+    overflow: hidden;
+    font-size: 14px;
+    color: var(--ink-2);
+  }
+
+  .card-rec header {
+    padding: 10px 16px;
+    font-size: 12.5px;
+    font-weight: 600;
+    background: var(--bg-2);
+    color: var(--ink);
+  }
+
+  .card-rec p {
+    margin: 10px 16px 0;
+    font-family: var(--mono);
+    font-size: 12.5px;
+    line-height: 1.7;
+  }
+
+  .relay-wrap {
+    padding: 8px 0 0;
+  }
+
+  .two {
+    display: grid;
+    grid-template-columns: minmax(0, 0.85fr) minmax(0, 1.15fr);
     gap: clamp(24px, 5vw, 64px);
     align-items: start;
+  }
+
+  .aside-note {
+    margin: 22px 0 0;
+    padding: 14px 16px;
+    border-radius: 12px;
+    background: var(--bg-2);
+    font-size: 14px;
+    color: var(--ink-2);
   }
 
   .day {
@@ -261,149 +359,80 @@ const typeNames: Record<string, string> = d.typeNames;
     color: var(--ink-2);
   }
 
-  .charts {
-    margin-top: 28px;
+  .gates {
+    margin: 24px 0 0;
+    padding: 0;
+    list-style: none;
     display: grid;
-    grid-template-columns: minmax(0, 1.15fr) minmax(0, 0.85fr);
-    gap: 20px;
+    grid-template-columns: repeat(4, minmax(0, 1fr));
+    gap: 12px;
   }
 
-  .chart {
-    padding: 22px;
+  .gates li {
+    display: grid;
+    gap: 4px;
+    align-content: start;
+    padding: 16px;
     border-radius: var(--r);
     border: 1px solid var(--line);
     background: var(--card);
-    min-width: 0;
-  }
-
-  .chart-title {
-    margin: 0 0 16px;
-    font-size: 14px;
-    font-weight: 600;
-  }
-
-  .chart-note {
-    margin: 14px 0 0;
-    font-size: 13px;
-    color: var(--ink-3);
-  }
-
-  .bars {
-    margin: 0;
-    padding: 0;
-    list-style: none;
-    display: grid;
-    gap: 8px;
-  }
-
-  .bars li {
-    display: grid;
-    grid-template-columns: 64px minmax(0, 1fr) 72px;
-    align-items: center;
-    gap: 10px;
-    font-size: 13px;
-  }
-
-  .bk {
+    font-size: 13.5px;
     color: var(--ink-2);
   }
 
-  .bt {
-    height: 14px;
-  }
-
-  .bf {
-    display: block;
-    height: 100%;
-    min-width: 3px;
-    border-radius: 0 4px 4px 0;
+  .gates .x {
+    width: 24px;
+    height: 24px;
+    display: grid;
+    place-items: center;
+    border-radius: 50%;
+    font-size: 12px;
+    color: var(--bg);
     background: var(--accent);
   }
 
-  .bv {
-    font-family: var(--mono);
-    font-size: 12px;
-    text-align: right;
-    font-variant-numeric: tabular-nums;
-  }
-
-  .bv small {
-    margin-left: 6px;
-    color: var(--ink-3);
-  }
-
-  .lessons {
-    margin: 28px 0 0;
-    padding: 0;
-    list-style: none;
-    display: grid;
-    grid-template-columns: repeat(5, minmax(0, 1fr));
-    border-top: 1px solid var(--line-2);
-  }
-
-  .lessons li {
-    padding: 18px 18px 0 0;
-  }
-
-  .lessons .n {
-    font-family: var(--mono);
-    font-size: 12px;
-    color: var(--accent-ink);
-  }
-
-  .lessons h3 {
-    margin: 6px 0 6px;
-    font-size: 20px;
-    font-weight: 600;
-  }
-
-  .lessons p {
-    margin: 0;
-    font-size: 14px;
-    color: var(--ink-2);
+  .gates strong {
+    margin-top: 6px;
+    font-size: 16px;
+    color: var(--ink);
   }
 
   .note-link {
-    margin: 32px 0 0;
+    margin: 28px 0 18px;
     font-size: 15px;
   }
 
-  .stack {
-    margin-top: 20px;
-  }
-
-  @media (max-width: 900px) {
+  @media (max-width: 960px) {
     .shots {
       grid-template-columns: none;
       grid-auto-flow: column;
-      grid-auto-columns: 42%;
+      grid-auto-columns: 40%;
       overflow-x: auto;
       padding-bottom: 8px;
       scroll-snap-type: x mandatory;
     }
-    .shots > :global(*) {
+    .shots figure {
       scroll-snap-align: start;
     }
-    .charts,
-    .day-wrap {
+    .usage,
+    .case-top,
+    .two {
       grid-template-columns: minmax(0, 1fr);
     }
-    .lessons {
+    .tiles {
       grid-template-columns: repeat(2, minmax(0, 1fr));
-      row-gap: 12px;
+    }
+    .gates {
+      grid-template-columns: repeat(2, minmax(0, 1fr));
     }
   }
 
-  @media (max-width: 560px) {
-    .roles,
-    .lessons {
+  @media (max-width: 520px) {
+    .gates {
       grid-template-columns: minmax(0, 1fr);
     }
-    .aside {
-      grid-template-columns: 110px minmax(0, 1fr);
-    }
     .day li {
-      grid-template-columns: 48px 52px minmax(0, 1fr);
+      grid-template-columns: 48px 56px minmax(0, 1fr);
       font-size: 14px;
     }
   }

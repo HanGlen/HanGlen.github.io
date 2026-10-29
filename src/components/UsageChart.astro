@@ -1,0 +1,193 @@
+---
+import data from '../data/dnd.json';
+
+interface Props {
+  lang: 'zh' | 'en';
+}
+
+const { lang } = Astro.props;
+const zh = lang === 'zh';
+const days = data.usage.daily as { d: string; uv: number; new: number }[];
+const W = 720;
+const H = 220;
+const pad = { l: 34, r: 8, t: 12, b: 26 };
+const max = 400;
+const x = (i: number) => pad.l + (i / (days.length - 1)) * (W - pad.l - pad.r);
+const y = (v: number) => pad.t + (1 - v / max) * (H - pad.t - pad.b);
+const line = days.map((p, i) => `${i ? 'L' : 'M'}${x(i).toFixed(1)},${y(p.uv).toFixed(1)}`).join('');
+const area = `${line}L${x(days.length - 1)},${y(0)}L${x(0)},${y(0)}Z`;
+const newLine = days.map((p, i) => `${i ? 'L' : 'M'}${x(i).toFixed(1)},${y(p.new).toFixed(1)}`).join('');
+const holiday = [days.findIndex((p) => p.d === '2026-10-01'), days.findIndex((p) => p.d === '2026-10-07')];
+const ticks = [0, 100, 200, 300, 400];
+const monthMarks = days.map((p, i) => ({ p, i })).filter(({ p }) => p.d.endsWith('-01'));
+const tip = (p: { d: string; uv: number; new: number }) =>
+  zh ? `${Number(p.d.slice(5, 7))}月${Number(p.d.slice(8))}日 · 活跃 ${p.uv} · 新用户 ${p.new}` : `${p.d} · ${p.uv} active · ${p.new} new`;
+---
+
+<figure class="uc">
+  <svg viewBox={`0 0 ${W} ${H}`} role="img" aria-label={zh ? '近 60 天每日活跃用户' : 'Daily active users, last 60 days'}>
+    <rect
+      x={x(holiday[0])}
+      y={pad.t}
+      width={x(holiday[1]) - x(holiday[0])}
+      height={H - pad.t - pad.b}
+      class="band"
+    />
+    <text x={(x(holiday[0]) + x(holiday[1])) / 2} y={pad.t + 12} class="band-label" text-anchor="middle">
+      {zh ? '国庆' : 'Holiday'}
+    </text>
+    {
+      ticks.map((v) => (
+        <g>
+          <line x1={pad.l} x2={W - pad.r} y1={y(v)} y2={y(v)} class="grid" />
+          <text x={pad.l - 6} y={y(v) + 3} class="tick" text-anchor="end">
+            {v}
+          </text>
+        </g>
+      ))
+    }
+    {
+      monthMarks.map(({ p, i }) => (
+        <text x={x(i)} y={H - 8} class="tick" text-anchor="middle">
+          {zh ? `${Number(p.d.slice(5, 7))}月` : p.d.slice(5, 7)}
+        </text>
+      ))
+    }
+    <path d={area} class="area" />
+    <path d={line} class="line" />
+    <path d={newLine} class="line2" />
+    {
+      days.map((p, i) => (
+        <rect
+          x={x(i) - (W - pad.l - pad.r) / days.length / 2}
+          y={pad.t}
+          width={(W - pad.l - pad.r) / days.length}
+          height={H - pad.t - pad.b}
+          class="hit"
+          data-tip={tip(p)}
+          data-x={x(i)}
+          data-y={y(p.uv)}
+        />
+      ))
+    }
+    <circle r="4.5" class="dot" cx="-10" cy="-10" />
+  </svg>
+  <figcaption>
+    <span class="readout" aria-live="polite">{zh ? '鼠标移到图上看每天的数字' : 'Hover to see each day'}</span>
+    <span class="legend">
+      <i class="k1"></i>{zh ? '活跃用户' : 'Active users'}
+      <i class="k2"></i>{zh ? '新用户' : 'New users'}
+    </span>
+  </figcaption>
+</figure>
+
+<script>
+  document.querySelectorAll<HTMLElement>('figure.uc').forEach((fig) => {
+    const readout = fig.querySelector<HTMLElement>('.readout');
+    const dot = fig.querySelector<SVGCircleElement>('.dot');
+    if (!readout || !dot) return;
+    const initial = readout.textContent;
+    fig.querySelectorAll<SVGRectElement>('.hit').forEach((r) => {
+      r.addEventListener('mouseenter', () => {
+        readout.textContent = r.dataset.tip ?? '';
+        dot.setAttribute('cx', r.dataset.x ?? '-10');
+        dot.setAttribute('cy', r.dataset.y ?? '-10');
+      });
+    });
+    fig.querySelector('svg')?.addEventListener('mouseleave', () => {
+      readout.textContent = initial;
+      dot.setAttribute('cx', '-10');
+    });
+  });
+</script>
+
+<style>
+  .uc {
+    margin: 0;
+  }
+
+  svg {
+    display: block;
+    width: 100%;
+    height: auto;
+  }
+
+  .grid {
+    stroke: var(--line);
+    stroke-width: 1;
+  }
+
+  .tick {
+    font-family: var(--mono);
+    font-size: 10px;
+    fill: var(--ink-3);
+  }
+
+  .band {
+    fill: var(--accent-soft);
+  }
+
+  .band-label {
+    font-size: 11px;
+    fill: var(--accent-ink);
+  }
+
+  .area {
+    fill: var(--accent);
+    opacity: 0.1;
+  }
+
+  .line {
+    fill: none;
+    stroke: var(--accent);
+    stroke-width: 2;
+    stroke-linejoin: round;
+  }
+
+  .line2 {
+    fill: none;
+    stroke: var(--ink-3);
+    stroke-width: 1.5;
+    stroke-dasharray: 3 3;
+  }
+
+  .hit {
+    fill: transparent;
+  }
+
+  .dot {
+    fill: var(--accent);
+    stroke: var(--bg);
+    stroke-width: 2;
+    pointer-events: none;
+  }
+
+  figcaption {
+    margin-top: 10px;
+    display: flex;
+    justify-content: space-between;
+    flex-wrap: wrap;
+    gap: 6px 16px;
+    font-size: 13px;
+    color: var(--ink-2);
+  }
+
+  .legend {
+    display: inline-flex;
+    align-items: center;
+    gap: 6px;
+    color: var(--ink-3);
+    font-size: 12px;
+  }
+
+  .legend i {
+    width: 14px;
+    height: 0;
+    border-top: 2px solid var(--accent);
+  }
+
+  .legend i.k2 {
+    margin-left: 10px;
+    border-top: 2px dashed var(--ink-3);
+  }
+</style>

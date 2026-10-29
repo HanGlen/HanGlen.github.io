@@ -46,14 +46,18 @@ const [lead, ...rest] = t.work;
           <span class="more">{t.ui.readMore} →</span>
         </div>
         <div class="lead-shots">
-          <Placeholder kind="phone" label={lead.shot} lang={t.lang} />
-          <Placeholder kind="phone" label={zh ? '角色卡截图' : 'Character sheet'} lang={t.lang} />
+          <img class="phone" src={lead.shot} alt="" loading="lazy" width="455" height="983" />
+          <img class="phone" src={lead.shot2} alt="" loading="lazy" width="455" height="983" />
         </div>
       </a>
       {
         rest.map((w) => (
           <a class="work reveal" href={`${base}/work/${w.slug}/`}>
-            <Placeholder kind="wide" label={w.shot} lang={t.lang} />
+            {w.shot ? (
+              <img class="wide" src={w.shot} alt="" loading="lazy" />
+            ) : (
+              <Placeholder kind="wide" label={zh ? '短片画面' : 'Episode still'} lang={t.lang} />
+            )}
             <div class="work-text">
               <p class="eyebrow">{w.kind}</p>
               <h3 class="serif">{w.name}</h3>
@@ -64,6 +68,23 @@ const [lead, ...rest] = t.work;
         ))
       }
     </div>
+  </section>
+
+  <section class="wrap section">
+    <div class="section-head">
+      <h2 class="eyebrow">{h.statsTitle}</h2>
+      <span class="small muted">{h.statsNote}</span>
+    </div>
+    <dl class="usage reveal">
+      {
+        t.usage.map((u) => (
+          <div>
+            <dd class="serif">{u.v}</dd>
+            <dt>{u.k}</dt>
+          </div>
+        ))
+      }
+    </dl>
   </section>
 
   <section class="wrap section">
@@ -213,8 +234,52 @@ const [lead, ...rest] = t.work;
     width: 100%;
   }
 
-  .lead-shots > :global(*:last-child) {
+  .lead-shots > :last-child {
     margin-top: 40px;
+  }
+
+  .phone {
+    width: 100%;
+    height: auto;
+    border-radius: 24px;
+    border: 5px solid var(--ink);
+    background: var(--ink);
+    box-shadow: var(--shadow);
+  }
+
+  .wide {
+    width: 100%;
+    aspect-ratio: 16 / 10;
+    object-fit: cover;
+    object-position: top left;
+    border-radius: var(--r);
+    border: 1px solid var(--line);
+  }
+
+  .usage {
+    margin: 0;
+    display: grid;
+    grid-template-columns: repeat(4, minmax(0, 1fr));
+    gap: 12px;
+  }
+
+  .usage div {
+    padding: 18px 20px;
+    border-radius: var(--r);
+    background: var(--card);
+    border: 1px solid var(--line);
+  }
+
+  .usage dd {
+    margin: 0;
+    font-size: clamp(26px, 3.4vw, 38px);
+    font-weight: 600;
+    line-height: 1.2;
+  }
+
+  .usage dt {
+    font-size: 13px;
+    color: var(--ink-3);
   }
 
   .work-text p {
@@ -297,6 +362,9 @@ const [lead, ...rest] = t.work;
   }
 
   @media (max-width: 760px) {
+    .usage {
+      grid-template-columns: repeat(2, minmax(0, 1fr));
+    }
     .works,
     .lead,
     .two {
