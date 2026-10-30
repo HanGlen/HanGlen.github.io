@@ -1,6 +1,5 @@
 ---
 import Base from '../../layouts/Base.astro';
-import Placeholder from '../Placeholder.astro';
 import { rich } from '../../lib/rich';
 import type { Content } from '../../i18n/zh';
 
@@ -14,14 +13,12 @@ const a = t.about;
 
 <Base lang={t.lang} title={a.title} description={a.description}>
   <section class="wrap intro">
-    <div class="photo reveal"><Placeholder kind="photo" label={a.photo} lang={t.lang} /></div>
-    <div>
-      <h1 class="h-display">{a.name}</h1>
-      {a.bio.map((p) => <p class="bio" set:html={rich(p)} />)}
-      <div class="life">
-        {a.lifeShots.map((s) => <Placeholder kind="wide" label={s} lang={t.lang} />)}
-      </div>
-    </div>
+    <h1 class="h-display">{a.name}</h1>
+    {a.bio.map((p) => <p class="bio" set:html={rich(p)} />)}
+    <p class="jump">
+      <a class="btn" href="#cv">{a.toCv} <span aria-hidden="true">↓</span></a>
+      <a class="link" href="mailto:494564549@qq.com">494564549@qq.com</a>
+    </p>
   </section>
 
   <section class="wrap section cv" id="cv">
@@ -90,10 +87,6 @@ const a = t.about;
 <style>
   .intro {
     padding-top: clamp(40px, 7vw, 88px);
-    display: grid;
-    grid-template-columns: 260px minmax(0, 1fr);
-    gap: clamp(28px, 5vw, 64px);
-    align-items: start;
   }
 
   .bio {
@@ -107,12 +100,30 @@ const a = t.about;
     margin-top: 22px;
   }
 
-  .life {
-    margin-top: 28px;
-    display: grid;
-    grid-template-columns: repeat(2, minmax(0, 1fr));
-    gap: 14px;
-    max-width: 520px;
+  .jump {
+    margin: 32px 0 0;
+    display: flex;
+    flex-wrap: wrap;
+    align-items: center;
+    gap: 12px 24px;
+  }
+
+  .btn {
+    display: inline-flex;
+    gap: 6px;
+    font-size: 14px;
+    padding: 8px 16px;
+    border-radius: 999px;
+    border: 1px solid var(--line-2);
+    background: var(--card);
+    color: var(--ink);
+    text-decoration: none;
+    transition: border-color 0.2s, transform 0.2s;
+  }
+
+  .btn:hover {
+    border-color: var(--accent);
+    transform: translateY(-1px);
   }
 
   .print {
@@ -237,12 +248,6 @@ const a = t.about;
   }
 
   @media (max-width: 760px) {
-    .intro {
-      grid-template-columns: minmax(0, 1fr);
-    }
-    .photo {
-      max-width: 200px;
-    }
     .exp > li,
     .skills div,
     .contact li {
