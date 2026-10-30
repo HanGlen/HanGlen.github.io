@@ -308,7 +308,7 @@ export const en: Content = {
     ],
     s3: 'What I built',
     modules: [
-      { name: 'Desktop analyzer', v: 'Import a signal file, pick filtering and R-peak algorithms, get heart-rate plots, ~100 HRV metrics and Poincaré plots. This is the piece slated to go commercial.', stack: 'PyQt5 · neurokit2 · MNE', badge: 'Copyright', shot: '/shots/signal/desktop-ecg.png' },
+      { name: 'Desktop analyzer', v: 'Import a signal file, pick filtering and R-peak algorithms, get heart-rate plots, ~100 HRV metrics and Poincaré plots. This is the piece slated to go commercial.', stack: 'PyQt5 · neurokit2 · MNE', badge: 'Copyright', shot: '/shots/signal/desktop-ecg.png', span: true },
       { name: 'Web console', v: 'Users manage the signal files they uploaded and view waveforms and results. A whole 40 MB EDF recording is drawn as one ECharts waveform.', stack: 'Vue3 · Element Plus · ECharts', badge: 'Copyright', shot: '' },
       { name: 'Cloud backend', v: 'Stores signals and users, calls the algorithms. Python runs separately from Spring Boot; there was no complete guide for that online, so I wrote one.', stack: 'Spring Boot · Shiro · JWT · MyBatis-Plus', badge: 'Copyright', shot: '' },
       { name: 'App', v: 'Pairs with the wristband over Bluetooth, records the chosen channels, shows live waveforms and a blood-pressure estimate, uploads, and shows HRV results on the phone.', stack: 'uni-app · uView2', badge: '', shot: '/shots/signal/app.jpg', span: true },
