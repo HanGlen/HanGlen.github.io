@@ -1,0 +1,337 @@
+---
+/**
+ * 信号平台卡片里的心电示意：合成心电像监护仪一样扫过去，
+ * 用阈值加不应期的简单算法实时找 R 峰、算心率。
+ * 悬停或方向键选一拍，看它和上一拍的 RR 间期。
+ */
+interface Props {
+  lang: 'zh' | 'en';
+  cap: string;
+}
+
+const { lang, cap } = Astro.props;
+const zh = lang === 'zh';
+---
+
+<figure class="ecg" data-ecg data-lang={lang}>
+  <div class="screen" tabindex="0" role="img" aria-label={cap}>
+    <canvas aria-hidden="true"></canvas>
+    <p class="hr"><b data-bpm>--</b> <span>bpm</span></p>
+    <p class="tip" data-tip aria-live="polite"></p>
+  </div>
+  <figcaption>{cap}</figcaption>
+</figure>
+
+<style>
+  .ecg {
+    margin: 0;
+  }
+
+  .screen {
+    position: relative;
+    height: clamp(150px, 20vw, 210px);
+    border-radius: 12px;
+    border: 1px solid var(--line);
+    background: var(--bg);
+    overflow: hidden;
+    cursor: crosshair;
+  }
+
+  canvas {
+    position: absolute;
+    inset: 0;
+    width: 100%;
+    height: 100%;
+  }
+
+  .hr {
+    position: absolute;
+    top: 10px;
+    right: 14px;
+    margin: 0;
+    font-family: var(--mono);
+    font-size: 12px;
+    color: var(--ink-3);
+  }
+
+  .hr b {
+    font-family: var(--serif);
+    font-size: 26px;
+    font-weight: 600;
+    color: var(--accent-ink);
+    font-variant-numeric: tabular-nums;
+  }
+
+  .tip {
+    position: absolute;
+    top: 10px;
+    left: 12px;
+    margin: 0;
+    padding: 4px 9px;
+    border-radius: 8px;
+    border: 1px solid var(--line-2);
+    background: var(--card);
+    font-family: var(--mono);
+    font-size: 12px;
+    color: var(--ink-2);
+  }
+
+  .tip:empty {
+    display: none;
+  }
+
+  figcaption {
+    margin-top: 8px;
+    font-size: 12.5px;
+    color: var(--ink-3);
+  }
+</style>
+
+<script>
+  document.querySelectorAll<HTMLElement>('[data-ecg]').forEach(init);
+
+  function init(fig: HTMLElement) {
+    const zh = fig.dataset.lang === 'zh';
+    const screen = fig.querySelector<HTMLElement>('.screen')!;
+    const canvas = fig.querySelector('canvas')!;
+    const ctx = canvas.getContext('2d')!;
+    const bpmEl = fig.querySelector<HTMLElement>('[data-bpm]')!;
+    const tip = fig.querySelector<HTMLElement>('[data-tip]')!;
+    const reduce = matchMedia('(prefers-reduced-motion: reduce)').matches;
+
+    const SPEED = 110; // 每秒走多少像素
+    const SUB = 3; // 每个像素列的采样次数
+    let W = 0;
+    let H = 0;
+    let dpr = 1;
+    let buf: Float32Array = new Float32Array(0); // 每个像素列一个值
+    let head = 0; // 扫描线位置
+    let colors = { line: '', peak: '', grid: '', grid2: '', bg: '' };
+
+    // 合成一拍心电：P、Q、R、S、T 五个高斯波
+    const waves = [
+      [0.18, 0.12, 0.028],
+      [0.355, -0.12, 0.01],
+      [0.38, 1, 0.011],
+      [0.405, -0.26, 0.012],
+      [0.64, 0.28, 0.05],
+    ];
+    const beat = (ph: number) => waves.reduce((s, [c, a, w]) => s + a * Math.exp(-((ph - c) ** 2) / (2 * w * w)), 0);
+
+    let tSig = 0; // 信号时间（秒）
+    let beatStart = 0;
+    let rr = 0.82;
+    const nextRR = () => 0.74 + Math.random() * 0.16 + Math.sin(tSig * 0.9) * 0.03; // 带一点呼吸性窦性心律不齐
+    const sample = () => {
+      let ph = (tSig - beatStart) / rr;
+      if (ph >= 1) {
+        beatStart += rr;
+        rr = nextRR();
+        ph = (tSig - beatStart) / rr;
+      }
+      return beat(ph) + (Math.random() - 0.5) * 0.025 + Math.sin(tSig * 1.7) * 0.03;
+    };
+
+    // R 峰检测：超过阈值后找局部最大，之后 250ms 不应期
+    type Peak = { x: number; t: number; rr: number };
+    let peaks: Peak[] = [];
+    let above = false;
+    let candT = 0;
+    let candV = 0;
+    let candX = 0;
+    let lastPeakT = -1;
+    const detect = (v: number, x: number) => {
+      if (v > 0.55 && tSig - lastPeakT > 0.25) {
+        if (!above || v > candV) {
+          candV = v;
+          candT = tSig;
+          candX = x;
+        }
+        above = true;
+      } else if (above && v < 0.4) {
+        above = false;
+        const r = lastPeakT > 0 ? candT - lastPeakT : 0;
+        lastPeakT = candT;
+        peaks.push({ x: candX, t: candT, rr: r });
+        if (r > 0) {
+          const recent = peaks.filter((p) => p.rr > 0).slice(-4);
+          const avg = recent.reduce((s, p) => s + p.rr, 0) / recent.length;
+          bpmEl.textContent = String(Math.round(60 / avg));
+        }
+      }
+    };
+
+    function readColors() {
+      const cs = getComputedStyle(document.documentElement);
+      const g = (v: string) => cs.getPropertyValue(v).trim();
+      colors = { line: g('--accent'), peak: g('--accent-ink'), grid: g('--line'), grid2: g('--line-2'), bg: g('--bg') };
+    }
+
+    function layout() {
+      dpr = Math.min(window.devicePixelRatio || 1, 2);
+      W = screen.clientWidth;
+      H = screen.clientHeight;
+      canvas.width = Math.round(W * dpr);
+      canvas.height = Math.round(H * dpr);
+      buf = new Float32Array(Math.ceil(W)).fill(NaN);
+      head = 0;
+      peaks = [];
+      // 先填满一屏，静态时也有完整波形
+      advance(W);
+    }
+
+    let carry = 0;
+    function advance(px: number) {
+      carry += px;
+      while (carry >= 1) {
+        carry -= 1;
+        // 每个像素列分 SUB 次采样，检测用全部采样，画图取最后一个
+        let v = 0;
+        for (let i = 0; i < SUB; i++) {
+          tSig += 1 / (SPEED * SUB);
+          v = sample();
+          detect(v, head);
+        }
+        buf[head] = v;
+        peaks = peaks.filter((p) => p.x !== head || p.t === lastPeakT);
+        head = (head + 1) % buf.length;
+      }
+    }
+
+    let sel: Peak | null = null;
+    function showTip(p: Peak | null) {
+      sel = p;
+      if (!p || p.rr <= 0) {
+        tip.textContent = '';
+        return;
+      }
+      const ms = Math.round(p.rr * 1000);
+      tip.textContent = zh ? `这一拍 RR ${ms} ms · 心率 ${Math.round(60 / p.rr)}` : `RR ${ms} ms · ${Math.round(60 / p.rr)} bpm`;
+    }
+
+    const visiblePeaks = () => peaks.filter((p) => p.rr > 0 && Math.abs(((p.x - head + buf.length) % buf.length)) > 24);
+    screen.addEventListener('pointermove', (e) => {
+      const x = e.clientX - screen.getBoundingClientRect().left;
+      const list = visiblePeaks();
+      if (!list.length) return;
+      showTip(list.reduce((a, b) => (Math.abs(b.x - x) < Math.abs(a.x - x) ? b : a)));
+    });
+    screen.addEventListener('pointerleave', () => showTip(null));
+    screen.addEventListener('blur', () => showTip(null));
+    screen.addEventListener('keydown', (e) => {
+      if (e.key !== 'ArrowLeft' && e.key !== 'ArrowRight') return;
+      e.preventDefault();
+      const list = visiblePeaks().sort((a, b) => a.x - b.x);
+      if (!list.length) return;
+      const i = sel ? list.findIndex((p) => p === sel) : -1;
+      const j = i < 0 ? (e.key === 'ArrowLeft' ? list.length - 1 : 0) : Math.min(list.length - 1, Math.max(0, i + (e.key === 'ArrowLeft' ? -1 : 1)));
+      showTip(list[j]);
+    });
+
+    function draw() {
+      ctx.setTransform(dpr, 0, 0, dpr, 0, 0);
+      ctx.clearRect(0, 0, W, H);
+      // 心电图纸的格子：小格 8px，大格 40px
+      for (let x = 0; x < W; x += 8) {
+        ctx.fillStyle = x % 40 === 0 ? colors.grid2 : colors.grid;
+        ctx.fillRect(x, 0, 1, H);
+      }
+      for (let y = 0; y < H; y += 8) {
+        ctx.fillStyle = y % 40 === 0 ? colors.grid2 : colors.grid;
+        ctx.fillRect(0, y, W, 1);
+      }
+
+      const base = H * 0.7;
+      const amp = H * 0.42;
+      const yOf = (v: number) => base - v * amp;
+      ctx.strokeStyle = colors.line;
+      ctx.lineWidth = 1.8;
+      ctx.lineJoin = 'round';
+      ctx.beginPath();
+      let pen = false;
+      for (let x = 0; x < buf.length; x++) {
+        const gap = (x - head + buf.length) % buf.length;
+        const v = buf[x];
+        if (gap < 18 || Number.isNaN(v)) {
+          pen = false;
+          continue;
+        }
+        if (pen) ctx.lineTo(x, yOf(v));
+        else ctx.moveTo(x, yOf(v));
+        pen = true;
+      }
+      ctx.stroke();
+
+      // 扫描头的亮点
+      const hx = (head - 1 + buf.length) % buf.length;
+      if (!Number.isNaN(buf[hx])) {
+        ctx.fillStyle = colors.line;
+        ctx.beginPath();
+        ctx.arc(hx, yOf(buf[hx]), 3, 0, Math.PI * 2);
+        ctx.fill();
+      }
+
+      // 检测到的 R 峰
+      for (const p of peaks) {
+        const gap = (p.x - head + buf.length) % buf.length;
+        if (gap < 18) continue;
+        const y = yOf(buf[p.x]) - 9;
+        ctx.fillStyle = colors.peak;
+        ctx.beginPath();
+        ctx.moveTo(p.x, y + 4);
+        ctx.lineTo(p.x - 4, y - 3);
+        ctx.lineTo(p.x + 4, y - 3);
+        ctx.closePath();
+        ctx.fill();
+        if (p === sel) {
+          ctx.strokeStyle = colors.peak;
+          ctx.lineWidth = 1;
+          ctx.setLineDash([3, 3]);
+          ctx.beginPath();
+          ctx.moveTo(p.x, 0);
+          ctx.lineTo(p.x, H);
+          ctx.stroke();
+          ctx.setLineDash([]);
+        }
+      }
+    }
+
+    let last = 0;
+    let running = false;
+    function frame(now: number) {
+      const dt = last ? Math.min(0.05, (now - last) / 1000) : 0;
+      last = now;
+      advance(dt * SPEED);
+      draw();
+      if (running) requestAnimationFrame(frame);
+    }
+
+    readColors();
+    layout();
+    draw();
+    if (!reduce) {
+      new IntersectionObserver((es) => {
+        const vis = es[0].isIntersecting;
+        if (vis && !running) {
+          running = true;
+          last = 0;
+          requestAnimationFrame(frame);
+        } else if (!vis) running = false;
+      }).observe(screen);
+    }
+    let rt = 0;
+    addEventListener('resize', () => {
+      clearTimeout(rt);
+      rt = window.setTimeout(() => {
+        if (Math.abs(screen.clientWidth - W) > 1) {
+          layout();
+          draw();
+        }
+      }, 150);
+    });
+    matchMedia('(prefers-color-scheme: dark)').addEventListener('change', () => {
+      readColors();
+      draw();
+    });
+  }
+</script>

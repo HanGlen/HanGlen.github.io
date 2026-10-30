@@ -2,7 +2,8 @@
 import { getCollection } from 'astro:content';
 import Base from '../../layouts/Base.astro';
 import Section from '../Section.astro';
-import Heatmap from '../Heatmap.astro';
+import PrField from '../PrField.astro';
+import Ecg from '../Ecg.astro';
 import type { Content } from '../../i18n/zh';
 
 interface Props {
@@ -15,74 +16,87 @@ const zh = t.lang === 'zh';
 const base = zh ? '' : '/en';
 const notes = (await getCollection('notes')).sort((a, b) => b.data.date.valueOf() - a.data.date.valueOf()).slice(0, 3);
 const fmt = (d: Date) => d.toISOString().slice(0, 10);
-const [lead, ...rest] = t.work;
+const [dnd, signal, tavern] = t.work;
+// 数字滚动：拆出数字部分，其余原样保留
+const split = (v: string) => {
+  const m = v.match(/^([^\d]*)([\d,.]+)(.*)$/);
+  return m ? { pre: m[1], num: m[2], post: m[3] } : null;
+};
 ---
 
 <Base lang={t.lang} title={h.title} description={h.description}>
-  <section class="wrap hero">
-    <p class="eyebrow reveal">{h.hello}</p>
-    <h1 class="reveal">{h.line}</h1>
-    <p class="sub reveal">{h.sub}</p>
-    <div class="cta reveal">
-      <a class="btn primary" href={`${base}/work/dnd/#case`}>{h.cta} →</a>
-      <a class="btn" href={`${base}/about/#cv`}>{h.openLink}</a>
-      <span class="open"><span class="pulse" aria-hidden="true"></span>{h.open}</span>
-    </div>
-    <dl class="proof reveal">
+  <PrField t={t} />
+
+  <section class="wrap band">
+    <dl class="proof">
       {
-        h.proof.map((p) => (
-          <div class="sourced" tabindex="0">
-            <dd>{p.v}</dd>
-            <dt>{p.k}</dt>
-            <dd class="src" role="note">{p.src}</dd>
-          </div>
-        ))
+        h.proof.map((p) => {
+          const s = split(p.v);
+          return (
+            <div class="sourced reveal" tabindex="0">
+              <dd>{s ? <>{s.pre}<span data-count={s.num}>{s.num}</span>{s.post}</> : p.v}</dd>
+              <dt>{p.k}</dt>
+              <dd class="src" role="note">{p.src}</dd>
+            </div>
+          );
+        })
       }
     </dl>
   </section>
 
-  <Section no="01" title={h.workTitle} lead={h.workLead} id="work">
-    <a class="feature reveal" href={`${base}/work/${lead.slug}/`}>
-      <div class="f-text">
-        <p class="eyebrow">{lead.kind}</p>
-        <h3>{lead.name}</h3>
-        <p class="muted">{lead.line}</p>
-        <p class="stat">{lead.stat}</p>
-        <span class="more">{t.ui.readMore} →</span>
+  <Section no="01" title={h.workTitle} lead={h.workLead} id="work" wide>
+    <div class="bento">
+      <a class="card lead spot reveal" href={`${base}/work/${dnd.slug}/`} data-tilt>
+        <div class="txt">
+          <p class="eyebrow">{dnd.kind}</p>
+          <h3>{dnd.name}</h3>
+          <p class="muted">{dnd.line}</p>
+          <p class="stat">{dnd.stat}</p>
+          <ul class="badges">{dnd.badges.map((b) => <li>{b}</li>)}</ul>
+          <span class="more">{t.ui.readMore} <i>→</i></span>
+        </div>
+        <div class="phones" aria-hidden="true">
+          <img src={dnd.shot} alt="" loading="lazy" width="455" height="983" />
+          <img src={dnd.shot2} alt="" loading="lazy" width="455" height="983" />
+        </div>
+      </a>
+
+      <article class="card sig spot reveal">
+        <div class="txt">
+          <p class="eyebrow">{signal.kind}</p>
+          <h3><a class="stretch" href={`${base}/work/${signal.slug}/`}>{signal.name}</a></h3>
+          <p class="muted">{signal.line}</p>
+          <ul class="badges">
+            {signal.badges.map((b, i) => <li class={i === 0 ? 'key' : ''}>{b}</li>)}
+          </ul>
+          <a class="more" href={`${base}/work/${signal.slug}/`}>{t.ui.readMore} <i>→</i></a>
+        </div>
+        <div class="viz">
+          <Ecg lang={t.lang} cap={h.ecgCap} />
+        </div>
+      </article>
+
+      <a class="card tav spot reveal" href={`${base}/work/${tavern.slug}/`}>
+        <img src={tavern.shot} alt="" loading="lazy" width="1600" height="900" />
+        <div class="txt">
+          <p class="eyebrow">{tavern.kind}</p>
+          <h3>{tavern.name}</h3>
+          <p class="muted">{tavern.line}</p>
+          <span class="more">{t.ui.readMore} <i>→</i></span>
+        </div>
+      </a>
+
+      <div class="card now spot reveal">
+        <p class="eyebrow">{h.nowCard}</p>
+        <ul>
+          {t.now.short.map((x) => <li>{x}</li>)}
+        </ul>
+        <a class="more" href={`${base}/now/`}>{h.nowMore} <i>→</i></a>
       </div>
-      <div class="f-shots" aria-hidden="true">
-        <img src={lead.shot} alt="" loading="lazy" width="455" height="983" />
-        <img src={lead.shot2} alt="" loading="lazy" width="455" height="983" />
-      </div>
-    </a>
-    {
-      rest.map((w) => (
-        <a class="row reveal" href={`${base}/work/${w.slug}/`}>
-          <img src={w.shot} alt="" loading="lazy" />
-          <div>
-            <p class="eyebrow">{w.kind}</p>
-            <h3>{w.name}</h3>
-            <p class="muted">{w.line}</p>
-            <p class="stat">{w.stat}</p>
-          </div>
-        </a>
-      ))
-    }
+    </div>
   </Section>
 
-  <Section no="02" title={h.heatTitle} lead={h.dataLead}>
-    <div class="panel reveal"><Heatmap lang={t.lang} cases={t.home.heatCases} compact /></div>
-    <a class="link small" href={`${base}/work/dnd/#case`}>{h.heatMore} →</a>
-  </Section>
-
-  <Section no="03" title={h.nowTitle}>
-    <ul class="now reveal">
-      {t.now.short.map((x) => <li>{x}</li>)}
-    </ul>
-    <a class="link small" href={`${base}/now/`}>{h.nowMore} →</a>
-  </Section>
-
-  <Section no="04" title={h.notesTitle}>
+  <Section no="02" title={h.notesTitle}>
     <ul class="notes reveal">
       {
         notes.map((n) => (
@@ -100,146 +114,80 @@ const [lead, ...rest] = t.work;
 </Base>
 
 <style>
-  .hero {
-    padding-top: clamp(64px, 12vw, 160px);
-  }
-
-  h1 {
-    margin: 18px 0 0;
-    font-family: var(--serif);
-    font-weight: 600;
-    font-size: clamp(42px, 8vw, 96px);
-    line-height: 1.06;
-    letter-spacing: -0.03em;
-    max-width: 12em;
-    white-space: pre-line;
-  }
-
-  :lang(zh-CN) h1 {
-    letter-spacing: -0.01em;
-    font-size: clamp(30px, 8.2vw, 88px);
-  }
-
-  .sub {
-    margin: 28px 0 0;
-    max-width: 34em;
-    font-size: clamp(17px, 1.8vw, 20px);
-    line-height: 1.7;
-    color: var(--ink-2);
-  }
-
-  .cta {
-    margin-top: 36px;
-    display: flex;
-    flex-wrap: wrap;
-    align-items: center;
-    gap: 12px 14px;
-  }
-
-  .btn {
-    display: inline-flex;
-    align-items: center;
-    height: 46px;
-    padding: 0 22px;
-    border-radius: 999px;
-    border: 1px solid var(--line-2);
-    font-size: 15px;
-    transition: transform 0.2s, background 0.2s, border-color 0.2s;
-  }
-
-  .btn:hover {
-    transform: translateY(-1px);
-    border-color: var(--ink-3);
-  }
-
-  .primary {
-    background: var(--accent);
-    border-color: var(--accent);
-    color: #fff;
-  }
-
-  .primary:hover {
-    background: var(--accent-ink);
-    border-color: var(--accent-ink);
-  }
-
-  .open {
-    display: inline-flex;
-    align-items: center;
-    gap: 8px;
-    font-size: 14px;
-    color: var(--ink-2);
-  }
-
-  .pulse {
-    width: 8px;
-    height: 8px;
-    border-radius: 50%;
-    background: #3f9b62;
-    box-shadow: 0 0 0 4px rgba(63, 155, 98, 0.18);
+  .band {
+    position: relative;
+    z-index: 1;
+    margin-top: calc(-1 * var(--gap) * 0.2);
   }
 
   .proof {
-    margin: clamp(56px, 8vw, 96px) 0 0;
+    margin: 0;
     display: grid;
     grid-template-columns: repeat(4, minmax(0, 1fr));
     border-top: 1px solid var(--line-2);
   }
 
   .proof div {
-    padding: 18px 20px 0 0;
+    padding: 22px 20px 0 0;
   }
 
   .proof dd:not(.src) {
     margin: 0;
     font-family: var(--serif);
-    font-size: clamp(30px, 3.8vw, 46px);
+    font-size: clamp(32px, 4.4vw, 56px);
     font-weight: 600;
-    line-height: 1.15;
+    line-height: 1.1;
+    letter-spacing: -0.02em;
     font-variant-numeric: tabular-nums;
   }
 
   .proof dt {
-    margin-top: 4px;
+    margin-top: 6px;
     font-size: 13.5px;
     color: var(--ink-3);
   }
 
-  .feature {
+  /* —— 作品：按分量排版 —— */
+  .bento {
     display: grid;
-    grid-template-columns: minmax(0, 1fr) minmax(0, 0.9fr);
-    gap: 24px;
-    align-items: center;
-    padding: clamp(22px, 3vw, 36px);
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+    gap: 16px;
+  }
+
+  .card {
+    display: block;
     border-radius: 22px;
     border: 1px solid var(--line);
     background: var(--card);
     overflow: hidden;
-    transition: border-color 0.25s, transform 0.25s;
+    transition:
+      border-color 0.3s,
+      transform 0.4s cubic-bezier(0.2, 0.7, 0.2, 1),
+      box-shadow 0.4s;
   }
 
-  .feature:hover,
-  .row:hover {
+  .card:hover {
     border-color: var(--line-2);
-    transform: translateY(-2px);
+    transform: translateY(-3px);
+    box-shadow: var(--shadow);
   }
 
-  .feature:hover h3,
-  .row:hover h3 {
-    color: var(--accent-ink);
+  .card p {
+    margin: 0;
   }
 
   h3 {
-    margin: 8px 0 8px;
+    margin: 10px 0 10px;
     font-family: var(--serif);
-    font-size: clamp(26px, 3vw, 36px);
+    font-size: clamp(26px, 3vw, 38px);
     font-weight: 600;
-    line-height: 1.2;
+    line-height: 1.15;
+    letter-spacing: -0.015em;
     transition: color 0.2s;
   }
 
-  .f-text p {
-    margin: 0;
+  .card:hover h3 {
+    color: var(--accent-ink);
   }
 
   .stat {
@@ -250,80 +198,160 @@ const [lead, ...rest] = t.work;
     color: var(--accent-ink);
   }
 
+  .badges {
+    margin: 16px 0 0;
+    padding: 0;
+    list-style: none;
+    display: flex;
+    flex-wrap: wrap;
+    gap: 6px;
+  }
+
+  .badges li {
+    padding: 5px 11px;
+    border-radius: 999px;
+    border: 1px solid var(--line-2);
+    font-size: 12.5px;
+    color: var(--ink-2);
+    white-space: nowrap;
+  }
+
+  .badges .key {
+    border-color: var(--accent);
+    color: var(--accent-ink);
+    background: var(--accent-soft);
+  }
+
   .more {
-    display: inline-block;
-    margin-top: 18px;
+    display: inline-flex;
+    gap: 6px;
+    margin-top: 20px;
     font-size: 14px;
     color: var(--ink-2);
   }
 
-  .f-shots {
+  .more i {
+    font-style: normal;
+    transition: transform 0.25s;
+  }
+
+  .card:hover .more i {
+    transform: translateX(4px);
+  }
+
+  /* 小程序：整行，右边两台手机，跟着鼠标微微转动 */
+  .lead {
+    grid-column: 1 / -1;
+    display: grid;
+    grid-template-columns: minmax(0, 1fr) minmax(0, 0.95fr);
+    gap: 24px;
+    align-items: center;
+    padding: clamp(24px, 3.4vw, 44px);
+    perspective: 1200px;
+  }
+
+  .phones {
     display: grid;
     grid-template-columns: repeat(2, minmax(0, 1fr));
-    gap: 14px;
-    margin-bottom: -60px;
+    gap: 16px;
+    margin-bottom: -90px;
+    transform: rotateX(var(--rx, 0deg)) rotateY(var(--ry, 0deg));
+    transition: transform 0.5s cubic-bezier(0.2, 0.7, 0.2, 1);
+    transform-style: preserve-3d;
   }
 
-  .f-shots img,
-  .row img {
+  .phones img {
     width: 100%;
     height: auto;
-  }
-
-  .f-shots img {
-    border-radius: 22px;
+    border-radius: 24px;
     border: 4px solid #1c1a17;
     background: #1c1a17;
     box-shadow: var(--shadow);
   }
 
-  .f-shots img:last-child {
-    margin-top: 48px;
+  .phones img:last-child {
+    margin-top: 56px;
   }
 
-  .row {
-    margin-top: 16px;
+  /* 信号平台：整行，左文右图 */
+  .sig {
+    position: relative;
+    grid-column: 1 / -1;
     display: grid;
-    grid-template-columns: minmax(0, 0.9fr) minmax(0, 1fr);
-    gap: 24px;
+    grid-template-columns: minmax(0, 1fr) minmax(0, 1.05fr);
+    gap: clamp(20px, 3vw, 40px);
     align-items: center;
-    padding: 18px;
-    border-radius: 22px;
-    border: 1px solid var(--line);
-    background: var(--card);
-    transition: border-color 0.25s, transform 0.25s;
+    padding: clamp(24px, 3.4vw, 44px);
   }
 
-  .row img {
-    aspect-ratio: 16 / 10;
+  .stretch::after {
+    content: '';
+    position: absolute;
+    inset: 0;
+    z-index: 0;
+  }
+
+  .sig .viz,
+  .sig .more {
+    position: relative;
+    z-index: 1;
+  }
+
+  /* 晨曦酒馆和最近在做：半行小卡 */
+  .tav img {
+    width: 100%;
+    height: auto;
+    aspect-ratio: 16 / 8;
     object-fit: cover;
-    object-position: top left;
-    border-radius: 12px;
-    border: 1px solid var(--line);
+    object-position: center 30%;
+    transition: transform 0.8s cubic-bezier(0.2, 0.7, 0.2, 1);
   }
 
-  .row p {
-    margin: 0;
+  .tav:hover img {
+    transform: scale(1.04);
   }
 
-  .row h3 {
+  .tav .txt {
+    padding: 20px 24px 24px;
+  }
+
+  .tav h3,
+  .now h3 {
     font-size: clamp(22px, 2.4vw, 28px);
   }
 
-  .panel {
-    padding: 22px;
-    border-radius: var(--r);
-    border: 1px solid var(--line);
-    background: var(--card);
+  .now {
+    padding: 24px;
+    display: flex;
+    flex-direction: column;
   }
 
-  .small {
+  .now ul {
+    margin: 12px 0 0;
+    padding: 0;
+    list-style: none;
+    flex: 1;
+  }
+
+  .now li {
+    padding: 14px 0;
+    border-bottom: 1px solid var(--line);
+    font-family: var(--serif);
+    font-size: 18px;
+    line-height: 1.45;
+  }
+
+  .now li::before {
+    content: '';
     display: inline-block;
-    margin-top: 16px;
-    font-size: 14px;
+    width: 6px;
+    height: 6px;
+    margin-right: 10px;
+    border-radius: 50%;
+    background: var(--accent);
+    vertical-align: 0.2em;
   }
 
-  .now,
   .notes {
     margin: 0;
     padding: 0;
@@ -331,31 +359,27 @@ const [lead, ...rest] = t.work;
     border-top: 1px solid var(--line);
   }
 
-  .now li {
-    padding: 14px 0;
-    border-bottom: 1px solid var(--line);
-    font-family: var(--serif);
-    font-size: 19px;
-  }
-
   .notes a {
     display: flex;
     justify-content: space-between;
     align-items: baseline;
     gap: 16px;
-    padding: 14px 0;
+    padding: 16px 0;
     border-bottom: 1px solid var(--line);
   }
 
   .nt {
     font-family: var(--serif);
-    font-size: 19px;
+    font-size: 20px;
     font-weight: 600;
-    transition: color 0.2s;
+    transition:
+      color 0.2s,
+      transform 0.3s;
   }
 
   .notes a:hover .nt {
     color: var(--accent-ink);
+    transform: translateX(4px);
   }
 
   .nd {
@@ -365,18 +389,97 @@ const [lead, ...rest] = t.work;
     color: var(--ink-3);
   }
 
+  .small {
+    display: inline-block;
+    margin-top: 16px;
+    font-size: 14px;
+  }
+
   @media (max-width: 760px) {
     .proof {
       grid-template-columns: repeat(2, minmax(0, 1fr));
       row-gap: 10px;
     }
-    .feature,
-    .row {
+    .bento {
       grid-template-columns: minmax(0, 1fr);
     }
-    .f-shots {
-      max-width: 320px;
-      margin: 0 auto -80px;
+    .lead,
+    .sig {
+      grid-template-columns: minmax(0, 1fr);
+    }
+    .phones {
+      max-width: 300px;
+      margin: 0 auto -110px;
+    }
+  }
+
+  @media (prefers-reduced-motion: reduce) {
+    .phones,
+    .card,
+    .tav img {
+      transition: none;
     }
   }
 </style>
+
+<script>
+  const reduce = matchMedia('(prefers-reduced-motion: reduce)').matches;
+
+  // 卡片柔光跟着鼠标走
+  document.querySelectorAll<HTMLElement>('.spot').forEach((el) => {
+    el.addEventListener('pointermove', (e) => {
+      const r = el.getBoundingClientRect();
+      el.style.setProperty('--mx', `${e.clientX - r.left}px`);
+      el.style.setProperty('--my', `${e.clientY - r.top}px`);
+    });
+  });
+
+  // 手机截图跟着鼠标微微转
+  if (!reduce) {
+    document.querySelectorAll<HTMLElement>('[data-tilt]').forEach((el) => {
+      const phones = el.querySelector<HTMLElement>('.phones');
+      if (!phones) return;
+      el.addEventListener('pointermove', (e) => {
+        const r = el.getBoundingClientRect();
+        const x = (e.clientX - r.left) / r.width - 0.5;
+        const y = (e.clientY - r.top) / r.height - 0.5;
+        phones.style.setProperty('--ry', `${x * 10}deg`);
+        phones.style.setProperty('--rx', `${-y * 8}deg`);
+      });
+      el.addEventListener('pointerleave', () => {
+        phones.style.setProperty('--ry', '0deg');
+        phones.style.setProperty('--rx', '0deg');
+      });
+    });
+  }
+
+  // 数据条的数字：进入视野时从 0 数上去
+  const counters = document.querySelectorAll<HTMLElement>('[data-count]');
+  if (!reduce && 'IntersectionObserver' in window) {
+    const io = new IntersectionObserver(
+      (es) => {
+        for (const e of es) {
+          if (!e.isIntersecting) continue;
+          io.unobserve(e.target);
+          const el = e.target as HTMLElement;
+          const raw = el.dataset.count!;
+          const target = parseFloat(raw.replace(/,/g, ''));
+          const dec = raw.includes('.') ? raw.split('.')[1].length : 0;
+          const comma = raw.includes(',');
+          const t0 = performance.now();
+          const tick = (now: number) => {
+            const k = Math.min(1, (now - t0) / 1400);
+            const v = target * (1 - Math.pow(1 - k, 4));
+            const s = v.toFixed(dec);
+            el.textContent = comma ? Number(s).toLocaleString('en-US', { minimumFractionDigits: dec }) : s;
+            if (k < 1) requestAnimationFrame(tick);
+            else el.textContent = raw;
+          };
+          requestAnimationFrame(tick);
+        }
+      },
+      { threshold: 0.6 },
+    );
+    counters.forEach((el) => io.observe(el));
+  }
+</script>

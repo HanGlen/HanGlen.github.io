@@ -18,7 +18,7 @@ const toc = ids.map((id, i) => ({ id, label: s.toc[i] }));
 ---
 
 <Base lang={t.lang} title={s.title} description={s.description}>
-  <CaseHeader kind={s.kind} name={s.name} line={s.line} stats={s.stats} back={t.ui.backHome} backHref={`${base}/`} />
+  <CaseHeader kind={s.kind} name={s.name} line={s.line} stats={s.stats} badges={s.badges} back={t.ui.backHome} backHref={`${base}/`} />
 
   <section class="wrap hero-wrap">
     <figure class="hero-shot reveal">

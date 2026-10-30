@@ -1,0 +1,787 @@
+---
+/**
+ * 首页开场：每个点是一个合入的 PR。
+ * 一开始散成一片会躲鼠标的粒子；往下滚，粒子按合入日期飞成每天的柱状图。
+ * 柱状图支持悬停和方向键读数，有案例的日子附链接。
+ */
+import data from '../data/dnd.json';
+import type { PrType } from '../lib/prtype';
+import type { Content } from '../i18n/zh';
+
+interface Props {
+  t: Content;
+}
+
+const { t } = Astro.props;
+const h = t.home;
+const f = h.field;
+const zh = t.lang === 'zh';
+const base = zh ? '' : '/en';
+
+const daily = data.daily as Record<string, number>;
+const dailyTypes = data.dailyTypes as Record<string, Partial<Record<PrType, number>>>;
+const keys = Object.keys(daily).sort();
+const days: { d: string; feat: number; fix: number; other: number }[] = [];
+for (let d = new Date(`${keys[0]}T00:00:00Z`), end = new Date(`${keys[keys.length - 1]}T00:00:00Z`); d <= end; d.setUTCDate(d.getUTCDate() + 1)) {
+  const key = d.toISOString().slice(0, 10);
+  const n = daily[key] ?? 0;
+  const ty = dailyTypes[key] ?? {};
+  const feat = ty.feat ?? 0;
+  const fix = ty.fix ?? 0;
+  days.push({ d: key, feat, fix, other: Math.max(0, n - feat - fix) });
+}
+const total = days.reduce((a, x) => a + x.feat + x.fix + x.other, 0);
+const peak = Math.max(...days.map((x) => x.feat + x.fix + x.other));
+const legend = zh ? { feat: '新功能', fix: '修复', other: '其他' } : { feat: 'Feature', fix: 'Fix', other: 'Other' };
+const payload = {
+  lang: t.lang,
+  days,
+  peak,
+  day: f.day,
+  legend,
+  cases: h.heatCases,
+};
+
+// 标题逐字升起：英文按词换行，中文每个字都可以换行
+const lines = h.line.split('\n').map((l) => l.match(/[A-Za-z0-9.,'’&-]+|\s+|./g) ?? []);
+let ci = 0;
+const fmtN = (n: number) => n.toLocaleString('en-US');
+---
+
+<section class="field" data-field>
+  <div class="stage">
+    <canvas class="canvas" aria-hidden="true"></canvas>
+
+    <div class="wrap intro">
+      <p class="eyebrow rise" style="--i:0">{h.hello}</p>
+      <h1 aria-label={h.line.replace('\n', ' ')}>
+        {
+          lines.map((tokens) => (
+            <span class="ln" aria-hidden="true">
+              {tokens.map((tok) =>
+                /^\s+$/.test(tok) ? (
+                  ' '
+                ) : (
+                  <span class="w">
+                    {[...tok].map((ch) => (
+                      <span class="ch" style={`--i:${ci++}`}>
+                        {ch}
+                      </span>
+                    ))}
+                  </span>
+                ),
+              )}
+            </span>
+          ))
+        }
+      </h1>
+      <p class="sub rise" style="--i:14">{h.sub}</p>
+      <div class="cta rise" style="--i:18">
+        <a class="btn primary" href={`${base}/work/dnd/#case`}>{h.cta} →</a>
+        <a class="btn" href={`${base}/about/#cv`}>{h.openLink}</a>
+        <span class="open"><span class="pulse" aria-hidden="true"></span>{h.open}</span>
+      </div>
+    </div>
+
+    <div class="wrap cap" aria-hidden="true">
+      <p class="eyebrow">{f.total.replace('{n}', fmtN(total))} · {f.peak.replace('{n}', String(peak))}</p>
+      <h2 class="cap-title">{f.title}</h2>
+      <p class="cap-sub">{f.sub}</p>
+      <ul class="legend">
+        <li><i class="k-feat"></i>{legend.feat}</li>
+        <li><i class="k-fix"></i>{legend.fix}</li>
+        <li><i class="k-other"></i>{legend.other}</li>
+      </ul>
+    </div>
+
+    <div class="wrap readout-wrap">
+      <div class="readout" data-readout aria-live="polite"></div>
+    </div>
+
+    <div class="focus-target" tabindex="0" role="img" aria-label={f.aria} data-focus></div>
+
+    <p class="hint" aria-hidden="true"><span>{f.hint}</span><i></i></p>
+  </div>
+  <script type="application/json" data-payload set:html={JSON.stringify(payload)} />
+</section>
+
+<style>
+  .field {
+    position: relative;
+    height: 240svh;
+  }
+
+  .stage {
+    position: sticky;
+    top: 0;
+    height: 100svh;
+    min-height: 560px;
+    overflow: hidden;
+  }
+
+  .canvas {
+    position: absolute;
+    inset: 0;
+    width: 100%;
+    height: 100%;
+    touch-action: pan-y;
+  }
+
+  .intro {
+    position: relative;
+    z-index: 2;
+    padding-top: clamp(96px, 16vh, 180px);
+    pointer-events: none;
+    will-change: opacity, transform;
+  }
+
+  .intro a {
+    pointer-events: auto;
+  }
+
+  h1 {
+    margin: 18px 0 0;
+    font-family: var(--serif);
+    font-weight: 600;
+    font-size: clamp(44px, 8.4vw, 112px);
+    line-height: 1.04;
+    letter-spacing: -0.035em;
+  }
+
+  :lang(zh-CN) h1 {
+    letter-spacing: -0.01em;
+    font-size: clamp(34px, 8.6vw, 104px);
+    line-height: 1.12;
+  }
+
+  .ln {
+    display: block;
+  }
+
+  .w {
+    display: inline-block;
+    white-space: nowrap;
+  }
+
+  .ch {
+    display: inline-block;
+    animation: rise 0.9s cubic-bezier(0.2, 0.75, 0.15, 1) both;
+    animation-delay: calc(var(--i) * 32ms + 120ms);
+  }
+
+  .rise {
+    animation: rise 0.9s cubic-bezier(0.2, 0.75, 0.15, 1) both;
+    animation-delay: calc(var(--i) * 40ms + 120ms);
+  }
+
+  @keyframes rise {
+    from {
+      opacity: 0;
+      transform: translateY(0.45em) rotate(2deg);
+      filter: blur(6px);
+    }
+    to {
+      opacity: 1;
+      transform: none;
+      filter: none;
+    }
+  }
+
+  .sub {
+    margin: 28px 0 0;
+    max-width: 34em;
+    font-size: clamp(16px, 1.7vw, 19px);
+    line-height: 1.7;
+    color: var(--ink-2);
+    text-shadow: 0 0 18px var(--bg), 0 0 6px var(--bg);
+  }
+
+  .cta {
+    margin-top: 32px;
+    display: flex;
+    flex-wrap: wrap;
+    align-items: center;
+    gap: 12px 14px;
+  }
+
+  .btn {
+    display: inline-flex;
+    align-items: center;
+    height: 46px;
+    padding: 0 22px;
+    border-radius: 999px;
+    border: 1px solid var(--line-2);
+    background: color-mix(in srgb, var(--bg) 70%, transparent);
+    backdrop-filter: blur(6px);
+    font-size: 15px;
+    transition: transform 0.2s, background 0.2s, border-color 0.2s;
+  }
+
+  .btn:hover {
+    transform: translateY(-1px);
+    border-color: var(--ink-3);
+  }
+
+  .primary {
+    background: var(--accent);
+    border-color: var(--accent);
+    color: var(--bg);
+  }
+
+  .primary:hover {
+    background: var(--accent-ink);
+    border-color: var(--accent-ink);
+  }
+
+  .open {
+    display: inline-flex;
+    align-items: center;
+    gap: 8px;
+    font-size: 14px;
+    color: var(--ink-2);
+    text-shadow: 0 0 10px var(--bg);
+  }
+
+  .pulse {
+    width: 8px;
+    height: 8px;
+    border-radius: 50%;
+    background: var(--ok);
+    box-shadow: 0 0 0 4px var(--ok-soft);
+    animation: pulse 2.4s ease-in-out infinite;
+  }
+
+  @keyframes pulse {
+    50% {
+      box-shadow: 0 0 0 7px transparent;
+    }
+  }
+
+  .cap,
+  .readout-wrap {
+    position: absolute;
+    left: 0;
+    right: 0;
+    z-index: 2;
+    opacity: 0;
+    pointer-events: none;
+  }
+
+  .cap {
+    top: clamp(84px, 13vh, 132px);
+  }
+
+  .cap-title {
+    margin: 10px 0 0;
+    font-family: var(--serif);
+    font-weight: 600;
+    font-size: clamp(28px, 4.4vw, 54px);
+    line-height: 1.12;
+    letter-spacing: -0.02em;
+  }
+
+  .cap-sub {
+    margin: 12px 0 0;
+    max-width: 36em;
+    color: var(--ink-2);
+    font-size: 15px;
+  }
+
+  .legend {
+    margin: 14px 0 0;
+    padding: 0;
+    list-style: none;
+    display: flex;
+    gap: 16px;
+    font-size: 13px;
+    color: var(--ink-3);
+  }
+
+  .legend li {
+    display: inline-flex;
+    align-items: center;
+    gap: 6px;
+  }
+
+  .legend i {
+    width: 9px;
+    height: 9px;
+    border-radius: 2px;
+  }
+
+  .k-feat {
+    background: var(--accent);
+  }
+
+  .k-fix {
+    background: var(--heat-2);
+  }
+
+  .k-other {
+    background: var(--ink-3);
+  }
+
+  .readout-wrap {
+    bottom: 0;
+  }
+
+  .readout {
+    position: absolute;
+    left: var(--gutter);
+    bottom: var(--ro-bottom, 40%);
+    transform: translateX(var(--ro-x, 0));
+    width: max-content;
+    max-width: min(320px, calc(100vw - 2 * var(--gutter)));
+    padding: 10px 13px;
+    border-radius: 12px;
+    border: 1px solid var(--line-2);
+    background: var(--card);
+    box-shadow: var(--shadow);
+    font-size: 13px;
+    line-height: 1.55;
+    transition: transform 0.18s ease-out;
+  }
+
+  .readout:empty {
+    display: none;
+  }
+
+  .readout :global(b) {
+    display: block;
+    font-family: var(--serif);
+    font-size: 16px;
+  }
+
+  .readout :global(span) {
+    color: var(--ink-2);
+    font-variant-numeric: tabular-nums;
+  }
+
+  .readout :global(a) {
+    display: block;
+    margin-top: 4px;
+    color: var(--accent-ink);
+    pointer-events: auto;
+  }
+
+  .focus-target {
+    position: absolute;
+    left: var(--gutter);
+    right: var(--gutter);
+    bottom: 6%;
+    height: 50%;
+    z-index: 1;
+    border-radius: 12px;
+    pointer-events: none;
+  }
+
+  .hint {
+    position: absolute;
+    z-index: 2;
+    left: 50%;
+    bottom: 22px;
+    margin: 0;
+    transform: translateX(-50%);
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 10px;
+    font-family: var(--mono);
+    font-size: 11.5px;
+    letter-spacing: 0.06em;
+    color: var(--ink-3);
+    white-space: nowrap;
+    animation: rise 1s 1.4s backwards;
+  }
+
+  .hint i {
+    width: 1px;
+    height: 36px;
+    background: linear-gradient(var(--ink-3), transparent);
+    animation: drip 1.8s ease-in-out infinite;
+    transform-origin: top;
+  }
+
+  @keyframes drip {
+    0% {
+      transform: scaleY(0);
+    }
+    50% {
+      transform: scaleY(1);
+    }
+    100% {
+      transform: scaleY(1);
+      opacity: 0;
+    }
+  }
+
+  @media (max-width: 640px) {
+    .field {
+      height: 220svh;
+    }
+    .intro {
+      padding-top: 88px;
+    }
+    .cta {
+      margin-top: 24px;
+    }
+    .btn {
+      height: 42px;
+      padding: 0 18px;
+    }
+  }
+
+  @media (prefers-reduced-motion: reduce) {
+    .ch,
+    .rise,
+    .hint,
+    .hint i,
+    .pulse {
+      animation: none;
+    }
+  }
+</style>
+
+<script>
+  type Day = { d: string; feat: number; fix: number; other: number };
+  type Case = { date: string; label: string; refs: string; href: string };
+  type Payload = { lang: 'zh' | 'en'; days: Day[]; peak: number; day: string; legend: Record<'feat' | 'fix' | 'other', string>; cases: Case[] };
+
+  const root = document.querySelector<HTMLElement>('[data-field]');
+  if (root) init(root);
+
+  function init(root: HTMLElement) {
+    const P: Payload = JSON.parse(root.querySelector('[data-payload]')!.textContent!);
+    const stage = root.querySelector<HTMLElement>('.stage')!;
+    const canvas = root.querySelector<HTMLCanvasElement>('canvas')!;
+    const ctx = canvas.getContext('2d')!;
+    const intro = root.querySelector<HTMLElement>('.intro')!;
+    const cap = root.querySelector<HTMLElement>('.cap')!;
+    const roWrap = root.querySelector<HTMLElement>('.readout-wrap')!;
+    const ro = root.querySelector<HTMLElement>('[data-readout]')!;
+    const hint = root.querySelector<HTMLElement>('.hint')!;
+    const focusEl = root.querySelector<HTMLElement>('[data-focus]')!;
+    const reduce = matchMedia('(prefers-reduced-motion: reduce)').matches;
+    const zh = P.lang === 'zh';
+    const enMonths = ['Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun', 'Jul', 'Aug', 'Sep', 'Oct', 'Nov', 'Dec'];
+    const dateLabel = (d: string) => (zh ? `${Number(d.slice(5, 7))}月${Number(d.slice(8))}日` : `${enMonths[Number(d.slice(5, 7)) - 1]} ${Number(d.slice(8))}`);
+
+    // —— 粒子：每个 PR 一个 ——
+    type Kind = 0 | 1 | 2; // 新功能 / 修复 / 其他
+    type Pt = {
+      kind: Kind;
+      col: number;
+      row: number;
+      hx: number; // 散开时的家
+      hy: number;
+      ph: number;
+      amp: number;
+      dx: number; // 被鼠标推开的位移
+      dy: number;
+      delay: number;
+      x: number;
+      y: number;
+    };
+    const pts: Pt[] = [];
+    P.days.forEach((day, col) => {
+      let row = 0;
+      const push = (kind: Kind, n: number) => {
+        for (let i = 0; i < n; i++) pts.push({ kind, col, row: row++, hx: 0, hy: 0, ph: Math.random() * Math.PI * 2, amp: 4 + Math.random() * 12, dx: 0, dy: 0, delay: 0, x: 0, y: 0 });
+      };
+      push(0, day.feat);
+      push(1, day.fix);
+      push(2, day.other);
+    });
+    const nDays = P.days.length;
+
+    let W = 0;
+    let H = 0;
+    let dpr = 1;
+    let chart = { left: 0, width: 0, bottom: 0, sx: 0, sy: 0, w: 0, h: 0 };
+    let colors = ['', '', '', '', '', ''];
+
+    function readColors() {
+      const cs = getComputedStyle(document.documentElement);
+      colors = ['--accent', '--heat-2', '--ink-3', '--line-2', '--ink-3', '--accent-ink'].map((v) => cs.getPropertyValue(v).trim());
+    }
+
+    // 用确定的伪随机撒点，保证每次布局一致、分布均匀
+    function scatter() {
+      let s = 7;
+      const rnd = () => ((s = (s * 16807) % 2147483647) / 2147483647);
+      for (const p of pts) {
+        p.hx = rnd() * W;
+        p.hy = rnd() * H;
+      }
+    }
+
+    function layout() {
+      dpr = Math.min(window.devicePixelRatio || 1, 2);
+      W = stage.clientWidth;
+      H = stage.clientHeight;
+      canvas.width = Math.round(W * dpr);
+      canvas.height = Math.round(H * dpr);
+      const wrap = cap.getBoundingClientRect();
+      const gutter = parseFloat(getComputedStyle(cap).paddingLeft) || 16;
+      const left = wrap.left + gutter;
+      const width = wrap.width - gutter * 2;
+      const bottom = H - Math.max(56, H * 0.1);
+      const capBottom = cap.offsetTop + cap.offsetHeight + 28;
+      const maxH = Math.max(80, bottom - capBottom - 40);
+      // 宽屏是方格；手机上一天的列很窄，格子拉高，柱子才看得清
+      const sx = width / nDays;
+      const sy = Math.min(maxH / P.peak, Math.max(sx, 6));
+      chart = { left, width, bottom, sx, sy, w: sx > 5 ? sx * 0.74 : sx * 0.8, h: sy * 0.78 };
+      focusEl.style.height = `${P.peak * sy + 24}px`;
+      focusEl.style.bottom = `${H - bottom - 12}px`;
+      scatter();
+      for (const p of pts) p.delay = (p.col / nDays) * 0.35 + Math.random() * 0.1;
+    }
+
+    // —— 滚动进度 ——
+    let target = 0;
+    let prog = 0;
+    function readScroll() {
+      const r = root.getBoundingClientRect();
+      const span = root.offsetHeight - stage.offsetHeight;
+      target = span > 0 ? Math.min(1, Math.max(0, -r.top / span)) : 0;
+    }
+
+    // —— 指针 ——
+    let mx = -9999;
+    let my = -9999;
+    let sel = -1;
+    stage.addEventListener('pointermove', (e) => {
+      const r = stage.getBoundingClientRect();
+      mx = e.clientX - r.left;
+      my = e.clientY - r.top;
+      if (morph > 0.9) pickAt(mx, my);
+    });
+    stage.addEventListener('pointerleave', () => {
+      mx = my = -9999;
+    });
+    stage.addEventListener('pointerdown', (e) => {
+      const r = stage.getBoundingClientRect();
+      if (morph > 0.9) pickAt(e.clientX - r.left, e.clientY - r.top);
+    });
+
+    function pickAt(x: number, y: number) {
+      const top = chart.bottom - P.peak * chart.sy - 30;
+      if (y < top || y > chart.bottom + 28 || x < chart.left - 4 || x > chart.left + chart.width + 4) return;
+      const c = Math.min(nDays - 1, Math.max(0, Math.floor((x - chart.left) / chart.sx)));
+      select(c);
+    }
+
+    function select(c: number) {
+      if (c === sel) return;
+      sel = c;
+      const day = P.days[c];
+      const n = day.feat + day.fix + day.other;
+      const parts = (['feat', 'fix', 'other'] as const).filter((k) => day[k] > 0).map((k) => `${P.legend[k]} ${day[k]}`);
+      const cases = P.cases.filter((x) => x.date === day.d);
+      ro.innerHTML = '';
+      const b = document.createElement('b');
+      b.textContent = P.day.replace('{d}', dateLabel(day.d)).replace('{n}', String(n));
+      ro.append(b);
+      if (parts.length) {
+        const s = document.createElement('span');
+        s.textContent = parts.join(' · ');
+        ro.append(s);
+      }
+      for (const cs of cases) {
+        const a = document.createElement('a');
+        a.href = cs.href;
+        a.textContent = `${cs.label} →`;
+        ro.append(a);
+      }
+      placeReadout();
+    }
+
+    function placeReadout() {
+      if (sel < 0) return;
+      const day = P.days[sel];
+      const n = day.feat + day.fix + day.other;
+      const x = chart.left + (sel + 0.5) * chart.sx;
+      const w = ro.offsetWidth;
+      const gutter = chart.left;
+      const left = Math.min(W - gutter - w, Math.max(gutter, x - w / 2));
+      ro.style.left = '0px';
+      ro.style.setProperty('--ro-x', `${left}px`);
+      ro.style.setProperty('--ro-bottom', `${H - chart.bottom + n * chart.sy + 14}px`);
+    }
+
+    focusEl.addEventListener('focus', () => {
+      // 键盘用户直接跳到柱状图
+      const span = root.offsetHeight - stage.offsetHeight;
+      const y = window.scrollY + root.getBoundingClientRect().top + span * 0.82;
+      if (target < 0.8) window.scrollTo({ top: y, behavior: reduce ? 'auto' : 'smooth' });
+      if (sel < 0) select(P.days.reduce((best, d, i, arr) => (d.feat + d.fix + d.other > arr[best].feat + arr[best].fix + arr[best].other ? i : best), 0));
+      focusEl.style.outline = `2px solid ${colors[0]}`;
+    });
+    focusEl.addEventListener('blur', () => {
+      focusEl.style.outline = 'none';
+    });
+    focusEl.addEventListener('keydown', (e) => {
+      const k = e.key;
+      let c = sel < 0 ? nDays - 1 : sel;
+      if (k === 'ArrowLeft') c--;
+      else if (k === 'ArrowRight') c++;
+      else if (k === 'Home') c = 0;
+      else if (k === 'End') c = nDays - 1;
+      else return;
+      e.preventDefault();
+      select(Math.min(nDays - 1, Math.max(0, c)));
+    });
+
+    // —— 绘制 ——
+    const ease = (x: number) => (x < 0.5 ? 4 * x * x * x : 1 - Math.pow(-2 * x + 2, 3) / 2);
+    const clamp = (x: number) => Math.min(1, Math.max(0, x));
+    const smooth = (a: number, b: number, x: number) => {
+      const u = clamp((x - a) / (b - a));
+      return u * u * (3 - 2 * u);
+    };
+    let morph = 0;
+    let t0 = performance.now();
+    let running = false;
+    let visible = true;
+    const caseCols = new Set(P.cases.map((c) => P.days.findIndex((d) => d.d === c.date)).filter((i) => i >= 0));
+
+    function frame(now: number) {
+      const t = (now - t0) / 1000;
+      prog = reduce ? target : prog + (target - prog) * 0.14;
+      morph = smooth(0.08, 0.72, prog);
+
+      // 文字层
+      const out = smooth(0.02, 0.3, prog);
+      intro.style.opacity = String(1 - out);
+      intro.style.transform = `translateY(${-out * 60}px)`;
+      intro.style.visibility = out > 0.99 ? 'hidden' : 'visible';
+      const inn = smooth(0.55, 0.78, prog);
+      cap.style.opacity = String(inn);
+      cap.style.transform = `translateY(${(1 - inn) * 24}px)`;
+      roWrap.style.opacity = String(smooth(0.8, 0.9, prog));
+      hint.style.opacity = String(1 - smooth(0, 0.08, prog));
+
+      ctx.setTransform(dpr, 0, 0, dpr, 0, 0);
+      ctx.clearRect(0, 0, W, H);
+
+      const { left, bottom, sx: stepX, sy: stepY, w: cw, h: chh } = chart;
+      const R = Math.min(170, W * 0.22);
+      const hasMouse = mx > -999;
+
+      // 坐标轴：月份
+      if (morph > 0.4) {
+        ctx.globalAlpha = smooth(0.4, 1, morph);
+        ctx.fillStyle = colors[4];
+        ctx.font = `11px ${getComputedStyle(document.body).getPropertyValue('--mono') || 'monospace'}`;
+        ctx.textBaseline = 'top';
+        let last = '';
+        P.days.forEach((d, i) => {
+          const m = d.d.slice(5, 7);
+          if (m !== last) {
+            last = m;
+            const x = left + i * stepX;
+            ctx.fillRect(x, bottom + 4, 1, 6);
+            ctx.fillText(zh ? `${Number(m)}月` : enMonths[Number(m) - 1], x + 4, bottom + 6);
+          }
+        });
+        ctx.fillStyle = colors[3];
+        ctx.fillRect(left, bottom + 2, chart.width, 1);
+        // 有案例的日子：柱顶一个小圈
+        ctx.strokeStyle = colors[5];
+        ctx.lineWidth = 1.2;
+        for (const c of caseCols) {
+          const d = P.days[c];
+          const n = d.feat + d.fix + d.other;
+          ctx.beginPath();
+          ctx.arc(left + (c + 0.5) * stepX, bottom - n * stepY - Math.max(5, stepY * 0.8), Math.max(2, Math.min(stepX, stepY) * 0.4), 0, Math.PI * 2);
+          ctx.stroke();
+        }
+      }
+
+      for (const p of pts) {
+        // 散开时的位置：在家附近漂，被鼠标推开
+        const fx = p.hx + (reduce ? 0 : Math.sin(t * 0.5 + p.ph) * p.amp);
+        const fy = p.hy + (reduce ? 0 : Math.cos(t * 0.37 + p.ph * 1.3) * p.amp);
+        let tx = 0;
+        let ty = 0;
+        if (hasMouse && morph < 0.6) {
+          const ddx = fx - mx;
+          const ddy = fy - my;
+          const d = Math.hypot(ddx, ddy);
+          if (d < R && d > 0.01) {
+            const k = Math.pow(1 - d / R, 2) * 70;
+            tx = (ddx / d) * k;
+            ty = (ddy / d) * k;
+          }
+        }
+        p.dx += (tx - p.dx) * (reduce ? 1 : 0.09);
+        p.dy += (ty - p.dy) * (reduce ? 1 : 0.09);
+        const sx = fx + p.dx;
+        const sy = fy + p.dy;
+
+        // 柱状图里的位置
+        const cx = left + p.col * stepX + (stepX - cw) / 2;
+        const cy = bottom - (p.row + 1) * stepY + (stepY - chh) / 2;
+
+        const m = ease(clamp((morph - p.delay) / 0.55));
+        p.x = sx + (cx - sx) * m;
+        p.y = sy + (cy - sy) * m;
+
+        const dim = sel >= 0 && morph > 0.9 && p.col !== sel ? 0.5 : 1;
+        ctx.globalAlpha = (0.55 + 0.45 * m) * dim;
+        ctx.fillStyle = colors[p.kind];
+        if (m < 0.98) {
+          // 散开时是一小段短线，朝向鼠标（没有鼠标时顺着漂的方向）
+          const ang = hasMouse ? Math.atan2(my - sy, mx - sx) : Math.sin(t * 0.3 + p.ph) * Math.PI;
+          const len = 7 * (1 - m) + cw * m;
+          const thick = 1.8 * (1 - m) + chh * m;
+          ctx.save();
+          ctx.translate(p.x + (cw / 2) * m, p.y + (chh / 2) * m);
+          ctx.rotate(ang * (1 - m));
+          ctx.fillRect(-len / 2, -thick / 2, len, thick);
+          ctx.restore();
+        } else {
+          ctx.fillRect(p.x, p.y, cw, chh);
+        }
+      }
+      ctx.globalAlpha = 1;
+
+      if (running) requestAnimationFrame(frame);
+    }
+
+    function start() {
+      if (running || !visible) return;
+      running = true;
+      requestAnimationFrame(frame);
+    }
+
+    readColors();
+    layout();
+    readScroll();
+    prog = target;
+    if (target > 0.85) select(nDays - 1);
+    start();
+
+    new IntersectionObserver((es) => {
+      visible = es[0].isIntersecting;
+      if (visible) start();
+      else running = false;
+    }).observe(root);
+
+    addEventListener('scroll', readScroll, { passive: true });
+    let rt = 0;
+    addEventListener('resize', () => {
+      clearTimeout(rt);
+      rt = window.setTimeout(() => {
+        layout();
+        placeReadout();
+      }, 120);
+    });
+    matchMedia('(prefers-color-scheme: dark)').addEventListener('change', readColors);
+    document.fonts?.ready.then(() => {
+      layout();
+      placeReadout();
+    });
+  }
+</script>
