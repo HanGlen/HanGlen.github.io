@@ -18,7 +18,7 @@ const toc = ['roles', 'gates', 'visuals'].map((id, i) => ({ id, label: v.toc[i] 
 ---
 
 <Base lang={t.lang} title={v.title} description={v.description}>
-  <CaseHeader kind={v.kind} name={v.name} line={v.line} stats={[]} back={t.ui.backHome} backHref={`${base}/`} />
+  <CaseHeader kind={v.kind} name={v.name} line={v.line} stats={[]} goal={v.goal} back={t.ui.backHome} backHref={`${base}/`} />
 
   <section class="wrap hero-wrap">
     <figure class="hero reveal">

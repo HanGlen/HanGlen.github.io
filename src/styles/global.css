@@ -15,6 +15,10 @@
   --accent: #b4441f;
   --accent-ink: #9a3412;
   --accent-soft: rgba(180, 68, 31, 0.08);
+  --accent-glow: rgba(180, 68, 31, 0.14);
+  --ok: #3f9b62;
+  --ok-soft: rgba(63, 155, 98, 0.18);
+  --grain: 0.05;
   --heat-0: #e6e0d3;
   --heat-1: #efc7b3;
   --heat-2: #df9677;
@@ -48,6 +52,10 @@
     --accent: #e3825c;
     --accent-ink: #f0a07f;
     --accent-soft: rgba(227, 130, 92, 0.1);
+    --accent-glow: rgba(227, 130, 92, 0.16);
+    --ok: #5cc184;
+    --ok-soft: rgba(92, 193, 132, 0.18);
+    --grain: 0.035;
     --heat-0: #24211d;
     --heat-1: #4a2d20;
     --heat-2: #7a3e25;
@@ -70,6 +78,10 @@
   --accent: #e3825c;
   --accent-ink: #f0a07f;
   --accent-soft: rgba(227, 130, 92, 0.1);
+  --accent-glow: rgba(227, 130, 92, 0.16);
+  --ok: #5cc184;
+  --ok-soft: rgba(92, 193, 132, 0.18);
+  --grain: 0.035;
   --heat-0: #24211d;
   --heat-1: #4a2d20;
   --heat-2: #7a3e25;
@@ -99,6 +111,39 @@ body {
   line-height: 1.75;
   -webkit-font-smoothing: antialiased;
   overflow-x: hidden;
+}
+
+/* 纸张颗粒：很淡的一层噪点，让米白底不像纯色块 */
+body::after {
+  content: '';
+  position: fixed;
+  inset: 0;
+  z-index: 100;
+  pointer-events: none;
+  opacity: var(--grain);
+  background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='160' height='160'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='.9' numOctaves='3' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)'/%3E%3C/svg%3E");
+}
+
+/* 卡片跟随鼠标的柔光：元素加 .spot，脚本写 --mx/--my */
+.spot {
+  position: relative;
+  isolation: isolate;
+}
+
+.spot::before {
+  content: '';
+  position: absolute;
+  inset: 0;
+  z-index: -1;
+  border-radius: inherit;
+  background: radial-gradient(520px circle at var(--mx, 50%) var(--my, 50%), var(--accent-glow), transparent 55%);
+  opacity: 0;
+  transition: opacity 0.35s;
+  pointer-events: none;
+}
+
+.spot:hover::before {
+  opacity: 1;
 }
 
 a {
