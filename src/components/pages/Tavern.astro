@@ -127,6 +127,12 @@ const toc = ['roles', 'gates', 'visuals'].map((id, i) => ({ id, label: v.toc[i] 
     grid-column: 1 / -1;
   }
 
+  .gallery figure:not(.wide) img {
+    aspect-ratio: 3 / 4;
+    object-fit: cover;
+    object-position: top;
+  }
+
   .gallery img {
     width: 100%;
     height: auto;
