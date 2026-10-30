@@ -56,13 +56,13 @@ const toc = ids.map((id, i) => ({ id, label: s.toc[i] }));
       {
         s.modules.map((m) => (
           <article class={`mod reveal ${m.span ? 'span' : ''}`}>
-            {m.shot && <img class="mod-img" src={m.shot} alt={m.name} loading="lazy" data-zoom="signal" />}
             <div class="mod-top">
               <h3 class="serif">{m.name}</h3>
               {m.badge && <span class="badge">{m.badge}</span>}
             </div>
             <p>{m.v}</p>
             <p class="mono">{m.stack}</p>
+            {m.shot && <img class="mod-img" src={m.shot} alt={m.name} loading="lazy" data-zoom="signal" />}
           </article>
         ))
       }
@@ -125,6 +125,7 @@ const toc = ids.map((id, i) => ({ id, label: s.toc[i] }));
   }
 
   .mod-img {
+    margin-top: 14px;
     aspect-ratio: 16 / 10;
     object-fit: cover;
     object-position: top left;
@@ -227,7 +228,6 @@ const toc = ids.map((id, i) => ({ id, label: s.toc[i] }));
   }
 
   .mod-top {
-    margin-top: 16px;
     display: flex;
     align-items: baseline;
     gap: 10px;

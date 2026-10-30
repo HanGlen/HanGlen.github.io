@@ -306,7 +306,7 @@ export const zh = {
     ],
     s3: '做了哪些东西',
     modules: [
-      { name: '桌面端分析软件', v: '导入信号文件，选滤波和 R 峰检测算法，出心率图、近百项 HRV 指标和庞加莱图。这是项目将来要商用的产品。', stack: 'PyQt5 · neurokit2 · MNE', badge: '软著', shot: '/shots/signal/desktop-ecg.png' },
+      { name: '桌面端分析软件', v: '导入信号文件，选滤波和 R 峰检测算法，出心率图、近百项 HRV 指标和庞加莱图。这是项目将来要商用的产品。', stack: 'PyQt5 · neurokit2 · MNE', badge: '软著', shot: '/shots/signal/desktop-ecg.png', span: true },
       { name: 'Web 端', v: '登录后管理自己上传的信号文件，查看波形和分析结果。一个 40MB 的 EDF 文件，波形用 ECharts 整段画出来。', stack: 'Vue3 · Element Plus · ECharts', badge: '软著', shot: '' },
       { name: '云端后端', v: '存信号和用户数据，调用算法算指标。Python 算法和 Spring Boot 拆开部署，当时网上找不到完整做法，我写了篇文章。', stack: 'Spring Boot · Shiro · JWT · MyBatis-Plus', badge: '软著', shot: '' },
       { name: 'App', v: '蓝牙连腕表，选通道和时长开始采集；实时看波形和血压预测，采完上传，在手机上看 HRV 结果。', stack: 'uni-app · uView2', badge: '', shot: '/shots/signal/app.jpg', span: true },
