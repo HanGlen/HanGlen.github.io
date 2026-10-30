@@ -322,7 +322,7 @@ export const zh = {
     photoCap: '第九届全国大学生生物医学工程创新设计竞赛现场',
     certsTitle: '拿到的',
     certs: ['全国大学生生物医学工程创新设计竞赛 · 研究生组三等奖', '软著：桌面端分析软件', '软著：云端分析软件', '软著：网页前端软件'],
-    noteLink: '开发过程写在笔记《生理信号分析平台开发记录》',
+    noteLink: '开发过程写在笔记《应激生理监测系统开发记录》',
     stack: ['Java', 'Spring Boot', 'Shiro', 'MySQL', 'Vue3', 'ECharts', 'uni-app', 'Python', 'PyQt5', 'neurokit2'],
   },
 

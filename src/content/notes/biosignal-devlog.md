@@ -1,7 +1,7 @@
 ---
-title: 生理信号分析平台开发记录
+title: 应激生理监测系统开发记录
 date: 2024-07-31
-summary: 研究生期间做的生理信号分析平台：桌面端、云端后端、Web 端和 App 的技术栈与开发总结。
+summary: 研究生期间做的应激生理监测系统：桌面端、云端后端、Web 端和 App 的技术栈与开发总结。
 tags: [全栈, 信号处理]
 origin: https://blog.csdn.net/qq_42325493/article/details/137463959
 ---
