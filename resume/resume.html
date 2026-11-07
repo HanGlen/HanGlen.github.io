@@ -1,0 +1,119 @@
+<!doctype html>
+<html lang="zh">
+<head>
+<meta charset="utf-8">
+<title>李睿涵_AI应用工程师</title>
+<style>
+  @font-face { font-family: "Sans"; font-weight: 400; src: url("{{FONT_SANS_400}}") format("woff2"); }
+  @font-face { font-family: "Sans"; font-weight: 500; src: url("{{FONT_SANS_500}}") format("woff2"); }
+  @font-face { font-family: "Sans"; font-weight: 700; src: url("{{FONT_SANS_700}}") format("woff2"); }
+  @font-face { font-family: "Serif"; font-weight: 700; src: url("{{FONT_SERIF_700}}") format("woff2"); }
+  @page { size: A4; margin: 0; }
+  :root {
+    --ink: #1d1b19; --ink-2: #5b5650; --ink-3: #8a847c;
+    --accent: #b5482a; --accent-soft: #f6ebe6; --line: #e3ddd4; --paper: #ffffff;
+  }
+  * { box-sizing: border-box; }
+  html, body { margin: 0; background: var(--paper); }
+  body { color: var(--ink); font: 400 9.5pt/1.55 "Sans", sans-serif; }
+  .page { width: 210mm; height: 297mm; padding: 12mm 14mm 10mm; position: relative; overflow: hidden; }
+  .page::before { content: ""; position: absolute; left: 0; top: 0; bottom: 0; width: 3.2mm; background: var(--accent); }
+
+  header { display: grid; grid-template-columns: 1fr auto; gap: 8mm; align-items: start; }
+  .name { font: 700 24pt/1.1 "Serif", serif; letter-spacing: 3px; margin: 0; }
+  .title { margin: 3px 0 0; font-weight: 500; font-size: 11pt; color: var(--accent); }
+  .tagline { margin: 6px 0 0; color: var(--ink-2); font-size: 9.4pt; max-width: 120mm; }
+  .contact { margin: 7px 0 0; display: flex; flex-wrap: wrap; gap: 3px 14px; font-size: 9pt; color: var(--ink-2); }
+  .contact b { color: var(--ink); font-weight: 500; }
+  .side { display: flex; gap: 4mm; align-items: flex-start; }
+  .qr { width: 26mm; text-align: center; }
+  .qr svg { width: 26mm; height: 26mm; display: block; }
+  .qr span { display: block; margin-top: 1px; font-size: 7.4pt; color: var(--ink-3); line-height: 1.3; }
+  .photo { width: 25mm; height: 33mm; object-fit: cover; border-radius: 2mm; display: block; }
+
+  .site { margin: 4mm 0 0; padding: 2.4mm 3.5mm; background: var(--accent-soft); border-radius: 2mm; font-size: 9pt; color: var(--ink-2); }
+  .site b { color: var(--accent); font-weight: 700; }
+
+  h2 { display: flex; align-items: center; gap: 8px; margin: 4mm 0 1.4mm; font: 700 11.5pt/1.2 "Serif", serif; color: var(--ink); letter-spacing: 1px; }
+  h2::after { content: ""; flex: 1; height: 1px; background: var(--line); }
+
+  .row { display: flex; justify-content: space-between; align-items: baseline; gap: 10px; margin-top: 2.2mm; }
+  .row b { font-size: 10.2pt; font-weight: 700; }
+  .row .role { color: var(--ink-2); margin-left: 8px; font-size: 9pt; }
+  .time { color: var(--ink-3); white-space: nowrap; font-size: 8.6pt; font-variant-numeric: tabular-nums; }
+  h2 + .row, h2 + div > .row:first-child { margin-top: 0; }
+  .lead { margin: 1px 0 0; color: var(--ink-2); }
+  ul { margin: 1px 0 0; padding-left: 0; list-style: none; }
+  li { position: relative; padding-left: 11px; margin: 1.2px 0; }
+  li::before { content: ""; position: absolute; left: 1px; top: 0.62em; width: 4px; height: 4px; border-radius: 50%; background: var(--ink-3); }
+  li strong { font-weight: 700; }
+  .num { color: var(--accent); font-weight: 700; }
+
+  .edu .row { margin-top: 0.8mm; }
+  .skills { margin: 0; display: grid; grid-template-columns: 17mm 1fr; row-gap: 1px; }
+  .skills dt { font-weight: 700; }
+  .skills dd { margin: 0; }
+</style>
+</head>
+<body>
+<div class="page">
+  <header>
+    <div>
+      <h1 class="name">李睿涵</h1>
+      <p class="title">AI 应用工程师 · FDE</p>
+      <p class="tagline">一个人带一支 AI 研发团队：跑团小程序 5 个月由 AI 合入 1,633 个 PR；做过带引用核验的 RAG 规则问答，也训练过生理信号的压力分类模型。</p>
+      <div class="contact">{{PHONE_HTML}}<span><b>邮箱</b> 494564549@qq.com</span><span><b>GitHub</b> github.com/HanGlen</span></div>
+    </div>
+    <div class="side">
+      <div class="qr">{{QR_SVG}}<span>扫码看作品集</span></div>
+      {{PHOTO_HTML}}
+    </div>
+  </header>
+
+  <p class="site"><b>作品集 hanglen.github.io</b>　可交互查看 AI 流水线每一步的原始记录、规则问答拦截案例和 183 道门禁的来历</p>
+
+  <h2>教育经历</h2>
+  <div class="edu">
+    <div class="row"><span><b>西安电子科技大学</b><span class="role">电子信息 · 硕士　论文：心电与皮电信号的精神压力分类</span></span><span class="time">2022.09 – 2025.06</span></div>
+    <div class="row"><span><b>西安电子科技大学</b><span class="role">电子信息工程 · 学士</span></span><span class="time">2016.09 – 2020.06</span></div>
+  </div>
+
+  <h2>专业技能</h2>
+  <dl class="skills">
+    <dt>AI 应用</dt><dd>RAG（检索、意图改写、引用核验、拒答策略）、LLM 调用（DeepSeek、混元）、结构化抽取、离线评测、成本与计费</dd>
+    <dt>AI 工程化</dt><dd>Claude Code / Codex / Cursor / Trae 多 Agent 编排；Skill、MCP、上下文工程；CI 门禁</dd>
+    <dt>后端</dt><dd>Java、Spring Boot、MyBatis-Plus、MySQL 调优；Node.js 云函数；Python、Flask</dd>
+    <dt>其他</dt><dd>PyTorch（CNN + LSTM 时序分类）、微信小程序、Vue3、uni-app</dd>
+  </dl>
+
+  <h2>项目经历</h2>
+  <div class="row"><span><b>洛山达 DND 助手</b><span class="role">微信小程序 · 独立开发与运营</span></span><span class="time">2022.07 – 至今</span></div>
+  <p class="lead">D&amp;D 一站式小程序，支持 2014 / 2024 两版规则，覆盖车卡、角色管理、开团和 DM 工具。累计访客 <span class="num">1.39 万</span>，日均活跃 <span class="num">252</span>，玩家建角色卡 <span class="num">9,138</span> 张。</p>
+  <ul>
+    <li><strong>设计并搭建多 Agent 研发流水线：</strong>Grok 核实反馈开单，Claude 写前端，Codex 写后端并交叉评审，Cursor 检查全过后自动合并；5 个月合入 <span class="num">1,633</span> 个 PR，近 30 天日均 <span class="num">26</span> 个。我只定方向、审方案、发版。</li>
+    <li><strong>建立 AI 产出质量护栏：</strong>AI 每犯一类新错就加一道自动检查，累计 <span class="num">183</span> 道，禁止为过 CI 改 CI；玩家反馈从开单到关单中位数 <span class="num">19</span> 小时。</li>
+    <li><strong>主导规则问答 RAG（内测）：</strong><span class="num">35</span> 本规则书入库，倒排检索，两版规则隔离；结论逐字核对原文，再加确定性事实护栏，证据不足就拒答；搭了召回评测和真实玩家题抽测。</li>
+    <li><strong>落地 AI 功能并商业化：</strong>模组长文本结构化抽取、角色故事与画像；上线金币付费，AI 生文、生图单项毛利 <span class="num">78%</span> 以上。</li>
+  </ul>
+
+  <div class="row"><span><b>应激生理监测系统</b><span class="role">西电 × 第四军医大合作项目 · 软件总负责人</span></span><span class="time">2022.07 – 2025.09</span></div>
+  <ul>
+    <li><strong>对接合作方需求，独立交付 4 端软件</strong>（PyQt5 桌面、Spring Boot 云端、Vue3 Web、uni-app App），打通「腕表采集 → 云端算法 → PDF 报告」全链路；国赛研究生组三等奖，软著 3 项。</li>
+    <li><strong>设计并训练压力分类模型：</strong>CNN + BiLSTM，心电 + 皮电双通道，10 秒片段准确率 <span class="num">77.6%</span>，5 分钟投票 <span class="num">83.3%</span>；封装成 Flask 服务接入后端。</li>
+  </ul>
+
+  <h2>工作经历</h2>
+  <div class="row"><span><b>比亚迪股份有限公司</b><span class="role">高级系统开发工程师</span></span><span class="time">2025.07 – 2026.07</span></div>
+  <ul>
+    <li><strong>推动团队 AI 化开发：</strong>引入 Trae 等 AI Agent 覆盖需求拆解、编码和代码审查，编写代码审核、后端开发、项目文档等 Skill 和团队规范。</li>
+    <li><strong>负责品质管理系统色差匹配模块</strong>（全球业务，用户百万级），30 多个接口从开发到上线；开发集团级 OA 流程；慢接口从 10 秒级优化到 2 秒以内。</li>
+  </ul>
+  <div class="row"><span><b>北京外企德科（华为 OD）</b><span class="role">Java 开发工程师 · 华为后端系统开发与联调</span></span><span class="time">2021.04 – 2021.09</span></div>
+
+  <h2>其他</h2>
+  <ul>
+    <li><strong>晨曦酒馆</strong>（跑团短视频账号，2026 起步）：把多 Agent 流程用到内容生产，Claude 写脚本和剪辑，Codex 画图，本地 Qwen3-TTS 配音，中英双版。</li>
+  </ul>
+</div>
+</body>
+</html>
