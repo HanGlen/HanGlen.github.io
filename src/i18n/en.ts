@@ -5,10 +5,10 @@ export const en: Content = {
 
   home: {
     title: 'Ruihan Li',
-    description: 'Ruihan Li built a tabletop RPG mini program with 13.9k visitors to date. Today most of its code is written by AI.',
+    description: 'Ruihan Li built a tabletop RPG mini program with 14.6k users to date. Today most of its code is written by AI.',
     hello: 'Ruihan Li · AI application engineer',
     line: 'One person.\nAn AI engineering team.',
-    sub: 'I built a tabletop RPG mini program with 13.9k visitors to date. Since June it has been run by a crew of AI agents (Claude, Codex, Cursor and more) on 8 scheduled shifts; I bring ideas, approve plans and ship releases.',
+    sub: 'I built a tabletop RPG mini program with 14.6k users to date. Since June it has been run by a crew of AI agents (Claude, Codex, Cursor and more) on 8 scheduled shifts; I bring ideas, approve plans and ship releases.',
     proof: [
       { v: '1,633', k: 'PRs written and merged by AI', src: 'Merge log of the mini program dev branch, Jun 17 to Nov 6' },
       { v: '26 / day', k: 'merged on average, last 30 days', src: 'dev branch merge log: 795 from Oct 8 to Nov 6' },
@@ -34,7 +34,7 @@ export const en: Content = {
     nowCard: 'Working on now',
     dataLead: 'Since June 2026. Each square is a day; darker means more merged PRs.',
     statsTitle: 'The mini program today',
-    statsNote: 'As of 2026-10-23, exported from the WeChat console',
+    statsNote: 'Total users as of 2026-11-06, the rest as of 2026-10-23, from the WeChat console',
     heatTitle: 'PRs merged per day',
     heatCases: [
       { date: '2026-08-16', label: 'The package size check was added', refs: 'PR #699', href: '/en/work/dnd/#checks' },
@@ -56,7 +56,7 @@ export const en: Content = {
       slug: 'dnd',
       name: 'Lathander D&D Assistant',
       kind: 'WeChat mini program · 2022 – now',
-      stat: '13.9k visitors · 9,138 characters',
+      stat: '14.6k users · 9,138 characters',
       line: 'Build D&D characters and run games. Maintained by AI agents since June.',
       shot: '/shots/dnd/premade.jpg',
       shot2: '/shots/dnd/sheet.jpg',
@@ -99,7 +99,7 @@ export const en: Content = {
   },
 
   usage: [
-    { v: '13.9k', k: 'total visitors' },
+    { v: '14.6k', k: 'total users' },
     { v: '9,138', k: 'characters created' },
     { v: '1,087', k: 'campaign rooms' },
     { v: '31 min', k: 'average daily time per active user' },
@@ -107,12 +107,12 @@ export const en: Content = {
 
   dnd: {
     title: 'Lathander D&D Assistant · Ruihan Li',
-    description: 'A D&D mini program with 13.9k visitors, maintained mostly by AI agents since June 2026.',
+    description: 'A D&D mini program with 14.6k users, maintained mostly by AI agents since June 2026.',
     kind: 'WeChat mini program · 2022 – now',
     name: 'Lathander D&D Assistant',
     line: 'A mini program for building D&D characters, managing them and running games. I wrote it alone in 2022; since June 2026 AI agents maintain it.',
     stats: [
-      { v: '13.9k', k: 'total visitors', src: 'WeChat analytics export, as of Oct 23' },
+      { v: '14.6k', k: 'total users', src: 'WeChat console, as of Nov 6' },
       { v: '252', k: 'daily active, 30-day avg', src: 'WeChat dashboard, average of Sep 24 to Oct 23' },
       { v: '1,633', k: 'PRs merged by AI', src: 'dev branch merge log, as of Nov 6' },
       { v: '88', k: 'requests in queue', src: 'Open tickets in Linear (duplicates excluded), as of Nov 7' },
@@ -134,12 +134,12 @@ export const en: Content = {
     opsTabs: ['Users', 'Player feedback', 'Content & cost'],
     usageNote: 'Daily active users over the last 60 days. The National Day holiday peaked at 378 in one day.',
     usageStats: [
-      { v: '13.9k', k: 'total visitors' },
+      { v: '14.6k', k: 'total users' },
       { v: '252', k: 'daily actives, 30-day avg' },
       { v: '1,825', k: 'new users, last 30 days' },
       { v: '31 min', k: 'average daily time per active user' },
     ],
-    usageSource: 'Data from the WeChat console and We Analytics, as of 2026-10-23.',
+    usageSource: 'Total users from the WeChat console as of 2026-11-06; the rest from the WeChat console and We Analytics as of 2026-10-23.',
     feedbackNote: 'Players report issues in a shared sheet. Every night an AI checks each one and files the real ones as GitHub issues labelled "player feedback". Below: issues filed per month.',
     feedbackStats: [
       { v: '177', k: 'player reports filed as issues' },
@@ -482,7 +482,7 @@ export const en: Content = {
     open: 'Looking for roles in AI applications and AI engineering.',
     exp: [
       { t: '2025.07 – 2026.07', org: 'BYD Company Limited', href: 'https://www.byd.com', role: 'Senior Systems Engineer', pts: ['Brought AI tools such as Trae into the team, and wrote skills and guidelines for code review, backend work and project docs', 'Backend of the global quality management system, millions of users', 'Owned the color-matching module (30+ APIs from build to launch) and several group- and division-level OA workflows', 'Cut several slow APIs from ~10 s to under 2 s'] },
-      { t: '2022.07 – now', org: 'Lathander D&D Assistant', href: '/en/work/dnd/', role: 'Own project', pts: ['13.9k total visitors, 252 daily active (30-day average)', 'Built a multi-agent dev workflow: 1,633 PRs merged in 5 months', 'Built rules Q&A (RAG): 35 rulebooks indexed, every claim cited, declines when evidence is thin; in beta', 'Paid features live; AI text and image items run at 78%+ gross margin'] },
+      { t: '2022.07 – now', org: 'Lathander D&D Assistant', href: '/en/work/dnd/', role: 'Own project', pts: ['14.6k total users, 252 daily active (30-day average)', 'Built a multi-agent dev workflow: 1,633 PRs merged in 5 months', 'Built rules Q&A (RAG): 35 rulebooks indexed, every claim cited, declines when evidence is thin; in beta', 'Paid features live; AI text and image items run at 78%+ gross margin'] },
       { t: '2022.09 – 2025.06', org: 'Xidian University', href: 'https://www.xidian.edu.cn', role: 'M.Eng., Electronic Information', pts: ['Software lead of a stress monitoring system built with the Fourth Military Medical University, 3 software copyrights', 'Thesis: stress classification from ECG + skin conductance (CNN + BiLSTM), 83.3% on 5-minute windows', 'Third Prize, graduate track, National BME Innovation Design Competition'] },
       { t: '2021.04 – 2021.09', org: 'FESCO Adecco (Huawei OD)', role: 'Java Developer', pts: ['Backend development and integration testing for Huawei'] },
       { t: '2016.09 – 2020.06', org: 'Xidian University', href: 'https://www.xidian.edu.cn', role: 'B.Eng., Electronic Information Engineering', pts: [] },
