@@ -458,9 +458,7 @@ export const en: Content = {
     toCv: 'Jump to CV',
     cvTitle: 'CV',
     print: 'Print / save as PDF',
-    pdf: 'PDF (Chinese)',
     photoAlt: 'Portrait of Ruihan Li',
-    cvSource: 'The PDF résumé is code too: written in HTML and rendered to one page by a script. [Source on GitHub](https://github.com/HanGlen/HanGlen.github.io/tree/main/resume).',
     open: 'Looking for roles in AI applications and AI engineering.',
     exp: [
       { t: '2025.07 – 2026.07', org: 'BYD Company Limited', href: 'https://www.byd.com', role: 'Senior Systems Engineer', pts: ['Brought AI tools such as Trae into the team, and wrote skills and guidelines for code review, backend work and project docs', 'Backend of the global quality management system, millions of users', 'Owned the color-matching module (30+ APIs from build to launch) and several group- and division-level OA workflows', 'Cut several slow APIs from ~10 s to under 2 s'] },
