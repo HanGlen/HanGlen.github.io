@@ -4,6 +4,7 @@ import CaseHeader from '../CaseHeader.astro';
 import Toc from '../Toc.astro';
 import Section from '../Section.astro';
 import NextWork from '../NextWork.astro';
+import Relay from '../Relay.astro';
 import type { Content } from '../../i18n/zh';
 
 interface Props {
@@ -13,7 +14,7 @@ interface Props {
 const { t } = Astro.props;
 const s = t.signal;
 const base = t.lang === 'zh' ? '' : '/en';
-const ids = ['why', 'architecture', 'built', 'reports', 'competition'];
+const ids = ['why', 'architecture', 'built', 'model', 'reports', 'competition'];
 const toc = ids.map((id, i) => ({ id, label: s.toc[i] }));
 ---
 
@@ -69,7 +70,13 @@ const toc = ids.map((id, i) => ({ id, label: s.toc[i] }));
     </div>
   </Section>
 
-  <Section no="04" title={s.s5} lead={s.s5Lead} id="reports">
+  <Section no="04" title={s.s6} lead={s.s6Lead} id="model">
+    <div class="reveal">
+      <Relay legs={s.modelRelay as any} hint={s.modelHint} id="model" />
+    </div>
+  </Section>
+
+  <Section no="05" title={s.s5} lead={s.s5Lead} id="reports">
     <div class="reports reveal">
       {
         s.reports.map((r) => (
@@ -82,7 +89,7 @@ const toc = ids.map((id, i) => ({ id, label: s.toc[i] }));
     </div>
   </Section>
 
-  <Section no="05" title={s.s4} id="competition">
+  <Section no="06" title={s.s4} id="competition">
     <div class="honors reveal">
       <figure class="photo">
         <img src={s.photo} alt={s.photoCap} loading="lazy" width="1080" height="1440" data-zoom="signal" />

@@ -24,7 +24,7 @@ const order = Object.keys(labels) as PrType[];
 
 // 从 2026-06-15（周一）排到数据最后一天，按周成列
 const start = new Date('2026-06-15T00:00:00Z');
-const end = new Date('2026-10-29T00:00:00Z');
+const end = new Date('2026-11-06T00:00:00Z');
 const days: { date: string; n: number; col: number; row: number }[] = [];
 for (let d = new Date(start), i = 0; d <= end; d.setUTCDate(d.getUTCDate() + 1), i++) {
   const key = d.toISOString().slice(0, 10);

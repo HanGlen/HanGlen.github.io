@@ -10,15 +10,15 @@ export const en: Content = {
     line: 'One person.\nAn AI engineering team.',
     sub: 'I built a tabletop RPG mini program that 14,000 people have used. Since June it has been run by a crew of AI agents (Claude, Codex, Cursor and more) on 8 scheduled shifts; I bring ideas, approve plans and ship releases.',
     proof: [
-      { v: '1,326', k: 'PRs written and merged by AI', src: 'GitHub search of merged PRs in the mini program repo, as of Oct 29' },
-      { v: '18 / day', k: 'merged on average, last 30 days', src: 'dev branch merge log: 555 from Sep 30 to Oct 29' },
+      { v: '1,633', k: 'PRs written and merged by AI', src: 'Merge log of the mini program dev branch, Jun 17 to Nov 6' },
+      { v: '26 / day', k: 'merged on average, last 30 days', src: 'dev branch merge log: 795 from Oct 8 to Nov 6' },
       { v: '8', k: 'scheduled AI shifts', src: 'The 7 jobs in the mini program’s routine table, plus the business-analytics patrol' },
       { v: '2.5 h', k: 'from player feedback to merged fix', src: 'Issue #2593 filed 08:50, PR #2598 merged 11:21' },
     ],
     field: {
       hint: 'Scroll — watch them line up by day',
       title: 'Every dot is a PR merged by AI.',
-      sub: 'June 17 to October 29, stacked on the day each one landed. Hover, or use the arrow keys, to read a day.',
+      sub: 'June 17 to November 6, stacked on the day each one landed. Hover, or use the arrow keys, to read a day.',
       aria: 'Bar chart of PRs merged per day; each dot is one PR. Focus it and use the left and right arrow keys to move between days.',
       day: '{d} · {n} PRs merged',
       peak: 'peak day {n}',
@@ -42,6 +42,7 @@ export const en: Content = {
       { date: '2026-10-28', label: 'How one piece of player feedback got fixed', refs: 'PR #2598', href: '/en/work/dnd/#case' },
       { date: '2026-10-28', label: 'The scheduling plan was merged', refs: 'PR #2618', href: '/en/work/dnd/#feature' },
       { date: '2026-10-29', label: 'The first five scheduling backend slices', refs: 'PR #2619 #2620 #2622 #2623 #2625', href: '/en/work/dnd/#feature' },
+      { date: '2026-11-05', label: 'Rules Q&A blocked a made-up spell level', refs: 'PR #3112', href: '/en/work/dnd/#qa' },
     ],
     heatMore: 'Where these PRs come from',
     nowTitle: 'Now',
@@ -113,8 +114,8 @@ export const en: Content = {
     stats: [
       { v: '13.9k', k: 'total visitors', src: 'WeChat analytics export, as of Oct 23' },
       { v: '252', k: 'daily active, 30-day avg', src: 'WeChat dashboard, average of Sep 24 to Oct 23' },
-      { v: '1,326', k: 'PRs merged by AI', src: 'GitHub search of merged PRs, as of Oct 29' },
-      { v: '99', k: 'requests in queue', src: 'Open GitHub issues, as of Oct 29' },
+      { v: '1,633', k: 'PRs merged by AI', src: 'dev branch merge log, as of Nov 6' },
+      { v: '88', k: 'requests in queue', src: 'Open tickets in Linear (duplicates excluded), as of Nov 7' },
     ],
     shots: [
       { src: '/shots/dnd/welcome.jpg', cap: 'Welcome' },
@@ -126,7 +127,7 @@ export const en: Content = {
     ],
     shotsNote: 'Screenshots were taken by AI during UI tests in the WeChat dev tools; character names are test accounts.',
 
-    toc: ['One fix', 'Pipeline', 'Throughput', 'Big feature', 'Metrics', 'Checks'],
+    toc: ['One fix', 'Pipeline', 'Throughput', 'Big feature', 'Rules Q&A', 'Metrics', 'Checks'],
 
     opsTitle: 'Metrics',
     opsBody: 'Who uses it, how much players report, and what they build. One tab each.',
@@ -141,13 +142,13 @@ export const en: Content = {
     usageSource: 'Data from the WeChat console and We Analytics, as of 2026-10-23.',
     feedbackNote: 'Players report issues in a shared sheet. Every night an AI checks each one and files the real ones as GitHub issues labelled "player feedback". Below: issues filed per month.',
     feedbackStats: [
-      { v: '129', k: 'player reports filed as issues' },
-      { v: '116', k: 'done and closed' },
-      { v: '20 h', k: 'median from filed to closed' },
-      { v: '12', k: 'queued or in progress' },
+      { v: '177', k: 'player reports filed as issues' },
+      { v: '166', k: 'done and closed' },
+      { v: '19 h', k: 'median from filed to closed' },
+      { v: '10', k: 'queued or in progress' },
     ],
     feedbackChart: 'Player-feedback issues filed per month',
-    feedbackSource: 'From the "player feedback" label in the mini program repo, as of 2026-10-29; October counted through the 29th.',
+    feedbackSource: 'From the "player feedback" label in the mini program repo, as of 2026-11-06; November counted through the 6th.',
     contentStats: [
       { v: '9,138', k: 'character sheets' },
       { v: '1,087', k: 'campaign rooms' },
@@ -251,9 +252,77 @@ export const en: Content = {
         },
       },
     ],
-    trendTitle: 'Throughput: 18 PRs a day',
-    trendBody: '555 PRs merged in the last 30 days: 18 a day on average, 52 on the busiest day. 99 requests are still queued; the limit is compute, not people.',
+    trendTitle: 'Throughput: 26 PRs a day',
+    trendBody: '795 PRs merged in the last 30 days: 26 a day on average, 52 on the busiest day. 88 requests are still queued; the limit is compute, not people.',
 
+    qaTitle: 'Rules Q&A: no answer beats a wrong one',
+    qaBody: 'Players ask rules questions in plain words, and every claim in the answer must cite the rulebook. If the evidence is thin, it says so instead of guessing.',
+    qaStats: [
+      { v: '35', k: 'rulebooks indexed, 2014 and 2024 kept apart' },
+      { v: '47', k: 'PRs with “Q&A” in the title since Oct 28' },
+      { v: '12', k: 'real player questions in the Nov 4 spot check' },
+      { v: 'Beta', k: 'not open to players yet' },
+    ],
+    qaHint: 'One question from the spot check. Click each step to see what it left behind.',
+    qaRelay: [
+      {
+        t: 'P05', who: 'Player', role: 'me', v: 'Asks a rules question', d: '',
+        detail: {
+          kind: 'issue', head: 'A real question from RPG Stack Exchange, asked in Chinese', ref: '#116392', href: 'https://rpg.stackexchange.com/questions/116392',
+          lines: ['“2014 rules: can I cast Fireball first and then Misty Step as a bonus action, and get around the limit by changing the order?”'],
+          aside: 'The right answer is no. On a turn you cast a bonus-action spell, the only other spell allowed is a one-action cantrip, before or after.',
+        },
+      },
+      {
+        t: '3.1 s', who: 'DeepSeek', role: 'ai', v: 'Rewrites it into a search plan', d: '',
+        detail: {
+          kind: 'note', head: 'Standalone question and search terms from the rewrite step', ref: 'stage: rewriting',
+          lines: ['Question: …first casts Fireball (a 1st-level-or-higher spell), then Misty Step (a 1st-level spell) as a bonus action…', 'Terms: bonus action spell · casting time · 附赠动作法术 · 施法时间'],
+          aside: 'This is where it went wrong: Fireball is 3rd level and Misty Step is 2nd. The model made up the levels in brackets.',
+        },
+      },
+      {
+        t: '35 books', who: 'Search', role: 'gate', v: 'Finds 3 passages', d: '',
+        detail: {
+          kind: 'note', head: 'Passages the answer cites (excerpt)', ref: 'PHB · XGE · TCE',
+          lines: ['Player’s Handbook: on a turn you cast a bonus-action spell, you can’t cast another spell except a cantrip with a casting time of one action.', 'Xanathar’s Guide: you can’t cast any other spell that turn, before or after.'],
+          aside: 'Search is a Chinese bigram inverted index, not vectors. The server fills in each quote from the corpus and checks it word for word.',
+        },
+      },
+      {
+        t: 'Answer', who: 'DeepSeek', role: 'ai', v: 'Writes the verdict with citations', d: '',
+        detail: {
+          kind: 'note', head: 'The verdict the model wrote (excerpt)', ref: 'kind: rule',
+          lines: ['Casting Fireball (1st level or higher) and then Misty Step (1st level) as a bonus action on the same turn doesn’t get around the limit by changing the order… [1][2][3]'],
+          aside: 'The verdict is right; the two spell levels in brackets are wrong. Nobody would get hurt at the table, but one line was invented.',
+        },
+      },
+      {
+        t: 'Nov 4', who: 'DeepSeek', role: 'ai', v: 'Model check: all passed', d: '',
+        detail: {
+          kind: 'checks', head: 'A separate call checks whether each claim is backed by its quotes', ref: 'before the guard',
+          checks: [['Claim 1 (with the made-up levels)', 'ok', 'supported'], ['Claim 2', 'ok', 'supported'], ['Claim 3', 'ok', 'supported']],
+          aside: 'Five different checker prompts, three runs each: 15 out of 15 missed it. Prompt tweaks alone don’t fix this.',
+        },
+      },
+      {
+        t: 'Nov 5', who: 'Code', role: 'gate', v: 'Level not in the quotes, blocked', d: '',
+        detail: {
+          kind: 'note', head: 'Deterministic check: any “level N” in a claim must appear in that claim’s own quotes', ref: 'PR #3112',
+          lines: ['The claim says “1st level”; none of the three quotes does.', 'Result: SPELL_LEVEL_UNSUPPORTED'],
+          aside: 'No model judgment here, just text matching. On Nov 6 it was extended to distances, durations, rule versions and concentration (PR #3182).',
+        },
+      },
+      {
+        t: 'Reply', who: 'Player sees', role: 'me', v: '“No clear basis found”', d: '',
+        detail: {
+          kind: 'note', head: 'What the player gets back', ref: 'kind: insufficient',
+          lines: ['No clear basis for this was found in the rulebooks.'],
+          aside: 'The verdict was right, but the numbers in brackets couldn’t be backed up, so the whole answer is withheld.',
+        },
+      },
+    ],
+    qaNote: 'Most questions are still judged “not enough evidence”: in the Nov 4 run, none of the 12 got a usable rules answer. Retrieval and context are being fixed; loosening the checks to pass more is off the table.',
     dayTitle: 'A big feature in six PRs, one afternoon',
     dayBody: 'Session scheduling was proposed by an AI. On October 29 it was claimed, planned and split after lunch, and all six backend slices were merged before 9 pm:',
     day: [
@@ -282,7 +351,7 @@ export const en: Content = {
 
   signal: {
     title: 'Stress Monitoring System · Ruihan Li',
-    description: 'A graduate project with the Fourth Military Medical University: a wearable stress monitoring system. I led and built all the software.',
+    description: 'A graduate project with the Fourth Military Medical University: a wearable stress monitoring system. I built all the software and the stress classification model.',
     kind: 'Joint project, Xidian × FMMU · 2022 – 2025 · software lead',
     badges: ['Confidential — public parts only', 'National 3rd prize'],
     name: 'Stress Monitoring System',
@@ -291,13 +360,13 @@ export const en: Content = {
       { v: '4 apps', k: 'desktop, web, mobile, cloud; all mine' },
       { v: '3', k: 'registered software copyrights' },
       { v: '~100', k: 'HRV metrics' },
-      { v: '1 click', k: 'to a PDF analysis report' },
+      { v: '83.3%', k: 'stress detection accuracy (5-minute windows)' },
     ],
-    toc: ['My role', 'Architecture', 'What I built', 'Reports', 'Competition'],
+    toc: ['My role', 'Architecture', 'What I built', 'Stress model', 'Reports', 'Competition'],
     heroShot: '/shots/signal/desktop-hrv.png',
     heroCap: 'Desktop HRV view: heart-rate curve, RR distribution and time-domain metrics',
     s1: 'My role',
-    s1Body: 'My advisor made me the software lead: teammates built the wristband and the core algorithms, and I owned the architecture and every piece of software. Data goes from the wristband to the app over Bluetooth, up to the cloud for analysis, and out to the web console; the desktop analyzer is the part meant to become a commercial product.',
+    s1Body: 'My advisor made me the software lead: teammates built the wristband and the signal processing, and I owned the architecture, every piece of software and the stress classification model. Data goes from the wristband to the app over Bluetooth, up to the cloud for analysis, and out to the web console; the desktop analyzer is the part meant to become a commercial product.',
     s2: 'How it fits together',
     arch: [
       { k: 'Capture', v: ['Wristband ECG / PPG / GSR', 'Bluetooth'] },
@@ -313,6 +382,18 @@ export const en: Content = {
       { name: 'Cloud backend', v: 'Stores signals and users, calls the algorithms. Python runs separately from Spring Boot; there was no complete guide for that online, so I wrote one.', stack: 'Spring Boot · Shiro · JWT · MyBatis-Plus', badge: 'Copyright', shot: '' },
       { name: 'App', v: 'Pairs with the wristband over Bluetooth, records the chosen channels, shows live waveforms and a blood-pressure estimate, uploads, and shows HRV results on the phone.', stack: 'uni-app · uView2', badge: '', shot: '/shots/signal/app.jpg', span: true },
     ],
+    s6: 'Stress classification model',
+    s6Lead: 'My master’s thesis: tell from 10 seconds of ECG and skin conductance whether someone is under stress. 77.6% per clip, 83.3% after a 5-minute vote.',
+    modelHint: 'Click each step to see how the thesis does it.',
+    modelRelay: [
+      { t: '1000 Hz', who: 'Raw signals', role: 'gate', v: 'ECG + skin conductance', d: '', detail: { kind: 'note', head: 'Two signals, two sample rates', ref: 'Thesis 5.2', lines: ['ECG is sampled at 1000 Hz, skin conductance at 20 Hz.', 'Labels follow the experiment timeline: which stretches were stressful and which were not.'] } },
+      { t: '128 Hz', who: 'Cleaning', role: 'ai', v: 'Denoise, resample', d: '', detail: { kind: 'note', head: 'Clean and align', ref: 'Thesis 5.2', lines: ['neurokit2 removes baseline wander and high-frequency noise.', 'Both channels are resampled to 128 Hz and z-scored.'] } },
+      { t: '10 s', who: 'Windows', role: 'ai', v: '10 s windows, 5 s step', d: '', detail: { kind: 'note', head: 'Model input', ref: 'Thesis 5.1', lines: ['Each clip is 1,280 samples × 2 channels.', 'The sliding window also multiplies the training samples.'] } },
+      { t: 'Conv1D', who: 'CNN', role: 'ai', v: 'Local waveform features', d: '', detail: { kind: 'note', head: 'Convolution layer', ref: 'Thesis 5.1', lines: ['1D convolution, 64 channels, kernel of 3 samples.', 'Followed by ReLU and dropout.'] } },
+      { t: 'BiLSTM', who: 'LSTM', role: 'ai', v: 'Order over time', d: '', detail: { kind: 'note', head: 'Bidirectional LSTM + global average pooling', ref: 'Thesis 5.1', lines: ['The BiLSTM reads both directions, then the output is averaged over time into one vector for the classifier.'], aside: 'TimesNet and a Transformer were tried too: no real accuracy gain, bigger models, worse for real-time use.' } },
+      { t: '77.6%', who: 'Per clip', role: 'gate', v: 'Stress / no stress', d: '', detail: { kind: 'checks', head: 'Test set results (10 s clips)', ref: 'Thesis 5.4', checks: [['Accuracy', 'ok', '77.57%'], ['F1, low stress', 'ok', '0.786'], ['F1, high stress', 'ok', '0.764']], aside: 'Recall on high stress is the weak spot (0.747): it misses more than it over-calls.' } },
+      { t: '83.3%', who: '5-minute vote', role: 'me', v: 'Majority of clips decides', d: '', detail: { kind: 'note', head: 'Stress lasts, so judge a stretch of time', ref: 'Thesis 5.4', lines: ['If more than half of the 10 s clips in a 5-minute stretch say stress, the whole stretch is stress.', 'Accuracy goes from 77.6% to 83.3%.'], aside: 'Adam with cosine annealing and mixed precision, 100 epochs on GPU. Served as a separate Flask service called by Spring Boot.' } },
+    ],
     s5: 'Reports',
     s5Lead: 'Clients upload a recording to the report site and get a PDF: waveforms, HRV tables, spectra, and sympathetic, parasympathetic and stress indices. No need to send us the data.',
     reports: [
@@ -325,7 +406,7 @@ export const en: Content = {
     certsTitle: 'Results',
     certs: ['3rd prize, graduate track, National Biomedical Engineering Innovation Design Competition', 'Software copyright: desktop analyzer', 'Software copyright: cloud software', 'Software copyright: web frontend'],
     noteLink: 'The build is written up in the notes (Chinese)',
-    stack: ['Java', 'Spring Boot', 'Shiro', 'MySQL', 'Vue3', 'ECharts', 'uni-app', 'Python', 'PyQt5', 'neurokit2'],
+    stack: ['Java', 'Spring Boot', 'Shiro', 'MySQL', 'Vue3', 'ECharts', 'uni-app', 'Python', 'PyQt5', 'neurokit2', 'PyTorch'],
   },
 
   tavern: {
@@ -379,15 +460,17 @@ export const en: Content = {
     print: 'Print / save as PDF',
     open: 'Looking for roles in AI applications and AI engineering.',
     exp: [
-      { t: '2025.07 – 2026.07', org: 'BYD Company Limited', href: 'https://www.byd.com', role: 'Senior Systems Engineer', pts: ['Backend of the global quality management system, millions of users', 'Group- and division-level OA workflows, 20%+ efficiency gain', 'Cut several slow APIs from ~10 s to under 2 s', 'Owned the color-matching module: 30+ APIs from build to launch', 'Brought AI tools such as Trae into the team, with shared skills and guidelines'] },
-      { t: '2022.07 – now', org: 'Lathander D&D Assistant', href: '/en/work/dnd/', role: 'Own project', pts: ['13.9k total visitors, 252 daily active (30-day average)', 'Built a multi-agent dev workflow: 1,326 PRs merged in 4.5 months', 'Paid features live; AI text and image items run at 78%+ gross margin'] },
-      { t: '2022.09 – 2025.06', org: 'Xidian University', href: 'https://www.xidian.edu.cn', role: 'M.Eng., Electronic Information', pts: ['Software lead of a stress monitoring system built with the Fourth Military Medical University, 3 software copyrights', 'Third Prize, graduate track, National BME Innovation Design Competition'] },
+      { t: '2025.07 – 2026.07', org: 'BYD Company Limited', href: 'https://www.byd.com', role: 'Senior Systems Engineer', pts: ['Brought AI tools such as Trae into the team, and wrote skills and guidelines for code review, backend work and project docs', 'Backend of the global quality management system, millions of users', 'Owned the color-matching module (30+ APIs from build to launch) and several group- and division-level OA workflows', 'Cut several slow APIs from ~10 s to under 2 s'] },
+      { t: '2022.07 – now', org: 'Lathander D&D Assistant', href: '/en/work/dnd/', role: 'Own project', pts: ['13.9k total visitors, 252 daily active (30-day average)', 'Built a multi-agent dev workflow: 1,633 PRs merged in 5 months', 'Built rules Q&A (RAG): 35 rulebooks indexed, every claim cited, declines when evidence is thin; in beta', 'Paid features live; AI text and image items run at 78%+ gross margin'] },
+      { t: '2022.09 – 2025.06', org: 'Xidian University', href: 'https://www.xidian.edu.cn', role: 'M.Eng., Electronic Information', pts: ['Software lead of a stress monitoring system built with the Fourth Military Medical University, 3 software copyrights', 'Thesis: stress classification from ECG + skin conductance (CNN + BiLSTM), 83.3% on 5-minute windows', 'Third Prize, graduate track, National BME Innovation Design Competition'] },
       { t: '2021.04 – 2021.09', org: 'FESCO Adecco (Huawei OD)', role: 'Java Developer', pts: ['Backend development and integration testing for Huawei'] },
       { t: '2016.09 – 2020.06', org: 'Xidian University', href: 'https://www.xidian.edu.cn', role: 'B.Eng., Electronic Information Engineering', pts: [] },
     ],
     skillsTitle: 'Skills',
     skills: [
+      { k: 'AI applications', v: ['RAG', 'Citation checks', 'Offline evals', 'Structured extraction', 'Cost & billing'] },
       { k: 'AI development', v: ['Claude Code', 'Codex', 'Cursor', 'Trae', 'Multi-agent workflows', 'Skills & rules', 'MCP'] },
+      { k: 'Deep learning', v: ['PyTorch', 'CNN + LSTM', 'neurokit2'] },
       { k: 'Backend', v: ['Java', 'Spring Boot', 'MyBatis-Plus', 'MySQL', 'Python', 'Node.js'] },
       { k: 'Frontend', v: ['WeChat Mini Program', 'Vue', 'uni-app', 'PyQt'] },
       { k: 'DevOps', v: ['GitHub Actions', 'CI checks', 'WeChat CloudBase'] },
