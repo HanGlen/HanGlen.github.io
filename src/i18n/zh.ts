@@ -457,6 +457,9 @@ export const zh = {
     toCv: '看简历',
     cvTitle: '简历',
     print: '打印 / 存为 PDF',
+    pdf: '下载 PDF',
+    photoAlt: '李睿涵的证件照',
+    cvSource: '这份简历本身也是代码：HTML 写内容，脚本排成一页 PDF，源码在 [GitHub](https://github.com/HanGlen/HanGlen.github.io/tree/main/resume)。',
     open: '在找 AI 应用 / AI 工程化方向的工作。',
     exp: [
       { t: '2025.07 – 2026.07', org: '比亚迪股份有限公司', href: 'https://www.byd.com', role: '高级系统开发工程师', pts: ['给团队引入 Trae 等 AI 工具，写了代码审核、后端开发、项目文档等 Skill 和使用规范', '品质管理系统后端，服务全球业务，用户百万级', '负责色差匹配管理模块，30 多个接口从开发到上线；做了多个集团级、事业部级 OA 流程', '把几个慢接口从 10 秒级优化到 2 秒以内'] },

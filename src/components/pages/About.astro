@@ -13,8 +13,13 @@ const a = t.about;
 
 <Base lang={t.lang} title={a.title} description={a.description}>
   <section class="wrap intro">
-    <h1 class="h-display">{a.name}</h1>
-    {a.bio.map((p) => <p class="bio" set:html={rich(p)} />)}
+    <div class="intro-grid">
+      <div>
+        <h1 class="h-display">{a.name}</h1>
+        {a.bio.map((p) => <p class="bio" set:html={rich(p)} />)}
+      </div>
+      <img class="photo" src="/shots/about/photo.jpg" alt={a.photoAlt} width="600" height="802" />
+    </div>
     <p class="jump">
       <a class="btn" href="#cv">{a.toCv} <span aria-hidden="true">↓</span></a>
       <a class="link" href="mailto:494564549@qq.com">494564549@qq.com</a>
@@ -24,9 +29,13 @@ const a = t.about;
   <section class="wrap section cv" id="cv">
     <div class="section-head">
       <h2 class="h-section">{a.cvTitle}</h2>
-      <button type="button" class="print" onclick="window.print()">{a.print}</button>
+      <span class="cv-actions">
+        <a class="print" href="/resume.pdf" download>{a.pdf}</a>
+        <button type="button" class="print" onclick="window.print()">{a.print}</button>
+      </span>
     </div>
     <p class="open">{a.open}</p>
+    <p class="cv-src" set:html={rich(a.cvSource)} />
 
     <ol class="exp">
       {
@@ -87,6 +96,45 @@ const a = t.about;
 <style>
   .intro {
     padding-top: clamp(40px, 7vw, 88px);
+  }
+
+  .intro-grid {
+    display: grid;
+    grid-template-columns: minmax(0, 1fr) clamp(120px, 18vw, 200px);
+    gap: clamp(20px, 4vw, 56px);
+    align-items: start;
+  }
+
+  .photo {
+    width: 100%;
+    height: auto;
+    aspect-ratio: 3 / 4;
+    object-fit: cover;
+    border-radius: var(--r);
+    border: 1px solid var(--line);
+  }
+
+  .cv-actions {
+    display: inline-flex;
+    gap: 8px;
+    flex-wrap: wrap;
+  }
+
+  a.print {
+    text-decoration: none;
+  }
+
+  .cv-src {
+    margin: 6px 0 0;
+    font-size: 12.5px;
+    color: var(--ink-3);
+  }
+
+  @media (max-width: 560px) {
+    .intro-grid {
+      grid-template-columns: minmax(0, 1fr) 92px;
+      gap: 16px;
+    }
   }
 
   .bio {
@@ -260,7 +308,8 @@ const a = t.about;
     :global(.top),
     :global(.foot),
     .intro,
-    .print {
+    .print,
+    .cv-src {
       display: none !important;
     }
     .cv {
