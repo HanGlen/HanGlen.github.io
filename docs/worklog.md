@@ -9,6 +9,7 @@
 | 每天 / 每月合入的 PR | `HanGlen/dnd-miniprogram` dev 分支合并记录（`git log`，含 squash 和 merge commit） | 2026-10-29 |
 | 合入 PR 总数 1,326、已关闭 Issue 1,148、排队 Issue 99 | GitHub 搜索 | 2026-10-29 |
 | 日活、新用户、PV、新建角色、留存 | 小程序仓库 `analytics/snapshots/2026-09-24_2026-10-23`、`analytics/reports/2026-10-24-review.md` | 2026-10-23 |
+| 2026-11-07 更新：日均活跃 209、近 30 天新用户 1,388、停留 28 分钟、PV 32.1 万、新建角色 1,197；角色卡 9,669、活跃战役房间 1,136；用户图改为 09-08 到 11-06 | 小程序仓库分支 `chore/wx-data-2026-10-08_2026-11-06` 的 analytics 快照（daily-trend、summary、characters-snapshot、campaigns-snapshot 的 active 行；日均活跃按日 UV 平均） | 2026-11-06 / 快照 2026-11-07 |
 | 累计用户 1.46 万（取代 1.39 万访客） | 车主提供的微信公众平台「昨日核心数据」截图：累计用户数 1.46 万，月环比 +10.50% | 2026-11-06 |
 | 累计访客 1.39 万、加到「我的小程序」702 | 小程序仓库 `analytics/manual/2026-10-24.json`（We分析） | 2026-10-23 |
 | 角色卡 9,138、战役房间 1,087 | 同一快照的 `characters-snapshot`、`campaigns-snapshot` | 2026-10-24 |

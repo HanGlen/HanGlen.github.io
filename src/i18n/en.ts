@@ -34,7 +34,7 @@ export const en: Content = {
     nowCard: 'Working on now',
     dataLead: 'Since June 2026. Each square is a day; darker means more merged PRs.',
     statsTitle: 'The mini program today',
-    statsNote: 'Total users as of 2026-11-06, the rest as of 2026-10-23, from the WeChat console',
+    statsNote: 'As of 2026-11-06, from the WeChat console and a database snapshot',
     heatTitle: 'PRs merged per day',
     heatCases: [
       { date: '2026-08-16', label: 'The package size check was added', refs: 'PR #699', href: '/en/work/dnd/#checks' },
@@ -56,7 +56,7 @@ export const en: Content = {
       slug: 'dnd',
       name: 'Lathander D&D Assistant',
       kind: 'WeChat mini program · 2022 – now',
-      stat: '14.6k users · 9,138 characters',
+      stat: '14.6k users · 9,669 characters',
       line: 'Build D&D characters and run games. Maintained by AI agents since June.',
       shot: '/shots/dnd/premade.jpg',
       shot2: '/shots/dnd/sheet.jpg',
@@ -100,9 +100,9 @@ export const en: Content = {
 
   usage: [
     { v: '14.6k', k: 'total users' },
-    { v: '9,138', k: 'characters created' },
-    { v: '1,087', k: 'campaign rooms' },
-    { v: '31 min', k: 'average daily time per active user' },
+    { v: '9,669', k: 'characters created' },
+    { v: '1,136', k: 'campaign rooms' },
+    { v: '28 min', k: 'average daily time per active user' },
   ],
 
   dnd: {
@@ -113,7 +113,7 @@ export const en: Content = {
     line: 'A mini program for building D&D characters, managing them and running games. I wrote it alone in 2022; since June 2026 AI agents maintain it.',
     stats: [
       { v: '14.6k', k: 'total users', src: 'WeChat console, as of Nov 6' },
-      { v: '252', k: 'daily active, 30-day avg', src: 'WeChat dashboard, average of Sep 24 to Oct 23' },
+      { v: '209', k: 'daily active, 30-day avg', src: 'WeChat dashboard, average of Oct 8 to Nov 6' },
       { v: '1,633', k: 'PRs merged by AI', src: 'dev branch merge log, as of Nov 6' },
       { v: '88', k: 'requests in queue', src: 'Open tickets in Linear (duplicates excluded), as of Nov 7' },
     ],
@@ -132,14 +132,14 @@ export const en: Content = {
     opsTitle: 'Metrics',
     opsBody: 'Who uses it, how much players report, and what they build. One tab each.',
     opsTabs: ['Users', 'Player feedback', 'Content & cost'],
-    usageNote: 'Daily active users over the last 60 days. The National Day holiday peaked at 378 in one day.',
+    usageNote: 'Daily active users from Sep 8 to Nov 6. The National Day holiday peaked at 378 in one day.',
     usageStats: [
       { v: '14.6k', k: 'total users' },
-      { v: '252', k: 'daily actives, 30-day avg' },
-      { v: '1,825', k: 'new users, last 30 days' },
-      { v: '31 min', k: 'average daily time per active user' },
+      { v: '209', k: 'daily actives, 30-day avg' },
+      { v: '1,388', k: 'new users, last 30 days' },
+      { v: '28 min', k: 'average daily time per active user' },
     ],
-    usageSource: 'Total users from the WeChat console as of 2026-11-06; the rest from the WeChat console and We Analytics as of 2026-10-23.',
+    usageSource: 'From the WeChat console; the last 30 days are 2026-10-08 to 11-06.',
     feedbackNote: 'Players report issues in a shared sheet. Every night an AI checks each one and files the real ones as GitHub issues labelled "player feedback". Below: issues filed per month.',
     feedbackStats: [
       { v: '177', k: 'player reports filed as issues' },
@@ -150,14 +150,14 @@ export const en: Content = {
     feedbackChart: 'Player-feedback issues filed per month',
     feedbackSource: 'From the "player feedback" label in the mini program repo, as of 2026-11-06; November counted through the 6th.',
     contentStats: [
-      { v: '9,138', k: 'character sheets' },
-      { v: '1,087', k: 'campaign rooms' },
-      { v: '1,639', k: 'characters created, last 30 days' },
-      { v: '386k', k: 'page views, last 30 days' },
+      { v: '9,669', k: 'character sheets' },
+      { v: '1,136', k: 'campaign rooms' },
+      { v: '1,197', k: 'characters created, last 30 days' },
+      { v: '321k', k: 'page views, last 30 days' },
       { v: '702', k: 'pinned it to "My mini programs"' },
       { v: '78%+', k: 'gross margin on AI text and images' },
     ],
-    contentSource: 'Sheets and rooms from the 2026-10-24 database snapshot; the rest from the WeChat console and the cost ledger.',
+    contentSource: 'Sheets and rooms from the 2026-11-07 database snapshot, page views through Nov 6; “added to My Mini Programs” as of Oct 23 (We Analytics); margin from the cost ledger.',
 
     roleTitle: 'A pipeline that runs itself',
     roleBody: 'From reading feedback to merging, AI agents hand work to each other on a schedule, with nobody watching. I sit at the two ends: ideas and plan approval, then the weekday evening release.',
@@ -482,7 +482,7 @@ export const en: Content = {
     open: 'Looking for roles in AI applications and AI engineering.',
     exp: [
       { t: '2025.07 – 2026.07', org: 'BYD Company Limited', href: 'https://www.byd.com', role: 'Senior Systems Engineer', pts: ['Brought AI tools such as Trae into the team, and wrote skills and guidelines for code review, backend work and project docs', 'Backend of the global quality management system, millions of users', 'Owned the color-matching module (30+ APIs from build to launch) and several group- and division-level OA workflows', 'Cut several slow APIs from ~10 s to under 2 s'] },
-      { t: '2022.07 – now', org: 'Lathander D&D Assistant', href: '/en/work/dnd/', role: 'Own project', pts: ['14.6k total users, 252 daily active (30-day average)', 'Built a multi-agent dev workflow: 1,633 PRs merged in 5 months', 'Built rules Q&A (RAG): 35 rulebooks indexed, every claim cited, declines when evidence is thin; in beta', 'Paid features live; AI text and image items run at 78%+ gross margin'] },
+      { t: '2022.07 – now', org: 'Lathander D&D Assistant', href: '/en/work/dnd/', role: 'Own project', pts: ['14.6k total users, 9,669 character sheets created', 'Built a multi-agent dev workflow: 1,633 PRs merged in 5 months', 'Built rules Q&A (RAG): 35 rulebooks indexed, every claim cited, declines when evidence is thin; in beta', 'Paid features live; AI text and image items run at 78%+ gross margin'] },
       { t: '2022.09 – 2025.06', org: 'Xidian University', href: 'https://www.xidian.edu.cn', role: 'M.Eng., Electronic Information', pts: ['Software lead of a stress monitoring system built with the Fourth Military Medical University, 3 software copyrights', 'Thesis: stress classification from ECG + skin conductance (CNN + BiLSTM), 83.3% on 5-minute windows', 'Third Prize, graduate track, National BME Innovation Design Competition'] },
       { t: '2021.04 – 2021.09', org: 'FESCO Adecco (Huawei OD)', role: 'Java Developer', pts: ['Backend development and integration testing for Huawei'] },
       { t: '2016.09 – 2020.06', org: 'Xidian University', href: 'https://www.xidian.edu.cn', role: 'B.Eng., Electronic Information Engineering', pts: [] },
