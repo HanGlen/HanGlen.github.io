@@ -29,13 +29,9 @@ const a = t.about;
   <section class="wrap section cv" id="cv">
     <div class="section-head">
       <h2 class="h-section">{a.cvTitle}</h2>
-      <span class="cv-actions">
-        <a class="print" href="/resume.pdf" download>{a.pdf}</a>
-        <button type="button" class="print" onclick="window.print()">{a.print}</button>
-      </span>
+      <button type="button" class="print" onclick="window.print()">{a.print}</button>
     </div>
     <p class="open">{a.open}</p>
-    <p class="cv-src" set:html={rich(a.cvSource)} />
 
     <ol class="exp">
       {
@@ -112,22 +108,6 @@ const a = t.about;
     object-fit: cover;
     border-radius: var(--r);
     border: 1px solid var(--line);
-  }
-
-  .cv-actions {
-    display: inline-flex;
-    gap: 8px;
-    flex-wrap: wrap;
-  }
-
-  a.print {
-    text-decoration: none;
-  }
-
-  .cv-src {
-    margin: 6px 0 0;
-    font-size: 12.5px;
-    color: var(--ink-3);
   }
 
   @media (max-width: 560px) {
@@ -308,8 +288,7 @@ const a = t.about;
     :global(.top),
     :global(.foot),
     .intro,
-    .print,
-    .cv-src {
+    .print {
       display: none !important;
     }
     .cv {
