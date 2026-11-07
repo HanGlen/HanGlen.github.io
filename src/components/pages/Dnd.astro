@@ -93,7 +93,15 @@ const toc = ids.map((id, i) => ({ id, label: d.toc[i] }));
         ))
       }
     </dl>
-    <div class="reveal gap-top">
+    <h3 class="qa-sub reveal">{d.qaArchTitle}</h3>
+    <div class="reveal">
+      <Tabs tabs={d.qaArchTabs} id="qa-arch">
+        <Fragment slot="p0"><Relay legs={d.qaOffline as any} hint={d.qaArchHint} id="qa-off" /></Fragment>
+        <Fragment slot="p1"><Relay legs={d.qaOnline as any} hint={d.qaArchHint} id="qa-on" /></Fragment>
+      </Tabs>
+    </div>
+    <h3 class="qa-sub reveal">{d.qaCaseTitle}</h3>
+    <div class="reveal">
       <Relay legs={d.qaRelay as any} hint={d.qaHint} id="qa" />
     </div>
     <p class="aside-note">{d.qaNote}</p>
@@ -193,6 +201,14 @@ const toc = ids.map((id, i) => ({ id, label: d.toc[i] }));
 
   .gap-top {
     margin-top: 16px;
+  }
+
+  .qa-sub {
+    margin: 36px 0 14px;
+    font-family: var(--serif);
+    font-size: 20px;
+    font-weight: 600;
+    color: var(--ink);
   }
 
   .shots-wrap {

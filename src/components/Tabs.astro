@@ -43,8 +43,9 @@ const panels = await Promise.all(tabs.map((_, i) => Astro.slots.render(`p${i}`))
 
 <script>
   document.querySelectorAll<HTMLElement>('[data-tabs]').forEach((root) => {
-    const tabs = [...root.querySelectorAll<HTMLButtonElement>('[role="tab"]')];
-    const panels = [...root.querySelectorAll<HTMLElement>('[role="tabpanel"]')];
+    // 只取本组件直属的标签和面板，面板里嵌套的 Relay 等组件也有 role="tab"，不能算进来
+    const tabs = [...root.querySelectorAll<HTMLButtonElement>(':scope > .tablist > [role="tab"]')];
+    const panels = [...root.querySelectorAll<HTMLElement>(':scope > [role="tabpanel"]')];
     const select = (i: number, focus = false) => {
       tabs.forEach((t, j) => {
         const on = i === j;

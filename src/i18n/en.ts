@@ -5,10 +5,10 @@ export const en: Content = {
 
   home: {
     title: 'Ruihan Li',
-    description: 'Ruihan Li built a tabletop RPG mini program used by 14,000 people. Today most of its code is written by AI.',
+    description: 'Ruihan Li built a tabletop RPG mini program with 13.9k visitors to date. Today most of its code is written by AI.',
     hello: 'Ruihan Li · AI application engineer',
     line: 'One person.\nAn AI engineering team.',
-    sub: 'I built a tabletop RPG mini program that 14,000 people have used. Since June it has been run by a crew of AI agents (Claude, Codex, Cursor and more) on 8 scheduled shifts; I bring ideas, approve plans and ship releases.',
+    sub: 'I built a tabletop RPG mini program with 13.9k visitors to date. Since June it has been run by a crew of AI agents (Claude, Codex, Cursor and more) on 8 scheduled shifts; I bring ideas, approve plans and ship releases.',
     proof: [
       { v: '1,633', k: 'PRs written and merged by AI', src: 'Merge log of the mini program dev branch, Jun 17 to Nov 6' },
       { v: '26 / day', k: 'merged on average, last 30 days', src: 'dev branch merge log: 795 from Oct 8 to Nov 6' },
@@ -67,7 +67,7 @@ export const en: Content = {
       name: 'Stress Monitoring System',
       kind: 'Xidian × FMMU joint project · 2022 – 2025',
       stat: '3 software copyrights · national award',
-      line: 'Hardware plus software: a wristband records ECG, pulse and skin conductance. My advisor put me in charge of the software, and I built all of it myself: desktop, web, mobile and cloud.',
+      line: 'Hardware plus software: a wristband records ECG, pulse and skin conductance. I led the software: desktop, web, mobile, cloud and the stress classification model are all mine.',
       shot: '/shots/signal/desktop-hrv.png',
       shot2: '',
       badges: ['Confidential — public parts only', 'Software lead', 'Full stack, 4 platforms, solo', '3 software copyrights', 'National 3rd prize'],
@@ -107,7 +107,7 @@ export const en: Content = {
 
   dnd: {
     title: 'Lathander D&D Assistant · Ruihan Li',
-    description: 'A D&D mini program used by 14,000 people, maintained mostly by AI agents since June 2026.',
+    description: 'A D&D mini program with 13.9k visitors, maintained mostly by AI agents since June 2026.',
     kind: 'WeChat mini program · 2022 – now',
     name: 'Lathander D&D Assistant',
     line: 'A mini program for building D&D characters, managing them and running games. I wrote it alone in 2022; since June 2026 AI agents maintain it.',
@@ -184,7 +184,7 @@ export const en: Content = {
     ],
 
     caseTitle: 'How one piece of player feedback got fixed',
-    caseBody: 'On October 29 a player reported that "Inspiration" on the character sheet was mistranslated. Two and a half hours from issue to merge, with no human involved.',
+    caseBody: 'On October 29 (Beijing time) a player reported that "Inspiration" on the character sheet was mistranslated. 2.5 hours from issue to merge, with no human involved.',
     quote: 'The translation is wrong: 灵感 should be 激励.',
     quoteWho: "Player's words (translated)",
     relayHint: 'Click each step to see the original record it left behind.',
@@ -263,6 +263,26 @@ export const en: Content = {
       { v: '12', k: 'real player questions in the Nov 4 spot check' },
       { v: 'Beta', k: 'not open to players yet' },
     ],
+    qaArchTitle: 'Architecture',
+    qaArchTabs: ['Offline: building the corpus', 'Online: answering a question'],
+    qaArchHint: 'Click each step to see how it works.',
+    qaOffline: [
+      { t: '01', who: 'Source', role: 'gate', v: '35 rulebooks', d: '', detail: { kind: 'note', head: 'One pinned copy of the source', ref: '#2540', lines: ['A fixed commit of the community Chinese rules repository, decoded as GBK; any decoding error fails the import.', 'The 2024 core and expansions, the 2014 core three and nine expansions, and thirteen setting books: 35 in all.'] } },
+      { t: '02', who: 'Parse', role: 'gate', v: 'HTML into text blocks', d: '', detail: { kind: 'note', head: 'Document → section tree → blocks', ref: '#2540', lines: ['Every block gets a stable blockId and its character offsets in the source, so it can always be traced back.', 'Translator and editor notes are tagged apart; they are never searched or cited.'] } },
+      { t: '03', who: 'Index', role: 'gate', v: 'Sharded by edition × book', d: '', detail: { kind: 'note', head: 'Three indexes', ref: '#2541', lines: ['Exact names: heading chains and a quick alias table, so terms like “grappled” hit directly.', 'Inverted index: Chinese bigrams plus English words, scored by term frequency.', 'Context: same entry, same section, one link deep, for reading around a hit.'] } },
+      { t: '04', who: 'Upload', role: 'gate', v: 'Compressed, read back, verified', d: '', detail: { kind: 'note', head: 'Lazy-loaded from a manifest', ref: '#2755', lines: ['Indexes are gzipped to cloud storage and read back to check hashes.', 'About 298 MB in total, so the cloud function loads one book at a time and caches a single shard.'] } },
+      { t: '05', who: 'Eval', role: 'me', v: 'Retrieval first, answers later', d: '', detail: { kind: 'note', head: 'Offline recall eval', ref: '#2542', lines: ['Dev and held-out question sets; only reviewed questions count.', 'Bar: ≥ 95% recall of required evidence, zero cross-edition hits.'], aside: 'This step scores retrieval, not answers; answer quality is checked with real player questions.' } },
+    ],
+    qaOnline: [
+      { t: '01', who: 'Submit', role: 'gate', v: 'Async job', d: '', detail: { kind: 'note', head: 'Mini program → cloud function', ref: 'start / get', lines: ['Submitting returns a jobId; the app polls through queued → rewriting → searching → answering → checking.', 'One question per player at a time, 240 s hard limit; the client never sends model, budget or price.'] } },
+      { t: '02', who: 'Rewrite', role: 'ai', v: 'Plain words → search plan', d: '', detail: { kind: 'note', head: 'A cheap model that may only return JSON', ref: 'DeepSeek Flash', lines: ['Three kinds: chat, rules question, or needs clarifying (with 2–4 options).', 'A rules question must come with a standalone question, search terms and rule points; malformed output fails.'] } },
+      { t: '03', who: 'Search', role: 'gate', v: 'Only this edition’s books', d: '', detail: { kind: 'note', head: 'Edition isolation + context', ref: '#2541', lines: ['Books are chosen by the chat’s edition and the player’s expansion settings.', 'Hits are expanded to their entry and section, capped at about 4,000 tokens of evidence.'] } },
+      { t: '04', who: 'Answer', role: 'ai', v: 'Cites passage IDs only', d: '', detail: { kind: 'note', head: 'The model can’t supply its own quotes', ref: 'passages-v1', lines: ['Each claim may only point at passage IDs from the evidence; claims without one are dropped.', 'At most one follow-up search. 1,800 output tokens, up to 4 calls, 45 s each.'] } },
+      { t: '05', who: 'Fill', role: 'gate', v: 'The server fills the quotes', d: '', detail: { kind: 'note', head: 'Book, path and text never come from the model', ref: '#2769', lines: ['Quotes are pulled from the corpus by passage ID, word for word.', 'One bad citation rejects the whole batch; a 2014 chat can’t cite 2024 text.'] } },
+      { t: '06', who: 'Check', role: 'gate', v: 'Guards + model review', d: '', detail: { kind: 'note', head: 'Two checks', ref: '#3112 · #3182', lines: ['Deterministic guards: any spell level, distance, duration, edition or concentration in a claim must appear in that claim’s own quotes.', 'A separate model call then judges, claim by claim, whether the quotes support it.'] } },
+      { t: '07', who: 'Reply', role: 'me', v: 'Only checked claims', d: '', detail: { kind: 'note', head: 'Verdict if it passes, quotes if it doesn’t', ref: 'insufficient', lines: ['Players only see claims that passed, each with its quote one tap away.', 'Otherwise they get the relevant passages and “no clear basis found”, never the model’s draft.'], aside: 'Usage is metered and charged in coins after the fact; billing is off during the beta.' } },
+    ],
+    qaCaseTitle: 'One question that got stopped, step by step',
     qaHint: 'One question from the spot check. Click each step to see what it left behind.',
     qaRelay: [
       {
@@ -324,7 +344,7 @@ export const en: Content = {
     ],
     qaNote: 'Most questions are still judged “not enough evidence”: in the Nov 4 run, none of the 12 got a usable rules answer. Retrieval and context are being fixed; loosening the checks to pass more is off the table.',
     dayTitle: 'A big feature in six PRs, one afternoon',
-    dayBody: 'Session scheduling was proposed by an AI. On October 29 it was claimed, planned and split after lunch, and all six backend slices were merged before 9 pm:',
+    dayBody: 'Session scheduling was proposed by an AI. On October 29 (Beijing time) it was claimed, planned and split after lunch, and all six backend slices were merged before 9 pm:',
     day: [
       { t: '14:30', who: 'Claude', v: 'Claims it, writes the plan', ref: 'Issue #1805', title: '' },
       { t: '14:34', who: 'Claude', v: 'Plan merged, split into two tickets', ref: 'PR #2618', title: 'docs: 约团排期 PRD（#1805）' },
@@ -366,7 +386,7 @@ export const en: Content = {
     heroShot: '/shots/signal/desktop-hrv.png',
     heroCap: 'Desktop HRV view: heart-rate curve, RR distribution and time-domain metrics',
     s1: 'My role',
-    s1Body: 'My advisor made me the software lead: teammates built the wristband and the signal processing, and I owned the architecture, every piece of software and the stress classification model. Data goes from the wristband to the app over Bluetooth, up to the cloud for analysis, and out to the web console; the desktop analyzer is the part meant to become a commercial product.',
+    s1Body: 'I was the project’s software lead: teammates built the wristband and the signal processing, and I owned the architecture, every piece of software and the stress classification model. Data goes from the wristband to the app over Bluetooth, up to the cloud for analysis, and out to the web console; the desktop analyzer is the part meant to become a commercial product.',
     s2: 'How it fits together',
     arch: [
       { k: 'Capture', v: ['Wristband ECG / PPG / GSR', 'Bluetooth'] },
@@ -452,7 +472,7 @@ export const en: Content = {
     name: 'Ruihan Li',
     bio: [
       'B.Eng. in Electronic Information Engineering and M.Eng. in Electronic Information, both from [Xidian University](https://www.xidian.edu.cn). I wrote Java backends at Huawei OD and spent a year as a senior systems engineer at [BYD](https://www.byd.com).',
-      'In 2022 I started a tabletop RPG mini program, the [D&D Assistant](/en/work/dnd/). Since June 2026 AI agents maintain it; I bring ideas, approve plans and ship releases.',
+      'In 2022 I started a tabletop RPG mini program, [Lathander D&D Assistant](/en/work/dnd/). Since June 2026 AI agents maintain it; I bring ideas, approve plans and ship releases.',
       'I play D&D, own a Bambu Lab 3D printer, and run a small tabletop animation channel.',
     ],
     toCv: 'Jump to CV',
