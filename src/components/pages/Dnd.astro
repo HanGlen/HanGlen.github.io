@@ -21,7 +21,7 @@ const { t } = Astro.props;
 const d = t.dnd;
 const zh = t.lang === 'zh';
 const base = zh ? '' : '/en';
-const ids = ['case', 'pipeline', 'throughput', 'feature', 'qa', 'metrics', 'checks'];
+const ids = ['case', 'pipeline', 'throughput', 'feature', 'qa', 'coop', 'metrics', 'checks'];
 const toc = ids.map((id, i) => ({ id, label: d.toc[i] }));
 ---
 
@@ -107,7 +107,23 @@ const toc = ids.map((id, i) => ({ id, label: d.toc[i] }));
     <p class="aside-note">{d.qaNote}</p>
   </Section>
 
-  <Section no="06" title={d.opsTitle} lead={d.opsBody} id="metrics">
+  <Section no="06" title={d.coopTitle} lead={d.coopBody} id="coop">
+    <dl class="tiles reveal">
+      {
+        d.coopStats.map((s) => (
+          <div>
+            <dd>{s.v}</dd>
+            <dt>{s.k}</dt>
+          </div>
+        ))
+      }
+    </dl>
+    <div class="reveal gap-top">
+      <Relay legs={d.coopRelay as any} hint={d.coopHint} id="coop" />
+    </div>
+  </Section>
+
+  <Section no="07" title={d.opsTitle} lead={d.opsBody} id="metrics">
     <div class="reveal">
       <Tabs tabs={d.opsTabs} id="ops">
         <Fragment slot="p0">
@@ -158,7 +174,7 @@ const toc = ids.map((id, i) => ({ id, label: d.toc[i] }));
     </div>
   </Section>
 
-  <Section no="07" title={d.gateTitle} lead={d.gateBody} id="checks">
+  <Section no="08" title={d.gateTitle} lead={d.gateBody} id="checks">
     <ul class="gates">
       {
         d.gates.map((g) => (

@@ -127,7 +127,43 @@ export const en: Content = {
     ],
     shotsNote: 'Screenshots were taken by AI during UI tests in the WeChat dev tools; character names are test accounts.',
 
-    toc: ['One fix', 'Pipeline', 'Throughput', 'Big feature', 'Rules Q&A', 'Metrics', 'Checks'],
+    toc: ['One fix', 'Pipeline', 'Throughput', 'Big feature', 'Rules Q&A', 'Store partner', 'Metrics', 'Checks'],
+
+    coopTitle: 'Store partner: Box of the Gods',
+    coopBody: 'Adventure Box (冒险匣子), a partner store in Xi\'an, runs its own ruleset, Box of the Gods (诸神之匣). The store sets the rules and asks for changes; AI built it into the app as a separate character builder and sheet, now live.',
+    coopStats: [
+      { v: '57', k: 'questions on the rules sign-off form the store filled in; 54 settled on the spot' },
+      { v: '12', k: 'classes, taken verbatim from the store\'s handbook' },
+      { v: '58', k: 'PRs with “诸神之匣” in the title, as of Nov 9' },
+      { v: 'Sep 14', k: 'project kicked off' },
+    ],
+    coopHint: 'Click each step to see the record it left behind.',
+    coopRelay: [
+      {
+        t: 'Sep 14', who: 'AI', role: 'ai', v: 'Plan and split into tickets', d: '',
+        detail: { kind: 'issue', head: 'Master plan issue', ref: '#1211', lines: ['Box of the Gods master plan: shared ruleset architecture, unified pages, strictly validated character builder', 'Same pages as D&D; rule differences live in a ruleset registry instead of a second app.'] },
+      },
+      {
+        t: 'Sep 22', who: 'Store', role: 'me', v: 'Signs off 57 rule questions', d: '',
+        detail: { kind: 'note', head: 'Box of the Gods rules sign-off form', ref: 'PR #1316', lines: ['Filled in by the Adventure Box owner on 2026-09-22: 54 of 57 settled, 3 pending.', 'AI turned each answer into a baseline, then into data fields, options, validation and math.'], aside: 'The original form is in the repo, so every rule traces back to a question.' },
+      },
+      {
+        t: 'Sep 24', who: 'AI', role: 'ai', v: 'Builds every combo before handoff', d: '',
+        detail: { kind: 'note', head: 'Pre-delivery fixes for level-1 builds', ref: 'PR #1366', lines: ['Built all 43 legal race × class combos to level 1 in the dev tools.', 'Caught an inverted hint: the handbook allows rogues “any non-lawful alignment”; the app said they could not pick one.'], aside: 'The store set the bar for v1: you can build a level-1 character, and it works at the table.' },
+      },
+      {
+        t: 'Sep 28', who: 'Store', role: 'me', v: 'Drops the invite code', d: '',
+        detail: { kind: 'note', head: 'Permissions changed at the store\'s request', ref: 'PR #1499', lines: ['No invite code needed; anyone can build a character.', 'Players edit their own gear and gold; the DM code from the store only covers XP, level-ups and custom items.'] },
+      },
+      {
+        t: 'Oct 9', who: 'AI', role: 'ai', v: 'Adds a class the store forgot', d: '',
+        detail: { kind: 'note', head: 'New class: Qi Cultivator (练炁士)', ref: 'PR #1767', lines: ['Human, Qiankun bloodline only; 11 classes became 12.', 'The handout left a few things out. AI did not borrow them from another ruleset; it listed them for the store to confirm.'] },
+      },
+      {
+        t: 'Oct 15', who: 'AI', role: 'ai', v: 'Rule changes the store asked for', d: '',
+        detail: { kind: 'note', head: 'No elite trial, 2 rolls, 3 characters per account', ref: 'PR #2038', lines: ['Full XP at level 4 now goes straight to 5, no DM-judged trial.', 'Two stat rolls in total; at most 3 characters per account, existing ones kept.'], aside: 'After this the ruleset was frozen: bug fixes and my own requests only.' },
+      },
+    ],
 
     opsTitle: 'Metrics',
     opsBody: 'Who uses it, how much players report, and what they build. One tab each.',
@@ -482,7 +518,7 @@ export const en: Content = {
     open: 'Looking for roles in AI applications and AI engineering.',
     exp: [
       { t: '2025.07 – 2026.07', org: 'BYD Company Limited', href: 'https://www.byd.com', role: 'Senior Systems Engineer', pts: ['Brought AI tools such as Trae into the team, and wrote skills and guidelines for code review, backend work and project docs', 'Backend of the global quality management system, millions of users', 'Owned the color-matching module (30+ APIs from build to launch) and several group- and division-level OA workflows', 'Cut several slow APIs from ~10 s to under 2 s'] },
-      { t: '2022.07 – now', org: 'Lathander D&D Assistant', href: '/en/work/dnd/', role: 'Own project', pts: ['14.6k total users, 9,669 character sheets created', 'Built a multi-agent dev workflow: 1,633 PRs merged in 5 months', 'Built rules Q&A (RAG): 35 rulebooks indexed, every claim cited, declines when evidence is thin; launched in November', 'Paid features live; AI text and image items run at 78%+ gross margin'] },
+      { t: '2022.07 – now', org: 'Lathander D&D Assistant', href: '/en/work/dnd/', role: 'Own project', pts: ['14.6k total users, 9,669 character sheets created', 'Built a multi-agent dev workflow: 1,633 PRs merged in 5 months', 'Built rules Q&A (RAG): 35 rulebooks indexed, every claim cited, declines when evidence is thin; launched in November', 'Partnered with Adventure Box, a store in Xi\'an, to ship its Box of the Gods ruleset in the app: the store signed off 57 rule questions, AI merged 58 PRs', 'Paid features live; AI text and image items run at 78%+ gross margin'] },
       { t: '2022.09 – 2025.06', org: 'Xidian University', href: 'https://www.xidian.edu.cn', role: 'M.Eng., Electronic Information', pts: ['Software lead of a stress monitoring system built with the Fourth Military Medical University, 3 software copyrights', 'Thesis: stress classification from ECG + skin conductance (CNN + BiLSTM), 83.3% on 5-minute windows', 'Third Prize, graduate track, National BME Innovation Design Competition'] },
       { t: '2021.04 – 2021.09', org: 'Huawei OD', role: 'Java Developer', pts: ['Backend development and integration testing for Huawei'] },
       { t: '2016.09 – 2020.06', org: 'Xidian University', href: 'https://www.xidian.edu.cn', role: 'B.Eng., Electronic Information Engineering', pts: [] },
