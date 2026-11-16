@@ -1,13 +1,13 @@
 ---
 /**
- * 演讲 02「AI 用得广，但用得浅」：四层数字，左边一个大圆环跟着走。
- * ← → 或悬停右边每一层切换；圆环、大数字、出处一起换。
+ * 演讲 02「先数字化，再 AI 化」：左右两块色块图（每格 1%），左边数字化、右边 AI 化，底下一格把两边连起来。
+ * ← → 或悬停每一行切换，对应那一块的色块跟着变；最下面一行小字是编号对应的来源。
  */
 import { talk } from '../../i18n/talk';
 
 const g = talk.gap;
-const R = 120;
-const L = 2 * Math.PI * R;
+const circled = (n: number) => String.fromCharCode(0x2460 + n - 1);
+const refOf = (r: number | number[]) => (Array.isArray(r) ? r : [r]).map(circled).join('');
 ---
 
 <section class="slide t-slide gap" data-slide data-notes={g.notes} aria-labelledby="gap-title">
@@ -18,51 +18,70 @@ const L = 2 * Math.PI * R;
   </header>
 
   <div class="body" data-stepper data-hover data-at="0" data-gap>
-    <div class="ring-box">
-      <svg viewBox="0 0 300 300" class="ring" aria-hidden="true">
-        <circle cx="150" cy="150" r={R} class="track" />
-        <circle cx="150" cy="150" r={R} class="arc" data-arc style={`stroke-dasharray:${L};stroke-dashoffset:${L * (1 - g.steps[0].v / 100)}`} data-len={L} transform="rotate(-90 150 150)" />
-      </svg>
+    <div class="blocks">
       {
-        g.steps.map((s, i) => (
-          <div class="mid" data-pane={String(i)} hidden={i !== 0}>
-            <b class="serif">{s.big}</b>
-            <span>{s.text}</span>
-          </div>
+        g.blocks.map((b, bi) => (
+          <section class={`block b${bi}`} data-block={bi}>
+            <h3 class="bk serif">{b.k}</h3>
+            <div class="inner">
+              <div class="waffle" data-waffle={bi} aria-hidden="true">
+                {Array.from({ length: 100 }, (_, i) => (
+                  <i style={`--i:${i}`} />
+                ))}
+              </div>
+              <ol class="items" role="tablist" aria-label={b.k}>
+                {b.items.map((it) => (
+                  <li>
+                    <button
+                      type="button"
+                      role="tab"
+                      data-step
+                      data-b={bi}
+                      data-v={it.v}
+                      data-deep={(it as { deep?: number }).deep ?? 0}
+                      data-tone={(it as { tone?: string }).tone ?? ''}
+                      aria-selected="false"
+                    >
+                      <b class="serif">{it.big}</b>
+                      <span>
+                        {it.text}
+                        <sup>{refOf(it.ref)}</sup>
+                      </span>
+                    </button>
+                  </li>
+                ))}
+              </ol>
+            </div>
+            <p class="refer">
+              {b.refer}
+              <sup>{refOf(b.referRef)}</sup>
+            </p>
+          </section>
         ))
       }
     </div>
 
-    <div class="right">
-      <ol class="steps" role="tablist" aria-label={g.title}>
-        {
-          g.steps.map((s, i) => (
-            <li>
-              <button type="button" role="tab" data-step data-v={s.v} aria-selected={i === 0 ? 'true' : 'false'}>
-                <span class="k">{s.k}</span>
-                <b class="serif">{s.big}</b>
-                <span class="t">{s.text}</span>
-              </button>
-            </li>
-          ))
-        }
-      </ol>
-
-      {
-        g.steps.map((s, i) => (
-          <div class="detail" data-pane={String(i)} hidden={i !== 0}>
-            <p class="sub">{s.sub}</p>
-            <p class="t-src">{s.src}</p>
-          </div>
-        ))
-      }
-
-      <blockquote class="quote">
-        <p class="q serif">{g.quote}</p>
-        <p class="qw">{g.quoteWho}</p>
-      </blockquote>
+    <div class="tie">
+      <button type="button" role="tab" data-step data-b="link" aria-selected="false">
+        <span class="lk">数字化 → AI 化</span>
+        <b class="serif">{g.link.big}</b>
+        <span>
+          {g.link.text}
+          <sup>{refOf(g.link.ref)}</sup>
+        </span>
+      </button>
       <p class="end serif">{g.end}</p>
     </div>
+
+    <ol class="refs">
+      {
+        g.refs.map((r, i) => (
+          <li>
+            {circled(i + 1)} {r}
+          </li>
+        ))
+      }
+    </ol>
   </div>
 </section>
 
@@ -70,191 +89,243 @@ const L = 2 * Math.PI * R;
   .body {
     flex: 1;
     min-height: 0;
-    display: grid;
-    grid-template-columns: minmax(0, 0.9fr) minmax(0, 1.1fr);
-    gap: clamp(24px, 4vw, 80px);
-    align-items: center;
-  }
-
-  .ring-box {
-    position: relative;
-    width: min(100%, 56vh, 560px);
-    aspect-ratio: 1;
-    justify-self: center;
-  }
-
-  .ring {
-    width: 100%;
-    height: 100%;
-  }
-
-  .track {
-    fill: none;
-    stroke: var(--heat-0);
-    stroke-width: 26;
-  }
-
-  .arc {
-    fill: none;
-    stroke: var(--accent);
-    stroke-width: 26;
-    stroke-linecap: round;
-    transition: stroke-dashoffset 0.8s cubic-bezier(0.2, 0.8, 0.2, 1);
-  }
-
-  .mid {
-    position: absolute;
-    inset: 0;
     display: flex;
     flex-direction: column;
-    align-items: center;
     justify-content: center;
-    text-align: center;
-    padding: 18%;
-    gap: 8px;
+    gap: clamp(12px, 2.2vh, 26px);
   }
 
-  .mid[hidden],
-  .detail[hidden] {
-    display: none;
+  .blocks {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: clamp(16px, 2.4vw, 44px);
   }
 
-  .mid b {
-    font-size: clamp(56px, 7vw, 128px);
-    line-height: 1;
-    color: var(--accent-ink);
+  .block {
+    display: flex;
+    flex-direction: column;
+    gap: 12px;
+    padding: clamp(14px, 1.6vw, 26px);
+    border: 1px solid var(--line);
+    border-radius: var(--r);
+    background: var(--card);
+    box-shadow: var(--shadow);
+    transition: border-color 0.3s;
+  }
+
+  .block.on {
+    border-color: var(--accent);
+  }
+
+  .bk {
+    margin: 0;
+    font-size: clamp(22px, 2vw, 36px);
     font-weight: 600;
   }
 
-  .mid span {
-    font-size: clamp(16px, 1.6vw, 28px);
-    line-height: 1.35;
+  .inner {
+    display: grid;
+    grid-template-columns: minmax(0, 0.8fr) minmax(0, 1.2fr);
+    gap: clamp(14px, 1.6vw, 28px);
+    align-items: center;
   }
 
-  .right {
-    display: flex;
-    flex-direction: column;
-    gap: clamp(14px, 2.4vh, 28px);
+  .waffle {
+    display: grid;
+    grid-template-columns: repeat(10, 1fr);
+    gap: clamp(2px, 0.3vw, 5px);
+    width: min(100%, 30vh);
+    aspect-ratio: 1;
   }
 
-  .steps {
+  .waffle i {
+    border-radius: 3px;
+    background: var(--heat-0);
+    transition: background 0.45s ease calc(var(--i) * 5ms), opacity 0.3s;
+  }
+
+  .waffle i.f {
+    background: var(--heat-3);
+  }
+
+  .waffle i.f.low {
+    background: var(--ink-3);
+  }
+
+  .waffle i.d {
+    background: var(--heat-4);
+    box-shadow: 0 0 0 2px var(--accent-glow);
+  }
+
+  .waffle.dim i.f:not(.d) {
+    background: var(--heat-1);
+  }
+
+  .items {
     list-style: none;
     margin: 0;
     padding: 0;
     display: flex;
     flex-direction: column;
-    gap: 6px;
+    gap: 4px;
   }
 
-  .steps button {
+  .items button,
+  .tie button {
     width: 100%;
     display: grid;
-    grid-template-columns: 3em 5.2em 1fr;
+    grid-template-columns: clamp(78px, 6.6vw, 128px) 1fr;
     align-items: baseline;
-    gap: 12px;
-    padding: 10px 16px;
+    gap: 10px;
+    padding: 8px 12px;
     text-align: left;
     font: inherit;
     color: var(--ink-3);
     background: transparent;
     border: 1.5px solid transparent;
-    border-radius: var(--r);
+    border-radius: var(--r-sm);
     cursor: pointer;
     transition: border-color 0.25s, background 0.25s, color 0.25s;
   }
 
-  .steps .k {
-    font-size: clamp(13px, 1vw, 16px);
-    letter-spacing: 0.06em;
-  }
-
-  .steps b {
-    font-size: clamp(22px, 2vw, 36px);
+  .items b {
+    font-size: clamp(20px, 1.8vw, 32px);
     line-height: 1;
     font-weight: 600;
   }
 
-  .steps .t {
-    font-size: clamp(15px, 1.35vw, 23px);
+  .items span {
+    font-size: clamp(14px, 1.15vw, 20px);
+    line-height: 1.4;
   }
 
-  .steps button.seen {
+  sup {
+    font-size: 0.7em;
+    color: var(--ink-3);
+    margin-left: 2px;
+  }
+
+  .items button.seen,
+  .tie button.seen {
     color: var(--ink-2);
   }
 
-  .steps button[aria-selected='true'] {
+  .items button[aria-selected='true'],
+  .tie button[aria-selected='true'] {
     color: var(--ink);
     border-color: var(--accent);
     background: var(--accent-soft);
   }
 
-  .steps button[aria-selected='true'] b {
+  .items button[aria-selected='true'] b,
+  .tie button[aria-selected='true'] b {
     color: var(--accent-ink);
   }
 
-  .detail {
-    min-height: 4.5em;
-  }
-
-  .detail p {
-    margin: 0 0 4px;
-  }
-
-  .sub {
-    font-size: clamp(16px, 1.4vw, 24px);
-    color: var(--ink-2);
-  }
-
-  .quote {
+  .refer {
     margin: 0;
-    padding: 2px 0 2px 18px;
-    border-left: 3px solid var(--accent);
-  }
-
-  .q {
-    margin: 0;
-    font-size: clamp(22px, 2.1vw, 36px);
-    font-weight: 600;
-  }
-
-  .qw {
-    margin: 4px 0 0;
-    font-size: 13px;
+    font-size: clamp(13px, 1vw, 16px);
     color: var(--ink-3);
+  }
+
+  .tie {
+    display: flex;
+    flex-wrap: wrap;
+    align-items: center;
+    gap: 8px clamp(16px, 2.4vw, 44px);
+  }
+
+  .tie button {
+    width: auto;
+    grid-template-columns: auto auto auto;
+    gap: 14px;
+    padding: 10px 18px;
+    border-color: var(--line-2);
+  }
+
+  .lk {
+    font-size: 13px;
+    letter-spacing: 0.06em;
+  }
+
+  .tie b {
+    font-size: clamp(22px, 2vw, 36px);
+    font-weight: 600;
+    line-height: 1;
+  }
+
+  .tie span {
+    font-size: clamp(14px, 1.2vw, 21px);
   }
 
   .end {
     margin: 0;
-    font-size: clamp(22px, 2.1vw, 36px);
+    font-size: clamp(20px, 1.9vw, 34px);
     font-weight: 600;
     color: var(--accent-ink);
   }
 
+  .refs {
+    list-style: none;
+    margin: 0;
+    padding: 10px 0 0;
+    border-top: 1px solid var(--line);
+    display: flex;
+    flex-wrap: wrap;
+    gap: 2px 18px;
+    font-size: clamp(11px, 0.78vw, 13px);
+    line-height: 1.5;
+    color: var(--ink-3);
+  }
+
   @media (max-width: 900px) {
-    .body {
+    .blocks {
       grid-template-columns: 1fr;
     }
-    .ring-box {
-      width: min(80vw, 320px);
+    .inner {
+      grid-template-columns: 1fr;
+    }
+    .waffle {
+      width: min(70vw, 260px);
+    }
+    .tie button {
+      grid-template-columns: 1fr;
     }
   }
 
   @media (prefers-reduced-motion: reduce) {
-    .arc {
+    .waffle i {
       transition: none;
     }
   }
 </style>
 
 <script>
-  // 圆环跟着当前层走
+  // 每一行对应一块色块图：前 v 格填色，前 deep 格用深色，tone=low 用灰色表示「还没做到」
   document.querySelectorAll<HTMLElement>('[data-gap]').forEach((root) => {
-    const arc = root.querySelector<SVGCircleElement>('[data-arc]')!;
-    const len = Number(arc.dataset.len);
     const steps = [...root.querySelectorAll<HTMLElement>('[data-step]')];
+    const blocks = [...root.querySelectorAll<HTMLElement>('[data-block]')];
+    const paint = (s: HTMLElement) => {
+      const b = s.dataset.b!;
+      if (b === 'link') return;
+      const v = Number(s.dataset.v);
+      const deep = Number(s.dataset.deep);
+      const low = s.dataset.tone === 'low';
+      const w = root.querySelector<HTMLElement>(`[data-waffle="${b}"]`)!;
+      w.classList.toggle('dim', deep > 0);
+      [...w.children].forEach((c, i) => {
+        c.classList.toggle('f', i < v);
+        c.classList.toggle('low', low && i < v);
+        c.classList.toggle('d', i < deep);
+      });
+    };
+    // 两块一开始各自显示第一行
+    blocks.forEach((bl) => paint(bl.querySelector<HTMLElement>('[data-step]')!));
+    blocks[0].classList.add('on');
     root.addEventListener('step', (e) => {
-      const v = Number(steps[(e as CustomEvent<number>).detail].dataset.v);
-      arc.style.strokeDashoffset = String(len * (1 - v / 100));
+      const s = steps[(e as CustomEvent<number>).detail];
+      paint(s);
+      blocks.forEach((bl) => bl.classList.toggle('on', bl.dataset.block === s.dataset.b || s.dataset.b === 'link'));
     });
   });
 </script>
