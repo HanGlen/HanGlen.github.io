@@ -1,0 +1,684 @@
+---
+/**
+ * 演讲第 1 部分「我是谁」：中间是我，周围是做过和在做的事。
+ * 颜色是关系（过去 / 自己的 / 合作），形状是状态（实心 / 空心 / 虚线）。
+ * 悬停或聚焦一个点，右边出大字卡片；讲过的点一直亮着。← → 依次切换。
+ */
+import { talk } from '../../i18n/talk';
+
+const m = talk.me;
+const nodes = m.nodes;
+const C = { x: 480, y: 370 };
+const pos = (id: string) => (id === 'center' ? C : nodes.find((n) => n.id === id)!);
+const edges = nodes.flatMap((n) => (n.links ?? ['center']).map((to) => ({ id: n.id, rel: n.rel, status: n.status, from: pos(to), to: n })));
+const pct = (v: number, of: number) => `${(v / of) * 100}%`;
+---
+
+<section class="slide me" data-slide data-notes={m.notes} aria-labelledby="me-title" data-network>
+  <header class="head">
+    <p class="no">{m.no}</p>
+    <h2 id="me-title">{m.title}</h2>
+    <p class="lead">{m.lead}</p>
+  </header>
+
+  <div class="body">
+    <div class="graph">
+      <div class="stage">
+        <svg viewBox="0 0 1000 760" aria-hidden="true" preserveAspectRatio="none">
+          {
+            edges.map((e) => (
+              <line
+                x1={e.from.x}
+                y1={e.from.y}
+                x2={e.to.x}
+                y2={e.to.y}
+                class={`edge rel-${e.rel} st-${e.status}`}
+                data-edge={e.id}
+                vector-effect="non-scaling-stroke"
+              />
+            ))
+          }
+        </svg>
+
+        <div class="center" style={`left:${pct(C.x, 1000)};top:${pct(C.y, 760)}`}>
+          <span class="serif">我</span>
+        </div>
+
+        {
+          nodes.map((n, i) => (
+            <button
+              type="button"
+              class={`node rel-${n.rel} st-${n.status}`}
+              style={`left:${pct(n.x, 1000)};top:${pct(n.y, 760)};--d:${0.25 + i * 0.05}s`}
+              data-node={n.id}
+              aria-label={`${n.title}：${n.lines.join('')}`}
+            >
+              <i class="dot" aria-hidden="true" />
+              <span class="lab">
+                {n.label}
+                {n.when && !n.quiet && <small>{n.when}</small>}
+              </span>
+            </button>
+          ))
+        }
+      </div>
+    </div>
+
+    <aside class="panel" aria-live="polite">
+      <div class="card idle" data-idle>
+        <p class="name serif">{m.name}</p>
+        <p class="role">{m.role}</p>
+        <div class="legend">
+          <ul>
+            {
+              m.legendRel.map((l) => (
+                <li>
+                  <i class={`sw rel-${l.k}`} />
+                  {l.v}
+                </li>
+              ))
+            }
+          </ul>
+          <ul>
+            {
+              m.legendStatus.map((l) => (
+                <li>
+                  <i class={`shape st-${l.k}`} />
+                  {l.v}
+                </li>
+              ))
+            }
+          </ul>
+        </div>
+        <p class="hint">{m.hint}</p>
+      </div>
+
+      {
+        nodes.map((n) => (
+          <div class={`card rel-${n.rel}`} data-card={n.id} hidden>
+            <p class="tag">
+              <i class={`sw rel-${n.rel}`} />
+              {m.relName[n.rel]} · {m.statusName[n.status]}
+              {n.when && !n.quiet && !n.stat && <span> · {n.when}</span>}
+            </p>
+            <h3 class="serif">{n.title}</h3>
+            {n.lines.map((l) => <p class="line">{l}</p>)}
+            {n.stat && (
+              <p class="stat">
+                <b class="serif">{n.stat.v}</b>
+                <span>{n.stat.k}</span>
+              </p>
+            )}
+            {n.steps && (
+              <ol class="steps">
+                {n.steps.map((s) => (
+                  <li>{s}</li>
+                ))}
+              </ol>
+            )}
+            {n.img && (
+              <figure>
+                <img src={n.img.src} alt={n.img.alt} loading="lazy" decoding="async" width="908" height="552" />
+                <figcaption>{n.img.cap}</figcaption>
+              </figure>
+            )}
+          </div>
+        ))
+      }
+
+      <p class="told">
+        <span data-told>{m.told.replace('{n}', '0').replace('{m}', String(nodes.length))}</span>
+        <b class="serif end" data-end>{m.end}</b>
+      </p>
+    </aside>
+  </div>
+  <script type="application/json" data-told-tpl set:html={JSON.stringify(m.told)} />
+</section>
+
+<style>
+  .me {
+    display: flex;
+    flex-direction: column;
+    padding: clamp(28px, 5vh, 64px) var(--pad) clamp(20px, 4vh, 44px);
+    gap: clamp(12px, 2vh, 24px);
+    --past: var(--ink-2);
+    --own: var(--accent);
+    --partner: var(--ok);
+  }
+
+  .head {
+    display: grid;
+    grid-template-columns: auto auto 1fr;
+    align-items: baseline;
+    gap: 6px 20px;
+  }
+
+  .no {
+    margin: 0;
+    font-family: var(--mono);
+    font-size: clamp(14px, 1.1vw, 18px);
+    color: var(--accent-ink);
+  }
+
+  h2 {
+    margin: 0;
+    font-family: var(--serif);
+    font-weight: 600;
+    font-size: clamp(32px, 3.4vw, 60px);
+    line-height: 1.1;
+  }
+
+  .lead {
+    margin: 0;
+    font-size: clamp(16px, 1.4vw, 24px);
+    color: var(--ink-2);
+  }
+
+  .body {
+    flex: 1;
+    min-height: 0;
+    display: grid;
+    grid-template-columns: minmax(0, 1.55fr) minmax(320px, 1fr);
+    gap: clamp(20px, 3vw, 56px);
+    align-items: center;
+  }
+
+  .graph {
+    height: 100%;
+    min-height: 0;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    container-type: size;
+  }
+
+  .stage {
+    position: relative;
+    width: min(100cqw, 100cqh * 1000 / 760);
+    aspect-ratio: 1000 / 760;
+  }
+
+  svg {
+    position: absolute;
+    inset: 0;
+    width: 100%;
+    height: 100%;
+    overflow: visible;
+  }
+
+  .edge {
+    stroke: var(--line-2);
+    stroke-width: 1.2;
+    transition: stroke 0.4s, stroke-width 0.4s, opacity 0.4s;
+  }
+
+  .edge.st-idea {
+    stroke-dasharray: 4 5;
+  }
+
+  .edge.lit.rel-past {
+    stroke: var(--past);
+  }
+  .edge.lit.rel-own {
+    stroke: var(--own);
+  }
+  .edge.lit.rel-partner {
+    stroke: var(--partner);
+  }
+  .edge.lit {
+    stroke-width: 2;
+    opacity: 0.75;
+  }
+  .edge.on {
+    opacity: 1;
+    stroke-width: 3;
+  }
+
+  .center {
+    position: absolute;
+    width: clamp(64px, 9cqw, 112px);
+    aspect-ratio: 1;
+    transform: translate(-50%, -50%);
+    border-radius: 50%;
+    display: grid;
+    place-items: center;
+    background: var(--ink);
+    color: var(--bg);
+    box-shadow: 0 0 0 10px var(--accent-soft), 0 0 0 22px color-mix(in srgb, var(--accent-soft) 50%, transparent);
+    font-size: clamp(24px, 3.4cqw, 44px);
+    font-weight: 600;
+    z-index: 2;
+  }
+
+  .node {
+    --c: var(--past);
+    position: absolute;
+    transform: translate(-50%, -50%);
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 6px;
+    padding: 6px;
+    border: 0;
+    background: none;
+    color: var(--ink);
+    font: inherit;
+    cursor: pointer;
+    z-index: 3;
+    opacity: 0.42;
+    transition: opacity 0.35s, transform 0.35s cubic-bezier(0.2, 0.7, 0.2, 1);
+    animation: pop 0.6s cubic-bezier(0.2, 0.7, 0.2, 1) both;
+    animation-delay: var(--d);
+  }
+
+  .node.rel-own {
+    --c: var(--own);
+  }
+  .node.rel-partner {
+    --c: var(--partner);
+  }
+
+  .dot {
+    width: clamp(14px, 2cqw, 24px);
+    aspect-ratio: 1;
+    border-radius: 50%;
+    background: var(--c);
+    border: 3px solid var(--c);
+    transition: box-shadow 0.35s, transform 0.35s;
+  }
+
+  .st-doing .dot {
+    background: var(--bg);
+  }
+
+  .st-idea .dot {
+    background: transparent;
+    border-style: dashed;
+    border-width: 2px;
+  }
+
+  .lab {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    font-size: clamp(14px, 1.95cqw, 22px);
+    font-weight: 600;
+    line-height: 1.25;
+    white-space: nowrap;
+    text-shadow: 0 0 4px var(--bg), 0 0 8px var(--bg), 0 0 12px var(--bg);
+  }
+
+  .lab small {
+    font-family: var(--mono);
+    font-size: 0.68em;
+    font-weight: 400;
+    color: var(--ink-3);
+  }
+
+  .st-idea .lab {
+    font-weight: 400;
+    color: var(--ink-3);
+  }
+
+  .node.seen {
+    opacity: 1;
+  }
+
+  .node.seen.st-idea {
+    opacity: 0.7;
+  }
+
+  .node.seen .dot {
+    box-shadow: 0 0 0 6px color-mix(in srgb, var(--c) 18%, transparent);
+  }
+
+  .node.on {
+    opacity: 1;
+    transform: translate(-50%, -50%) scale(1.14);
+    z-index: 4;
+  }
+
+  .node.on .dot {
+    box-shadow: 0 0 0 10px color-mix(in srgb, var(--c) 22%, transparent), 0 0 28px color-mix(in srgb, var(--c) 45%, transparent);
+  }
+
+  .node:focus-visible {
+    outline: none;
+  }
+
+  .node:focus-visible .lab {
+    outline: 2px solid var(--accent);
+    outline-offset: 4px;
+    border-radius: var(--r-sm);
+  }
+
+  /* —— 右侧卡片 —— */
+  .panel {
+    position: relative;
+    align-self: stretch;
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    min-height: 0;
+  }
+
+  .card {
+    --c: var(--past);
+    padding: clamp(22px, 2.4vw, 40px);
+    border: 1px solid var(--line);
+    border-radius: var(--r);
+    background: var(--card);
+    box-shadow: var(--shadow);
+    border-top: 4px solid var(--c);
+    animation: in 0.4s cubic-bezier(0.2, 0.7, 0.2, 1);
+    overflow: auto;
+    max-height: 100%;
+  }
+
+  .card.rel-own {
+    --c: var(--own);
+  }
+  .card.rel-partner {
+    --c: var(--partner);
+  }
+
+  .card.idle {
+    border-top-color: var(--ink);
+  }
+
+  .card[hidden] {
+    display: none;
+  }
+
+  .name {
+    margin: 0;
+    font-size: clamp(34px, 3.4vw, 60px);
+    font-weight: 600;
+    line-height: 1.1;
+  }
+
+  .role {
+    margin: 8px 0 0;
+    font-size: clamp(16px, 1.35vw, 22px);
+    color: var(--ink-2);
+  }
+
+  .legend {
+    margin-top: clamp(18px, 3vh, 32px);
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 16px;
+  }
+
+  .legend ul {
+    margin: 0;
+    padding: 0;
+    list-style: none;
+    display: grid;
+    gap: 8px;
+    font-size: clamp(14px, 1.05vw, 17px);
+    color: var(--ink-2);
+  }
+
+  .legend li {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+  }
+
+  .sw {
+    width: 12px;
+    height: 12px;
+    border-radius: 50%;
+    background: var(--past);
+    flex: none;
+  }
+  .sw.rel-own {
+    background: var(--own);
+  }
+  .sw.rel-partner {
+    background: var(--partner);
+  }
+
+  .shape {
+    width: 14px;
+    height: 14px;
+    border-radius: 50%;
+    border: 2.5px solid var(--ink-2);
+    background: var(--ink-2);
+    flex: none;
+  }
+  .shape.st-doing {
+    background: transparent;
+  }
+  .shape.st-idea {
+    background: transparent;
+    border-style: dashed;
+    border-width: 2px;
+  }
+
+  .hint {
+    margin: clamp(18px, 3vh, 32px) 0 0;
+    font-size: clamp(14px, 1.1vw, 18px);
+    color: var(--accent-ink);
+  }
+
+  .tag {
+    margin: 0 0 12px;
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    flex-wrap: wrap;
+    font-size: clamp(13px, 1vw, 16px);
+    color: var(--ink-3);
+  }
+
+  .tag span {
+    font-family: var(--mono);
+  }
+
+  h3 {
+    margin: 0 0 clamp(10px, 1.6vh, 18px);
+    font-size: clamp(28px, 2.6vw, 46px);
+    font-weight: 600;
+    line-height: 1.15;
+  }
+
+  .line {
+    margin: 0 0 10px;
+    font-size: clamp(17px, 1.45vw, 25px);
+    line-height: 1.55;
+    color: var(--ink-2);
+  }
+
+  .stat {
+    margin: clamp(12px, 2vh, 22px) 0 0;
+    display: flex;
+    align-items: baseline;
+    gap: 12px;
+    flex-wrap: wrap;
+  }
+
+  .stat b {
+    font-size: clamp(34px, 3.4vw, 60px);
+    font-weight: 600;
+    line-height: 1;
+    color: var(--c);
+  }
+
+  .stat span {
+    font-size: clamp(14px, 1.1vw, 18px);
+    color: var(--ink-3);
+  }
+
+  .steps {
+    margin: 14px 0 0;
+    padding: 0;
+    list-style: none;
+    display: flex;
+    flex-wrap: wrap;
+    gap: 6px;
+    counter-reset: s;
+  }
+
+  .steps li {
+    counter-increment: s;
+    padding: 3px 10px;
+    border-radius: var(--r-pill);
+    background: color-mix(in srgb, var(--c) 12%, transparent);
+    font-size: clamp(13px, 1vw, 16px);
+  }
+
+  .steps li::before {
+    content: counter(s) ' ';
+    font-family: var(--mono);
+    color: var(--c);
+  }
+
+  figure {
+    margin: 16px 0 0;
+  }
+
+  figure img {
+    display: block;
+    width: 100%;
+    max-height: 34vh;
+    object-fit: cover;
+    object-position: center;
+    border-radius: var(--r-sm);
+  }
+
+  figcaption {
+    margin-top: 6px;
+    font-size: 13px;
+    color: var(--ink-3);
+  }
+
+  .told {
+    flex-wrap: wrap;
+    margin: 14px 0 0;
+    min-height: 1.6em;
+    display: flex;
+    align-items: baseline;
+    justify-content: space-between;
+    gap: 12px;
+    font-family: var(--mono);
+    font-size: 13px;
+    color: var(--ink-3);
+  }
+
+  .end {
+    font-family: var(--serif);
+    font-size: clamp(18px, 1.6vw, 26px);
+    color: var(--ink);
+    opacity: 0;
+    transform: translateY(6px);
+    transition: opacity 0.6s, transform 0.6s;
+  }
+
+  .me.done .end {
+    opacity: 1;
+    transform: none;
+  }
+
+  @keyframes pop {
+    from {
+      opacity: 0;
+      transform: translate(-50%, -50%) scale(0.6);
+    }
+  }
+
+  @keyframes in {
+    from {
+      opacity: 0;
+      transform: translateY(8px);
+    }
+  }
+
+  @media (max-width: 900px) {
+    .head {
+      grid-template-columns: auto 1fr;
+    }
+    .lead {
+      grid-column: 1 / -1;
+    }
+    .body {
+      grid-template-columns: 1fr;
+      align-items: start;
+    }
+    .graph {
+      height: auto;
+      container-type: inline-size;
+    }
+    .stage {
+      width: 100%;
+    }
+    .lab {
+      font-size: clamp(10px, 2.6cqw, 14px);
+    }
+    .lab small {
+      display: none;
+    }
+  }
+
+  @media (prefers-reduced-motion: reduce) {
+    .node,
+    .card {
+      animation: none;
+    }
+    .node,
+    .end {
+      transition: none;
+    }
+  }
+</style>
+
+<script>
+  const root = document.querySelector<HTMLElement>('[data-network]');
+  if (root) init(root);
+
+  function init(root: HTMLElement) {
+    const tpl: string = JSON.parse(root.querySelector('[data-told-tpl]')!.textContent!);
+    const nodes = [...root.querySelectorAll<HTMLButtonElement>('[data-node]')];
+    const idle = root.querySelector<HTMLElement>('[data-idle]')!;
+    const told = root.querySelector<HTMLElement>('[data-told]')!;
+    const seen = new Set<string>();
+    let cur = -1;
+
+    function show(i: number) {
+      cur = i;
+      const id = nodes[i].dataset.node!;
+      seen.add(id);
+      nodes.forEach((n, j) => {
+        n.classList.toggle('on', j === i);
+        if (seen.has(n.dataset.node!)) n.classList.add('seen');
+      });
+      root.querySelectorAll<SVGLineElement>('[data-edge]').forEach((e) => {
+        const nid = e.dataset.edge!;
+        e.classList.toggle('lit', seen.has(nid));
+        e.classList.toggle('on', nid === id);
+      });
+      idle.hidden = true;
+      root.querySelectorAll<HTMLElement>('[data-card]').forEach((c) => {
+        c.hidden = c.dataset.card !== id;
+      });
+      told.textContent = tpl.replace('{n}', String(seen.size)).replace('{m}', String(nodes.length));
+      root.classList.toggle('done', seen.size === nodes.length);
+    }
+
+    nodes.forEach((n, i) => {
+      n.addEventListener('pointerenter', () => show(i));
+      n.addEventListener('focus', () => show(i));
+      n.addEventListener('click', () => show(i));
+    });
+
+    // 这一页在台上时，← → 依次讲下一个点
+    document.addEventListener('keydown', (e) => {
+      if (!root.classList.contains('is-current')) return;
+      if (e.key !== 'ArrowRight' && e.key !== 'ArrowLeft') return;
+      e.preventDefault();
+      const next = cur < 0 ? (e.key === 'ArrowRight' ? 0 : nodes.length - 1) : (cur + (e.key === 'ArrowRight' ? 1 : -1) + nodes.length) % nodes.length;
+      nodes[next].focus({ preventScroll: true });
+    });
+  }
+</script>

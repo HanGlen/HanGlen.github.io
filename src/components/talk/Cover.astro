@@ -1,0 +1,373 @@
+---
+/**
+ * 演讲封面：背景每个点是一个 AI 合入的 PR（数据同首页 PrField），
+ * 点在原地漂，鼠标经过会推开。数据来自 src/data/dnd.json。
+ */
+import data from '../../data/dnd.json';
+import { talk } from '../../i18n/talk';
+
+const c = talk.cover;
+const dailyTypes = data.dailyTypes as Record<string, { feat?: number; fix?: number }>;
+const daily = data.daily as Record<string, number>;
+let feat = 0;
+let fix = 0;
+let total = 0;
+for (const [d, n] of Object.entries(daily)) {
+  total += n;
+  feat += dailyTypes[d]?.feat ?? 0;
+  fix += dailyTypes[d]?.fix ?? 0;
+}
+const counts = [feat, fix, Math.max(0, total - feat - fix)];
+let ci = 0;
+const lines = c.title.split('\n');
+---
+
+<section class="slide cover" data-slide data-notes={c.notes} aria-label="封面">
+  <canvas class="cv" aria-hidden="true" data-cover-canvas data-counts={JSON.stringify(counts)}></canvas>
+  <div class="inner">
+    <p class="eyebrow rise" style="--i:0">{c.eyebrow}</p>
+    <h1 aria-label={c.title.replace('\n', '')}>
+      {
+        lines.map((l) => (
+          <span class="ln" aria-hidden="true">
+            {[...l].map((ch) => (
+              <span class="ch" style={`--i:${ci++}`}>
+                {ch === ' ' ? '\u00a0' : ch}
+              </span>
+            ))}
+          </span>
+        ))
+      }
+    </h1>
+    <p class="sub rise" style="--i:16">{c.sub}</p>
+    <p class="who rise" style="--i:20"><b class="serif">{c.name}</b><span>{c.role}</span></p>
+  </div>
+  <p class="field rise" style="--i:24">
+    <i aria-hidden="true"></i>{c.field}<span>{c.fieldNote.replace('{n}', total.toLocaleString('en-US'))}</span>
+  </p>
+  <p class="next" aria-hidden="true">{c.next}<i></i></p>
+</section>
+
+<style>
+  .cover {
+    position: relative;
+    overflow: hidden;
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+  }
+
+  .cv {
+    position: absolute;
+    inset: 0;
+    width: 100%;
+    height: 100%;
+  }
+
+  .inner {
+    position: relative;
+    width: min(100%, 1600px);
+    margin: 0 auto;
+    padding: 0 var(--pad);
+    pointer-events: none;
+  }
+
+  .inner > * {
+    pointer-events: auto;
+  }
+
+  .eyebrow {
+    margin: 0 0 clamp(16px, 2.4vh, 28px);
+    font-family: var(--mono);
+    font-size: clamp(13px, 1.1vw, 17px);
+    letter-spacing: 0.08em;
+    color: var(--accent-ink);
+  }
+
+  h1 {
+    margin: 0;
+    font-family: var(--serif);
+    font-weight: 600;
+    font-size: clamp(32px, 6.2vw, 120px);
+    line-height: 1.08;
+    letter-spacing: -0.01em;
+  }
+
+  .ln {
+    display: block;
+  }
+
+  @media (min-width: 900px) {
+    .ln {
+      white-space: nowrap;
+    }
+  }
+
+  .ch {
+    display: inline-block;
+    opacity: 0;
+    transform: translateY(0.4em);
+    animation: up 0.8s cubic-bezier(0.2, 0.7, 0.2, 1) forwards;
+    animation-delay: calc(0.15s + var(--i) * 0.04s);
+  }
+
+  .ln:last-child .ch:nth-last-child(-n + 8):not(:last-child) {
+    color: var(--accent);
+  }
+
+  .sub {
+    max-width: 30em;
+    margin: clamp(20px, 3vh, 36px) 0 0;
+    font-size: clamp(18px, 1.7vw, 28px);
+    line-height: 1.55;
+    color: var(--ink-2);
+  }
+
+  .who {
+    margin: clamp(24px, 4vh, 48px) 0 0;
+    display: flex;
+    align-items: baseline;
+    gap: 16px;
+    flex-wrap: wrap;
+  }
+
+  .who b {
+    font-size: clamp(24px, 2.2vw, 36px);
+    font-weight: 600;
+  }
+
+  .who span {
+    font-size: clamp(15px, 1.2vw, 20px);
+    color: var(--ink-3);
+  }
+
+  .field {
+    position: absolute;
+    left: var(--pad);
+    bottom: clamp(20px, 4vh, 40px);
+    margin: 0;
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    flex-wrap: wrap;
+    font-size: clamp(13px, 1vw, 16px);
+    color: var(--ink-2);
+    pointer-events: none;
+  }
+
+  .field i {
+    width: 10px;
+    height: 10px;
+    border-radius: var(--r-sm);
+    background: var(--accent);
+  }
+
+  .field span {
+    font-family: var(--mono);
+    font-size: 0.86em;
+    color: var(--ink-3);
+  }
+
+  .next {
+    position: absolute;
+    right: var(--pad);
+    bottom: clamp(20px, 4vh, 40px);
+    margin: 0;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 8px;
+    font-size: 13px;
+    color: var(--ink-3);
+    pointer-events: none;
+  }
+
+  .next i {
+    width: 1px;
+    height: 36px;
+    background: linear-gradient(var(--ink-3), transparent);
+    animation: drip 1.8s ease-in-out infinite;
+  }
+
+  .rise {
+    opacity: 0;
+    animation: fade 0.9s ease forwards;
+    animation-delay: calc(0.3s + var(--i) * 0.05s);
+  }
+
+  @keyframes up {
+    to {
+      opacity: 1;
+      transform: none;
+    }
+  }
+
+  @keyframes fade {
+    from {
+      opacity: 0;
+      transform: translateY(10px);
+    }
+    to {
+      opacity: 1;
+      transform: none;
+    }
+  }
+
+  @keyframes drip {
+    0%,
+    100% {
+      transform: scaleY(0.4);
+      transform-origin: top;
+    }
+    50% {
+      transform: scaleY(1);
+      transform-origin: top;
+    }
+  }
+
+  @media (max-width: 700px) {
+    .next {
+      display: none;
+    }
+    .field {
+      right: var(--pad);
+    }
+  }
+
+  @media (prefers-reduced-motion: reduce) {
+    .ch,
+    .rise {
+      animation: none;
+      opacity: 1;
+      transform: none;
+    }
+    .next i {
+      animation: none;
+    }
+  }
+</style>
+
+<script>
+  const canvas = document.querySelector<HTMLCanvasElement>('[data-cover-canvas]');
+  if (canvas) init(canvas);
+
+  function init(canvas: HTMLCanvasElement) {
+    const ctx = canvas.getContext('2d')!;
+    const host = canvas.parentElement!;
+    const counts: number[] = JSON.parse(canvas.dataset.counts || '[0,0,0]');
+    const reduce = matchMedia('(prefers-reduced-motion: reduce)').matches;
+    type P = { k: number; hx: number; hy: number; ph: number; amp: number; dx: number; dy: number; len: number };
+    const pts: P[] = [];
+    counts.forEach((n, k) => {
+      for (let i = 0; i < n; i++) pts.push({ k, hx: 0, hy: 0, ph: Math.random() * Math.PI * 2, amp: 4 + Math.random() * 14, dx: 0, dy: 0, len: 5 + Math.random() * 5 });
+    });
+    let W = 0;
+    let H = 0;
+    let dpr = 1;
+    let colors: string[] = [];
+    let mx = -9999;
+    let my = -9999;
+    let running = false;
+    let visible = true;
+
+    function readColors() {
+      const cs = getComputedStyle(document.documentElement);
+      colors = ['--accent', '--heat-2', '--ink-3'].map((v) => cs.getPropertyValue(v).trim());
+    }
+
+    function layout() {
+      dpr = Math.min(devicePixelRatio || 1, 2);
+      W = host.clientWidth;
+      H = host.clientHeight;
+      canvas.width = Math.round(W * dpr);
+      canvas.height = Math.round(H * dpr);
+      let s = 11;
+      const rnd = () => ((s = (s * 16807) % 2147483647) / 2147483647);
+      // 左上留给标题，点更多落在右边和下边
+      for (const p of pts) {
+        let x = 0;
+        let y = 0;
+        do {
+          x = rnd() * W;
+          y = rnd() * H;
+        } while (x < W * 0.58 && y > H * 0.18 && y < H * 0.8 && rnd() < 0.72);
+        p.hx = x;
+        p.hy = y;
+      }
+    }
+
+    host.addEventListener('pointermove', (e) => {
+      const r = host.getBoundingClientRect();
+      mx = e.clientX - r.left;
+      my = e.clientY - r.top;
+      if (reduce) start();
+    });
+    host.addEventListener('pointerleave', () => {
+      mx = my = -9999;
+      if (reduce) start();
+    });
+
+    const t0 = performance.now();
+    function frame(now: number) {
+      const t = (now - t0) / 1000;
+      ctx.setTransform(dpr, 0, 0, dpr, 0, 0);
+      ctx.clearRect(0, 0, W, H);
+      const R = Math.min(190, W * 0.2);
+      const hasMouse = mx > -999;
+      for (const p of pts) {
+        const fx = p.hx + (reduce ? 0 : Math.sin(t * 0.45 + p.ph) * p.amp);
+        const fy = p.hy + (reduce ? 0 : Math.cos(t * 0.33 + p.ph * 1.3) * p.amp);
+        let tx = 0;
+        let ty = 0;
+        if (hasMouse) {
+          const ddx = fx - mx;
+          const ddy = fy - my;
+          const d = Math.hypot(ddx, ddy);
+          if (d < R && d > 0.01) {
+            const k = Math.pow(1 - d / R, 2) * 80;
+            tx = (ddx / d) * k;
+            ty = (ddy / d) * k;
+          }
+        }
+        p.dx += (tx - p.dx) * (reduce ? 1 : 0.08);
+        p.dy += (ty - p.dy) * (reduce ? 1 : 0.08);
+        const x = fx + p.dx;
+        const y = fy + p.dy;
+        const ang = hasMouse ? Math.atan2(my - y, mx - x) : reduce ? p.ph : Math.sin(t * 0.25 + p.ph) * Math.PI;
+        ctx.globalAlpha = p.k === 2 ? 0.35 : 0.6;
+        ctx.fillStyle = colors[p.k];
+        ctx.save();
+        ctx.translate(x, y);
+        ctx.rotate(ang);
+        ctx.fillRect(-p.len / 2, -1, p.len, 2);
+        ctx.restore();
+      }
+      ctx.globalAlpha = 1;
+      if (running && !reduce) requestAnimationFrame(frame);
+      else running = false;
+    }
+
+    function start() {
+      if (running || !visible) return;
+      running = true;
+      requestAnimationFrame(frame);
+    }
+
+    readColors();
+    layout();
+    start();
+    new IntersectionObserver((es) => {
+      visible = es[0].isIntersecting;
+      if (visible) start();
+      else running = false;
+    }).observe(host);
+    let rt = 0;
+    addEventListener('resize', () => {
+      clearTimeout(rt);
+      rt = window.setTimeout(() => {
+        layout();
+        start();
+      }, 120);
+    });
+  }
+</script>
