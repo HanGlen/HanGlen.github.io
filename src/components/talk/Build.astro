@@ -1,0 +1,523 @@
+---
+/**
+ * 演讲 03「第一部分：怎么做出来」，一页三个 tab：选对模型、仓库是操作台、规则文档。
+ * ← → 切 tab；操作台悬停每个 AI 看分工，规则文档悬停亮着的行看它为什么写进来。
+ */
+import { talk } from '../../i18n/talk';
+import { rich } from '../../lib/rich';
+
+const b = talk.build;
+const P = b.hub.plugs;
+// 5 个 AI 围成一圈，在 1000 × 600 画布里
+const C = { x: 500, y: 300 };
+const R = { x: 380, y: 230 };
+const plugs = P.map((p, i) => {
+  const a = -Math.PI / 2 + (i * 2 * Math.PI) / P.length;
+  return { ...p, x: C.x + R.x * Math.cos(a), y: C.y + R.y * Math.sin(a) };
+});
+const pct = (v: number, of: number) => `${(v / of) * 100}%`;
+const code = (t: string) => rich(t).replace(/`([^`]+)`/g, '<code>$1</code>');
+---
+
+<section class="slide t-slide build" data-slide data-notes={b.notes} aria-labelledby="build-title">
+  <header class="t-head">
+    <p class="kicker">{b.no} · {b.kicker}</p>
+    <h2 id="build-title">{b.title}</h2>
+    <p class="lead">{b.lead}</p>
+  </header>
+
+  <div class="body" data-stepper data-at="0">
+    <div class="t-tabs" role="tablist" aria-label={b.title}>
+      {
+        b.tabs.map((t, i) => (
+          <button type="button" role="tab" data-step aria-selected={i === 0 ? 'true' : 'false'}>
+            <span class="n">{i + 1}</span>
+            {t}
+          </button>
+        ))
+      }
+    </div>
+
+    <!-- 1 选对模型 -->
+    <div class="pane models" data-pane="0" role="tabpanel">
+      <h3 class="ph serif">{b.models.head}</h3>
+      <div class="boards">
+        {
+          b.models.boards.map((m) => (
+            <article class="board">
+              <p class="bname">{m.name}</p>
+              <p class="what serif">{m.what}</p>
+              <p class="how">{m.how}</p>
+              <p class="who">{m.who}</p>
+              <a class="open" href={m.href} target="_blank" rel="noopener">
+                {b.models.open} ↗
+              </a>
+            </article>
+          ))
+        }
+      </div>
+      <p class="mine">{b.models.mine}</p>
+      <p class="note serif">{b.models.note}</p>
+    </div>
+
+    <!-- 2 仓库是操作台 -->
+    <div class="pane hub" data-pane="1" role="tabpanel" hidden data-hub>
+      <div class="hub-wrap">
+        <div class="stage">
+          <svg viewBox="0 0 1000 600" preserveAspectRatio="none" aria-hidden="true">
+            {plugs.map((p) => <line x1={C.x} y1={C.y} x2={p.x} y2={p.y} data-wire={p.k} vector-effect="non-scaling-stroke" />)}
+          </svg>
+          <div class="repo" style={`left:${pct(C.x, 1000)};top:${pct(C.y, 600)}`}>
+            <p class="rname serif">{b.hub.center}</p>
+            <ul>{b.hub.inside.map((x) => <li>{x}</li>)}</ul>
+          </div>
+          {
+            plugs.map((p) => (
+              <button type="button" class="plug" style={`left:${pct(p.x, 1000)};top:${pct(p.y, 600)}`} data-plug={p.k} aria-describedby="hub-role">
+                {p.k}
+              </button>
+            ))
+          }
+        </div>
+        <div class="role" id="hub-role" aria-live="polite">
+          <p class="t-hint" data-role-idle>{b.hub.hint}</p>
+          {
+            plugs.map((p) => (
+              <p class="rv" data-role={p.k} hidden>
+                <b class="serif">{p.k}</b>
+                {p.v}
+              </p>
+            ))
+          }
+        </div>
+      </div>
+      <p class="note serif">{b.hub.note}</p>
+    </div>
+
+    <!-- 3 规则文档 -->
+    <div class="pane rules" data-pane="2" role="tabpanel" hidden data-rules>
+      <div class="doc">
+        <p class="file">{b.rules.file}</p>
+        <div class="lines">
+          {
+            b.rules.lines.map((l, i) =>
+              l.why ? (
+                <button type="button" class="ln has" data-line={i}>
+                  <span set:html={code(l.t)} />
+                </button>
+              ) : (
+                <p class={`ln ${l.t.startsWith('#') ? 'h' : ''}`} set:html={code(l.t)} />
+              ),
+            )
+          }
+        </div>
+      </div>
+      <aside class="why" aria-live="polite">
+        <p class="t-hint" data-why-idle>{b.rules.hint}</p>
+        {
+          b.rules.lines.map(
+            (l, i) =>
+              l.why && (
+                <div class="wcard" data-why={i} hidden>
+                  <p class="wk">
+                    {l.why.when} · {l.why.ref}
+                  </p>
+                  <p class="wv">{l.why.v}</p>
+                </div>
+              ),
+          )
+        }
+      </aside>
+      <p class="note serif">{b.rules.note}</p>
+    </div>
+  </div>
+</section>
+
+<style>
+  .body {
+    flex: 1;
+    min-height: 0;
+    display: flex;
+    flex-direction: column;
+    gap: clamp(14px, 2.4vh, 28px);
+  }
+
+  .t-tabs .n {
+    font-family: var(--mono);
+    margin-right: 0.5em;
+    opacity: 0.6;
+  }
+
+  .pane {
+    flex: 1;
+    min-height: 0;
+    animation: fade 0.35s ease both;
+  }
+
+  .pane[hidden] {
+    display: none;
+  }
+
+  @keyframes fade {
+    from {
+      opacity: 0;
+      transform: translateY(8px);
+    }
+  }
+
+  .ph {
+    margin: 0 0 14px;
+    font-size: clamp(22px, 2vw, 34px);
+    font-weight: 600;
+  }
+
+  .note {
+    margin: 0;
+    font-size: clamp(20px, 1.9vw, 32px);
+    font-weight: 600;
+    color: var(--accent-ink);
+  }
+
+  /* 选对模型 */
+  .models {
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    gap: clamp(12px, 2vh, 22px);
+  }
+
+  .boards {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: clamp(14px, 2vw, 32px);
+  }
+
+  .board {
+    display: flex;
+    flex-direction: column;
+    gap: 8px;
+    padding: clamp(18px, 2vw, 30px);
+    border: 1px solid var(--line);
+    border-radius: var(--r);
+    background: var(--card);
+    box-shadow: var(--shadow);
+    transition: transform 0.25s, border-color 0.25s;
+  }
+
+  .board:hover {
+    transform: translateY(-3px);
+    border-color: var(--accent);
+  }
+
+  .board p {
+    margin: 0;
+  }
+
+  .bname {
+    font-family: var(--mono);
+    font-size: clamp(13px, 1vw, 16px);
+    color: var(--ink-3);
+  }
+
+  .what {
+    font-size: clamp(28px, 2.8vw, 48px);
+    font-weight: 600;
+    line-height: 1.1;
+  }
+
+  .how {
+    font-size: clamp(16px, 1.4vw, 24px);
+    line-height: 1.5;
+  }
+
+  .who {
+    font-size: clamp(13px, 1vw, 16px);
+    color: var(--ink-3);
+  }
+
+  .open {
+    align-self: flex-start;
+    margin-top: 4px;
+    font-size: 15px;
+    color: var(--accent-ink);
+    text-decoration: none;
+    border-bottom: 1px solid currentColor;
+  }
+
+  .mine {
+    margin: 0;
+    font-size: clamp(16px, 1.4vw, 24px);
+    color: var(--ink-2);
+  }
+
+  /* 仓库是操作台 */
+  .hub {
+    display: flex;
+    flex-direction: column;
+    gap: 12px;
+  }
+
+  .hub-wrap {
+    flex: 1;
+    min-height: 0;
+    display: grid;
+    grid-template-columns: minmax(0, 1.8fr) minmax(220px, 1fr);
+    gap: clamp(16px, 3vw, 48px);
+    align-items: center;
+  }
+
+  .stage {
+    position: relative;
+    width: 100%;
+    max-height: 100%;
+    aspect-ratio: 1000 / 600;
+  }
+
+  .stage svg {
+    position: absolute;
+    inset: 0;
+    width: 100%;
+    height: 100%;
+  }
+
+  .stage line {
+    stroke: var(--line-2);
+    stroke-width: 1.5;
+    stroke-dasharray: 5 6;
+    transition: stroke 0.3s, stroke-width 0.3s;
+  }
+
+  .stage line.on {
+    stroke: var(--accent);
+    stroke-width: 3;
+    stroke-dasharray: none;
+  }
+
+  .repo {
+    position: absolute;
+    transform: translate(-50%, -50%);
+    width: 40%;
+    padding: clamp(12px, 1.6vw, 24px);
+    border-radius: var(--r);
+    background: var(--ink);
+    color: var(--bg);
+    text-align: center;
+    box-shadow: 0 0 0 10px var(--accent-soft);
+  }
+
+  .rname {
+    margin: 0 0 10px;
+    font-size: clamp(20px, 2vw, 34px);
+    font-weight: 600;
+  }
+
+  .repo ul {
+    list-style: none;
+    margin: 0;
+    padding: 0;
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 6px;
+  }
+
+  .repo li {
+    padding: 4px 6px;
+    border-radius: var(--r-sm);
+    border: 1px solid color-mix(in srgb, var(--bg) 30%, transparent);
+    font-size: clamp(12px, 1.1vw, 18px);
+  }
+
+  .plug {
+    position: absolute;
+    transform: translate(-50%, -50%);
+    padding: 0.5em 1.1em;
+    font: inherit;
+    font-size: clamp(15px, 1.4vw, 24px);
+    font-weight: 600;
+    border-radius: var(--r-pill);
+    border: 1.5px solid var(--line-2);
+    background: var(--card);
+    color: var(--ink);
+    cursor: pointer;
+    transition: border-color 0.25s, background 0.25s, color 0.25s, transform 0.25s;
+  }
+
+  .plug.on {
+    border-color: var(--accent);
+    background: var(--accent);
+    color: var(--bg);
+    transform: translate(-50%, -50%) scale(1.08);
+  }
+
+  .plug:focus-visible {
+    outline: 2px solid var(--accent);
+    outline-offset: 3px;
+  }
+
+  .role p {
+    margin: 0;
+  }
+
+  .rv {
+    font-size: clamp(18px, 1.7vw, 30px);
+    line-height: 1.45;
+  }
+
+  .rv b {
+    display: block;
+    font-size: clamp(28px, 2.8vw, 48px);
+    color: var(--accent-ink);
+  }
+
+  /* 规则文档 */
+  .rules {
+    display: grid;
+    grid-template-columns: minmax(0, 1.6fr) minmax(220px, 1fr);
+    grid-template-rows: 1fr auto;
+    gap: clamp(12px, 2vh, 22px) clamp(16px, 3vw, 48px);
+    align-items: center;
+  }
+
+  .rules .note {
+    grid-column: 1 / -1;
+  }
+
+  .doc {
+    border: 1px solid var(--line);
+    border-radius: var(--r);
+    background: var(--card);
+    box-shadow: var(--shadow);
+    overflow: hidden;
+  }
+
+  .file {
+    margin: 0;
+    padding: 10px 18px;
+    font-family: var(--mono);
+    font-size: 13px;
+    color: var(--ink-3);
+    border-bottom: 1px solid var(--line);
+    background: var(--bg-2);
+  }
+
+  .lines {
+    padding: 12px 8px;
+  }
+
+  .ln {
+    display: block;
+    width: 100%;
+    margin: 0;
+    padding: 5px 10px;
+    font: inherit;
+    font-family: var(--mono);
+    font-size: clamp(14px, 1.3vw, 23px);
+    line-height: 1.5;
+    text-align: left;
+    color: var(--ink-3);
+    background: transparent;
+    border: 0;
+    border-radius: var(--r-sm);
+  }
+
+  .ln.h {
+    color: var(--ink-2);
+    font-weight: 600;
+    margin-top: 6px;
+  }
+
+  .ln.has {
+    color: var(--ink);
+    cursor: pointer;
+    border-left: 3px solid var(--accent);
+    transition: background 0.2s;
+  }
+
+  .ln.has:hover,
+  .ln.has.on {
+    background: var(--accent-soft);
+  }
+
+  .ln.has:focus-visible {
+    outline: 2px solid var(--accent);
+  }
+
+  .ln :global(code) {
+    color: var(--accent-ink);
+  }
+
+  .why p {
+    margin: 0;
+  }
+
+  .wcard {
+    animation: fade 0.3s ease both;
+  }
+
+  .wk {
+    font-family: var(--mono);
+    font-size: 14px;
+    color: var(--accent-ink);
+    margin-bottom: 8px !important;
+  }
+
+  .wv {
+    font-size: clamp(18px, 1.7vw, 30px);
+    line-height: 1.45;
+  }
+
+  @media (max-width: 900px) {
+    .boards,
+    .hub-wrap,
+    .rules {
+      grid-template-columns: 1fr;
+    }
+    .plug {
+      font-size: 13px;
+      padding: 0.35em 0.8em;
+    }
+    .repo li {
+      font-size: 11px;
+    }
+  }
+
+  @media (prefers-reduced-motion: reduce) {
+    .pane,
+    .wcard {
+      animation: none;
+    }
+  }
+</style>
+
+<script>
+  // 操作台：悬停或聚焦一个 AI，连线点亮，右边写它干什么
+  document.querySelectorAll<HTMLElement>('[data-hub]').forEach((root) => {
+    const plugs = [...root.querySelectorAll<HTMLButtonElement>('[data-plug]')];
+    const show = (k: string) => {
+      plugs.forEach((p) => p.classList.toggle('on', p.dataset.plug === k));
+      root.querySelectorAll<SVGLineElement>('[data-wire]').forEach((l) => l.classList.toggle('on', l.dataset.wire === k));
+      root.querySelectorAll<HTMLElement>('[data-role]').forEach((r) => (r.hidden = r.dataset.role !== k));
+      root.querySelector<HTMLElement>('[data-role-idle]')!.hidden = true;
+    };
+    plugs.forEach((p) => {
+      p.addEventListener('pointerenter', () => show(p.dataset.plug!));
+      p.addEventListener('focus', () => show(p.dataset.plug!));
+      p.addEventListener('click', () => show(p.dataset.plug!));
+    });
+  });
+
+  // 规则文档：悬停或聚焦亮着的行，右边写它为什么写进来
+  document.querySelectorAll<HTMLElement>('[data-rules]').forEach((root) => {
+    const lines = [...root.querySelectorAll<HTMLButtonElement>('[data-line]')];
+    const show = (i: string) => {
+      lines.forEach((l) => l.classList.toggle('on', l.dataset.line === i));
+      root.querySelectorAll<HTMLElement>('[data-why]').forEach((w) => (w.hidden = w.dataset.why !== i));
+      root.querySelector<HTMLElement>('[data-why-idle]')!.hidden = true;
+    };
+    lines.forEach((l) => {
+      l.addEventListener('pointerenter', () => show(l.dataset.line!));
+      l.addEventListener('focus', () => show(l.dataset.line!));
+      l.addEventListener('click', () => show(l.dataset.line!));
+    });
+  });
+</script>

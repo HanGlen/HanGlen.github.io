@@ -6,6 +6,10 @@
 import '../../styles/global.css';
 import Cover from '../talk/Cover.astro';
 import Network from '../talk/Network.astro';
+import Gap from '../talk/Gap.astro';
+import Build from '../talk/Build.astro';
+import Keep from '../talk/Keep.astro';
+import Checklist from '../talk/Checklist.astro';
 import { talk } from '../../i18n/talk';
 ---
 
@@ -23,6 +27,10 @@ import { talk } from '../../i18n/talk';
     <main class="deck" data-deck tabindex="-1">
       <Cover />
       <Network />
+      <Gap />
+      <Build />
+      <Keep />
+      <Checklist />
     </main>
 
     <nav class="dots" aria-label="页码" data-dots></nav>
@@ -89,6 +97,39 @@ import { talk } from '../../i18n/talk';
         e.preventDefault();
       });
 
+      // 分步页：[data-stepper] 里的 [data-step] 按钮按顺序排，悬停、聚焦、点击或 ← → 切换；
+      // 当前步写进 data-at，[data-pane] 只显示当前那一格
+      document.querySelectorAll<HTMLElement>('[data-stepper]').forEach((root) => {
+        const steps = [...root.querySelectorAll<HTMLElement>('[data-step]')];
+        const panes = [...root.querySelectorAll<HTMLElement>('[data-pane]')];
+        const hover = root.hasAttribute('data-hover');
+        const sel = (i: number) => {
+          root.dataset.at = String(i);
+          steps.forEach((s, j) => {
+            s.setAttribute('aria-selected', String(i === j));
+            s.classList.toggle('seen', j <= i || s.classList.contains('seen'));
+          });
+          panes.forEach((p) => (p.hidden = p.dataset.pane !== String(i)));
+          root.dispatchEvent(new CustomEvent('step', { detail: i }));
+        };
+        steps.forEach((s, i) => {
+          s.addEventListener('click', () => sel(i));
+          s.addEventListener('focus', () => sel(i));
+          if (hover) s.addEventListener('pointerenter', () => sel(i));
+        });
+        document.addEventListener('keydown', (e) => {
+          const slide = root.closest('[data-slide]');
+          if (!slide?.classList.contains('is-current')) return;
+          if (e.key !== 'ArrowRight' && e.key !== 'ArrowLeft') return;
+          if (e.metaKey || e.ctrlKey || e.altKey) return;
+          e.preventDefault();
+          const at = Number(root.dataset.at ?? -1);
+          const n = e.key === 'ArrowRight' ? Math.min(steps.length - 1, at + 1) : Math.max(0, at - 1);
+          steps[n].focus({ preventScroll: true });
+        });
+        sel(0);
+      });
+
       mark(0);
       deck.focus({ preventScroll: true });
     </script>
@@ -109,6 +150,103 @@ import { talk } from '../../i18n/talk';
 
   body::after {
     z-index: 30;
+  }
+
+  /* 第 2 部分以后的页面共用的页头和版式 */
+  .t-slide {
+    display: flex;
+    flex-direction: column;
+    padding: clamp(28px, 5vh, 64px) var(--pad) clamp(36px, 6vh, 64px);
+    gap: clamp(14px, 2.4vh, 28px);
+  }
+
+  .t-head {
+    display: grid;
+    grid-template-columns: auto 1fr;
+    align-items: baseline;
+    gap: 6px 20px;
+  }
+
+  .t-head .no {
+    margin: 0;
+    font-family: var(--mono);
+    font-size: clamp(14px, 1.1vw, 18px);
+    color: var(--accent-ink);
+  }
+
+  .t-head .kicker {
+    margin: 0;
+    font-size: clamp(14px, 1.1vw, 18px);
+    color: var(--accent-ink);
+    letter-spacing: 0.08em;
+  }
+
+  .t-head h2 {
+    margin: 0;
+    font-family: var(--serif);
+    font-weight: 600;
+    font-size: clamp(32px, 3.4vw, 60px);
+    line-height: 1.1;
+  }
+
+  .t-head .lead {
+    grid-column: 2;
+    margin: 0;
+    font-size: clamp(16px, 1.4vw, 24px);
+    color: var(--ink-2);
+  }
+
+  .t-tabs {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 8px;
+  }
+
+  .t-tabs button {
+    font: inherit;
+    font-size: clamp(15px, 1.25vw, 22px);
+    padding: 0.4em 1em;
+    border-radius: var(--r-pill);
+    border: 1.5px solid var(--line-2);
+    background: transparent;
+    color: var(--ink-2);
+    cursor: pointer;
+    transition: background 0.2s, color 0.2s, border-color 0.2s;
+  }
+
+  .t-tabs button[aria-selected='true'] {
+    background: var(--ink);
+    border-color: var(--ink);
+    color: var(--bg);
+  }
+
+  /* 分步按钮获得焦点就是被选中，选中样式已经够醒目，不再叠一圈焦点框 */
+  .t-slide [data-step]:focus-visible {
+    outline: none;
+  }
+
+  .t-hint {
+    margin: 0;
+    font-size: 14px;
+    color: var(--ink-3);
+  }
+
+  .t-src {
+    margin: 0;
+    font-size: clamp(12px, 0.9vw, 15px);
+    line-height: 1.5;
+    color: var(--ink-3);
+  }
+
+  .t-src b {
+    color: var(--ink-2);
+    font-weight: 500;
+  }
+
+  @media (max-width: 900px) {
+    .t-head .lead {
+      grid-column: 1 / -1;
+    }
   }
 </style>
 

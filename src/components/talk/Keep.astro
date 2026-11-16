@@ -1,0 +1,399 @@
+---
+/**
+ * 演讲 04「第二部分：做出来怎么维护」：一条玩家反馈 2.5 小时修好的全程。
+ * 每一步的原始记录复用小程序页的数据（zh.dnd.relay），← → 一步步走，走过的线段点亮。
+ */
+import { talk } from '../../i18n/talk';
+import { zh } from '../../i18n/zh';
+
+const k = talk.keep;
+const legs = zh.dnd.relay;
+const esc = (x: string) => x.replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;');
+---
+
+<section class="slide t-slide keep" data-slide data-notes={k.notes} aria-labelledby="keep-title">
+  <header class="t-head">
+    <p class="kicker">{k.no} · {k.kicker}</p>
+    <h2 id="keep-title">{k.title}</h2>
+    <p class="lead">{k.lead}</p>
+  </header>
+
+  <ul class="stats">
+    {
+      k.stats.map((s) => (
+        <li>
+          <b class="serif">{s.v}</b>
+          <span>{s.k}</span>
+        </li>
+      ))
+    }
+  </ul>
+
+  <div class="case" data-stepper data-at="0">
+    <p class="ch">
+      <span>{k.caseHead}</span>
+      <q class="serif">{k.quote.replace(/[「」]/g, '')}</q>
+    </p>
+
+    <ol class="track" role="tablist" aria-label={k.caseHead} style={`--n:${legs.length}`}>
+      {
+        legs.map((l, i) => (
+          <li>
+            <button type="button" role="tab" data-step class={`leg ${l.role}`} aria-selected={i === 0 ? 'true' : 'false'}>
+              <span class="gap">{l.d}</span>
+              <i class="dot" aria-hidden="true" />
+              <time>{l.t}</time>
+              <strong>{l.who}</strong>
+              <span class="v">{l.v}</span>
+            </button>
+          </li>
+        ))
+      }
+    </ol>
+
+    {
+      legs.map((l, i) => (
+        <article class="panel" data-pane={String(i)} role="tabpanel" hidden={i !== 0}>
+          <header>
+            <span>{l.detail.head}</span>
+            {l.detail.ref && <span class="ref">{l.detail.ref}</span>}
+          </header>
+          <div class="pb">
+            {l.detail.lines?.map((line) => <p>{line}</p>)}
+            {l.detail.diff?.map((f) => (
+              <div class="file">
+                <div class="fname">{f.file}</div>
+                <pre set:html={f.rows.map(([s, c]) => `<span class="${s === '+' ? 'add' : 'del'}">${s} ${esc(c)}</span>`).join('')} />
+              </div>
+            ))}
+            {l.detail.checks && (
+              <ul class="checks">
+                {l.detail.checks.map(([n, , d]) => (
+                  <li>
+                    <span class="ok">✓</span>
+                    <span>{n}</span>
+                    <span class="cd">{d}</span>
+                  </li>
+                ))}
+              </ul>
+            )}
+          </div>
+          {l.detail.aside && <p class="aside">{l.detail.aside}</p>}
+        </article>
+      ))
+    }
+
+    <p class="foot">
+      <span class="t-hint">{k.hint}</span>
+      <b class="end serif">{k.end}</b>
+    </p>
+  </div>
+</section>
+
+<style>
+  .stats {
+    list-style: none;
+    margin: 0;
+    padding: 0;
+    display: flex;
+    flex-wrap: wrap;
+    gap: 10px clamp(24px, 4vw, 64px);
+  }
+
+  .stats li {
+    display: flex;
+    align-items: baseline;
+    gap: 10px;
+  }
+
+  .stats b {
+    font-size: clamp(28px, 2.8vw, 48px);
+    font-weight: 600;
+    color: var(--accent-ink);
+    line-height: 1;
+  }
+
+  .stats span {
+    font-size: clamp(14px, 1.2vw, 20px);
+    color: var(--ink-2);
+  }
+
+  .case {
+    flex: 1;
+    min-height: 0;
+    display: flex;
+    flex-direction: column;
+    gap: clamp(12px, 2vh, 22px);
+  }
+
+  .ch {
+    margin: 0;
+    display: flex;
+    flex-wrap: wrap;
+    align-items: baseline;
+    gap: 6px 16px;
+    font-size: clamp(14px, 1.2vw, 20px);
+    color: var(--ink-3);
+  }
+
+  .ch q {
+    font-size: clamp(22px, 2.2vw, 38px);
+    color: var(--ink);
+    font-weight: 600;
+  }
+
+  .track {
+    list-style: none;
+    margin: 0;
+    padding: 0;
+    display: grid;
+    grid-template-columns: repeat(var(--n), minmax(0, 1fr));
+    position: relative;
+  }
+
+  .leg {
+    position: relative;
+    width: 100%;
+    display: flex;
+    flex-direction: column;
+    align-items: flex-start;
+    gap: 2px;
+    padding: 0 8px 8px 0;
+    font: inherit;
+    text-align: left;
+    color: var(--ink-3);
+    background: none;
+    border: 0;
+    cursor: pointer;
+  }
+
+  .gap {
+    height: 1.3em;
+    font-family: var(--mono);
+    font-size: 12px;
+    color: var(--ink-3);
+  }
+
+  /* 每一步左边那段线：走到才点亮 */
+  .dot {
+    position: relative;
+    width: 16px;
+    height: 16px;
+    margin: 4px 0 8px;
+    border-radius: 50%;
+    border: 2px solid var(--line-2);
+    background: var(--bg);
+    z-index: 2;
+    transition: background 0.3s, border-color 0.3s, transform 0.3s;
+  }
+
+  .track li {
+    position: relative;
+  }
+
+  .track li + li::before {
+    content: '';
+    position: absolute;
+    top: calc(1.3 * 12px + 4px + 7px);
+    right: 100%;
+    width: 100%;
+    height: 2px;
+    background: var(--line-2);
+    transition: background 0.3s;
+  }
+
+  .track li:has(> .seen)::before {
+    background: var(--accent);
+  }
+
+  .leg.seen .dot {
+    border-color: var(--accent);
+    background: var(--accent);
+  }
+
+  .leg.me.seen .dot {
+    background: var(--ink);
+    border-color: var(--ink);
+  }
+
+  .leg.gate.seen .dot {
+    background: var(--ok);
+    border-color: var(--ok);
+  }
+
+  .leg[aria-selected='true'] .dot {
+    transform: scale(1.35);
+    box-shadow: 0 0 0 6px var(--accent-glow);
+  }
+
+  time {
+    font-family: var(--mono);
+    font-size: clamp(12px, 1vw, 16px);
+  }
+
+  .leg strong {
+    font-size: clamp(16px, 1.5vw, 26px);
+    color: var(--ink-2);
+  }
+
+  .leg .v {
+    font-size: clamp(12px, 1vw, 16px);
+    line-height: 1.35;
+  }
+
+  .leg[aria-selected='true'] strong {
+    color: var(--accent-ink);
+  }
+
+  .leg[aria-selected='true'] .v {
+    color: var(--ink);
+  }
+
+  .panel {
+    flex: 1;
+    min-height: 0;
+    overflow: auto;
+    padding: clamp(14px, 1.6vw, 24px);
+    border: 1px solid var(--line);
+    border-radius: var(--r);
+    background: var(--card);
+    box-shadow: var(--shadow);
+    animation: fade 0.3s ease both;
+  }
+
+  .panel[hidden] {
+    display: none;
+  }
+
+  @keyframes fade {
+    from {
+      opacity: 0;
+      transform: translateY(6px);
+    }
+  }
+
+  .panel header {
+    display: flex;
+    justify-content: space-between;
+    gap: 12px;
+    margin-bottom: 10px;
+    font-size: 14px;
+    color: var(--ink-3);
+  }
+
+  .ref {
+    font-family: var(--mono);
+  }
+
+  .pb p {
+    margin: 0 0 6px;
+    font-size: clamp(16px, 1.45vw, 25px);
+    line-height: 1.5;
+  }
+
+  .file {
+    border: 1px solid var(--line);
+    border-radius: var(--r-sm);
+    overflow: hidden;
+    margin-bottom: 8px;
+  }
+
+  .fname {
+    padding: 4px 10px;
+    font-family: var(--mono);
+    font-size: 12px;
+    color: var(--ink-3);
+    background: var(--bg-2);
+  }
+
+  pre {
+    margin: 0;
+    padding: 6px 10px;
+    font-family: var(--mono);
+    font-size: clamp(13px, 1.1vw, 18px);
+    white-space: pre-wrap;
+    word-break: break-all;
+  }
+
+  pre :global(span) {
+    display: block;
+  }
+
+  pre :global(.add) {
+    color: var(--ok);
+  }
+
+  pre :global(.del) {
+    color: var(--accent-ink);
+    opacity: 0.8;
+  }
+
+  .checks {
+    list-style: none;
+    margin: 0;
+    padding: 0;
+  }
+
+  .checks li {
+    display: grid;
+    grid-template-columns: auto 1fr auto;
+    gap: 10px;
+    padding: 6px 0;
+    border-bottom: 1px solid var(--line);
+    font-size: clamp(15px, 1.3vw, 22px);
+  }
+
+  .ok {
+    color: var(--ok);
+    font-weight: 700;
+  }
+
+  .cd {
+    font-family: var(--mono);
+    color: var(--ink-3);
+  }
+
+  .aside {
+    margin: 10px 0 0;
+    padding-left: 12px;
+    border-left: 3px solid var(--accent);
+    font-size: clamp(15px, 1.3vw, 22px);
+    color: var(--ink-2);
+  }
+
+  .foot {
+    margin: 0;
+    display: flex;
+    flex-wrap: wrap;
+    justify-content: space-between;
+    align-items: baseline;
+    gap: 8px 20px;
+  }
+
+  .end {
+    font-size: clamp(20px, 1.9vw, 32px);
+    color: var(--accent-ink);
+  }
+
+  @media (max-width: 900px) {
+    .track {
+      grid-template-columns: repeat(4, minmax(0, 1fr));
+      row-gap: 10px;
+    }
+    .track li::before {
+      display: none;
+    }
+    .leg .v {
+      display: none;
+    }
+  }
+
+  @media (prefers-reduced-motion: reduce) {
+    .panel {
+      animation: none;
+    }
+    .dot {
+      transition: none;
+    }
+  }
+</style>
