@@ -35,6 +35,8 @@
   --gutter: clamp(16px, 4vw, 40px);
   --gap: clamp(72px, 10vw, 136px);
   --r: 14px;
+  --r-sm: 8px;
+  --r-pill: 999px;
 
   color-scheme: light;
 }

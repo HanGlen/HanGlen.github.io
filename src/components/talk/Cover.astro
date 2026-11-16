@@ -158,7 +158,7 @@ const lines = c.title.split('\n');
   .field i {
     width: 10px;
     height: 10px;
-    border-radius: 2px;
+    border-radius: var(--r-sm);
     background: var(--accent);
   }
 
@@ -300,9 +300,11 @@ const lines = c.title.split('\n');
       const r = host.getBoundingClientRect();
       mx = e.clientX - r.left;
       my = e.clientY - r.top;
+      if (reduce) start();
     });
     host.addEventListener('pointerleave', () => {
       mx = my = -9999;
+      if (reduce) start();
     });
 
     const t0 = performance.now();
@@ -331,7 +333,7 @@ const lines = c.title.split('\n');
         p.dy += (ty - p.dy) * (reduce ? 1 : 0.08);
         const x = fx + p.dx;
         const y = fy + p.dy;
-        const ang = hasMouse ? Math.atan2(my - y, mx - x) : Math.sin(t * 0.25 + p.ph) * Math.PI;
+        const ang = hasMouse ? Math.atan2(my - y, mx - x) : reduce ? p.ph : Math.sin(t * 0.25 + p.ph) * Math.PI;
         ctx.globalAlpha = p.k === 2 ? 0.35 : 0.6;
         ctx.fillStyle = colors[p.k];
         ctx.save();
@@ -341,7 +343,8 @@ const lines = c.title.split('\n');
         ctx.restore();
       }
       ctx.globalAlpha = 1;
-      if (running) requestAnimationFrame(frame);
+      if (running && !reduce) requestAnimationFrame(frame);
+      else running = false;
     }
 
     function start() {
@@ -361,7 +364,10 @@ const lines = c.title.split('\n');
     let rt = 0;
     addEventListener('resize', () => {
       clearTimeout(rt);
-      rt = window.setTimeout(layout, 120);
+      rt = window.setTimeout(() => {
+        layout();
+        start();
+      }, 120);
     });
   }
 </script>
