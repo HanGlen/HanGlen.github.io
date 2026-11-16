@@ -1,6 +1,6 @@
 ---
 /**
- * 演讲 03「第一部分：怎么做出来」，一页三个 tab：选对模型、仓库是操作台、规则文档。
+ * 演讲 03「先备好三样东西」，一页三个 tab：选对模型、仓库是操作台、规则文档。
  * ← → 切 tab；操作台悬停每个 AI 看分工，规则文档悬停亮着的行看它为什么写进来。
  */
 import { talk } from '../../i18n/talk';
@@ -48,7 +48,6 @@ const code = (t: string) => rich(t).replace(/`([^`]+)`/g, '<code>$1</code>');
               <p class="bname">{m.name}</p>
               <p class="what serif">{m.what}</p>
               <p class="how">{m.how}</p>
-              <p class="who">{m.who}</p>
               <a class="open" href={m.href} target="_blank" rel="noopener">
                 {b.models.open} ↗
               </a>
@@ -56,7 +55,6 @@ const code = (t: string) => rich(t).replace(/`([^`]+)`/g, '<code>$1</code>');
           ))
         }
       </div>
-      <p class="mine">{b.models.mine}</p>
       <p class="note serif">{b.models.note}</p>
     </div>
 
@@ -92,6 +90,7 @@ const code = (t: string) => rich(t).replace(/`([^`]+)`/g, '<code>$1</code>');
         </div>
       </div>
       <p class="note serif">{b.hub.note}</p>
+      <p class="t-src">{b.hub.src}</p>
     </div>
 
     <!-- 3 规则文档 -->

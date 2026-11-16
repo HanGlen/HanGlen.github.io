@@ -1,0 +1,324 @@
+---
+/**
+ * 演讲 04「一层套一层的流水线」：Linear 任务池 ⊃ 规划和切片 ⊃ 定时轮班 ⊃ 一张单从需求到合并。
+ * 画成套在一起的窗口；← → 或悬停窗口标题从外往里看，右边写这一层做什么、怎么转、依据是什么。
+ */
+import { talk } from '../../i18n/talk';
+
+const f = talk.flow;
+const L = f.layers;
+
+// 从最里层开始往外拼，拼出套娃
+const win = (i: number): { i: number; l: (typeof L)[number]; child: ReturnType<typeof win> | null } => ({
+  i,
+  l: L[i],
+  child: i + 1 < L.length ? win(i + 1) : null,
+});
+const root = win(0);
+---
+
+<section class="slide t-slide flow" data-slide data-notes={f.notes} aria-labelledby="flow-title">
+  <header class="t-head">
+    <p class="kicker">{f.no} · {f.kicker}</p>
+    <h2 id="flow-title">{f.title}</h2>
+    <p class="lead">{f.lead}</p>
+  </header>
+
+  <div class="body" data-stepper data-hover data-at="0">
+    <div class="nest" role="tablist" aria-label={f.title}>
+      {
+        (function render(w: typeof root): any {
+          return (
+            <div class={`win w${w.i}`}>
+              <button type="button" role="tab" class="bar" data-step aria-selected={w.i === 0 ? 'true' : 'false'}>
+                <i class="dots" aria-hidden="true">
+                  <span />
+                  <span />
+                  <span />
+                </i>
+                <span class="name">{w.l.k}</span>
+                {w.l.loop && <span class="loop">↻ {w.l.loop}</span>}
+              </button>
+              <div class="wb">
+                <ol class="chips">
+                  {w.l.chips.map((c) => (
+                    <li>{c}</li>
+                  ))}
+                </ol>
+                {w.child && render(w.child)}
+              </div>
+            </div>
+          );
+        })(root)
+      }
+    </div>
+
+    <aside class="side" aria-live="polite">
+      <p class="t-hint">{f.hint}</p>
+      {
+        L.map((l, i) => (
+          <div class="pane" data-pane={String(i)} hidden={i !== 0}>
+            <p class="lk">
+              第 {i + 1} 层{l.loop && <span> · ↻ {l.loop}</span>}
+            </p>
+            <h3 class="serif">{l.k}</h3>
+            <p class="what">{l.what}</p>
+            <p class="how">{l.how}</p>
+            <p class="src">
+              <b>依据</b>
+              {l.src}
+            </p>
+          </div>
+        ))
+      }
+    </aside>
+  </div>
+
+  <p class="front">
+    <b class="serif">{f.front}</b>
+    <span class="t-src">{f.frontSrc}</span>
+  </p>
+</section>
+
+<style>
+  .body {
+    flex: 1;
+    min-height: 0;
+    display: grid;
+    grid-template-columns: minmax(0, 1.35fr) minmax(280px, 1fr);
+    gap: clamp(20px, 3.5vw, 64px);
+    align-items: center;
+  }
+
+  .win {
+    border: 1.5px solid var(--line-2);
+    border-radius: var(--r);
+    background: var(--card);
+    overflow: hidden;
+    transition: border-color 0.3s, box-shadow 0.3s, opacity 0.3s;
+  }
+
+  .win .win {
+    margin-top: clamp(8px, 1.4vh, 14px);
+  }
+
+  .bar {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    width: 100%;
+    padding: clamp(6px, 1vh, 10px) 14px;
+    font: inherit;
+    text-align: left;
+    color: var(--ink-2);
+    background: var(--bg-2);
+    border: 0;
+    border-bottom: 1px solid var(--line);
+    cursor: pointer;
+    transition: background 0.3s, color 0.3s;
+  }
+
+  .dots {
+    display: flex;
+    gap: 5px;
+  }
+
+  .dots span {
+    width: 9px;
+    height: 9px;
+    border-radius: 50%;
+    background: var(--line-2);
+  }
+
+  .name {
+    font-size: clamp(14px, 1.25vw, 22px);
+    font-weight: 600;
+  }
+
+  .loop {
+    margin-left: auto;
+    padding: 2px 10px;
+    border-radius: var(--r-pill);
+    font-size: clamp(12px, 0.95vw, 15px);
+    color: var(--accent-ink);
+    background: var(--accent-soft);
+    white-space: nowrap;
+  }
+
+  .wb {
+    padding: clamp(8px, 1.4vh, 14px) clamp(10px, 1vw, 16px);
+  }
+
+  .chips {
+    list-style: none;
+    margin: 0;
+    padding: 0;
+    display: flex;
+    flex-wrap: wrap;
+    align-items: center;
+    gap: 6px;
+  }
+
+  .chips li {
+    display: flex;
+    align-items: center;
+    gap: 6px;
+    font-size: clamp(13px, 1.1vw, 19px);
+    color: var(--ink-2);
+  }
+
+  .chips li + li::before {
+    content: '→';
+    color: var(--ink-3);
+  }
+
+  /* 当前层：边框和标题栏点亮，里面的层照常，外面的层淡一点 */
+  [data-at='0'] .w0,
+  [data-at='1'] .w1,
+  [data-at='2'] .w2,
+  [data-at='3'] .w3 {
+    border-color: var(--accent);
+    box-shadow: 0 0 0 4px var(--accent-glow);
+  }
+
+  [data-at='0'] .w0 > .bar,
+  [data-at='1'] .w1 > .bar,
+  [data-at='2'] .w2 > .bar,
+  [data-at='3'] .w3 > .bar {
+    background: var(--accent);
+    color: var(--bg);
+  }
+
+  [data-at='0'] .w0 > .bar .dots span,
+  [data-at='1'] .w1 > .bar .dots span,
+  [data-at='2'] .w2 > .bar .dots span,
+  [data-at='3'] .w3 > .bar .dots span {
+    background: color-mix(in srgb, var(--bg) 55%, transparent);
+  }
+
+  [data-at='0'] .w0 > .bar .loop,
+  [data-at='1'] .w1 > .bar .loop,
+  [data-at='2'] .w2 > .bar .loop,
+  [data-at='3'] .w3 > .bar .loop {
+    background: var(--bg);
+  }
+
+  [data-at='1'] .w0 > .wb > .chips,
+  [data-at='2'] .w0 > .wb > .chips,
+  [data-at='2'] .w1 > .wb > .chips,
+  [data-at='3'] .w0 > .wb > .chips,
+  [data-at='3'] .w1 > .wb > .chips,
+  [data-at='3'] .w2 > .wb > .chips {
+    opacity: 0.4;
+  }
+
+  [data-at='0'] .w0 > .wb > .chips li,
+  [data-at='1'] .w1 > .wb > .chips li,
+  [data-at='2'] .w2 > .wb > .chips li,
+  [data-at='3'] .w3 > .wb > .chips li {
+    color: var(--ink);
+    font-weight: 600;
+  }
+
+  .side {
+    display: flex;
+    flex-direction: column;
+    gap: 10px;
+  }
+
+  .pane[hidden] {
+    display: none;
+  }
+
+  .pane {
+    animation: flow-in 0.35s ease both;
+  }
+
+  @keyframes flow-in {
+    from {
+      opacity: 0;
+      transform: translateX(8px);
+    }
+  }
+
+  .pane p {
+    margin: 0;
+  }
+
+  .lk {
+    font-size: 14px;
+    color: var(--accent-ink);
+    letter-spacing: 0.06em;
+  }
+
+  .pane h3 {
+    margin: 4px 0 14px;
+    font-size: clamp(30px, 3vw, 54px);
+    font-weight: 600;
+    line-height: 1.1;
+  }
+
+  .what {
+    font-size: clamp(20px, 1.9vw, 33px);
+    line-height: 1.4;
+    font-weight: 600;
+  }
+
+  .how {
+    margin-top: 10px !important;
+    font-size: clamp(16px, 1.45vw, 25px);
+    line-height: 1.5;
+    color: var(--ink-2);
+  }
+
+  .src {
+    margin-top: 18px !important;
+    padding-left: 12px;
+    border-left: 3px solid var(--accent);
+    font-size: clamp(13px, 1.05vw, 18px);
+    line-height: 1.5;
+    color: var(--ink-2);
+  }
+
+  .src b {
+    display: block;
+    font-size: 12px;
+    font-weight: 500;
+    color: var(--ink-3);
+    letter-spacing: 0.08em;
+  }
+
+  .front {
+    margin: 0;
+    display: flex;
+    flex-wrap: wrap;
+    align-items: baseline;
+    gap: 4px 16px;
+    padding-top: clamp(8px, 1.4vh, 16px);
+    border-top: 1px solid var(--line);
+  }
+
+  .front b {
+    font-size: clamp(16px, 1.5vw, 26px);
+    font-weight: 600;
+  }
+
+  @media (max-width: 900px) {
+    .body {
+      grid-template-columns: 1fr;
+    }
+    .loop {
+      display: none;
+    }
+  }
+
+  @media (prefers-reduced-motion: reduce) {
+    .pane {
+      animation: none;
+    }
+    .win,
+    .bar {
+      transition: none;
+    }
+  }
+</style>

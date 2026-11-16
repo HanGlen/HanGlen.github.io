@@ -1,13 +1,13 @@
 ---
 /**
- * 演讲 02「问题在哪」：信通院 6000 多家中小企业调查，折成 100 格。
- * ← → 一层层讲：受访 → 在用 → 在试 → 用深。悬停格子看它属于哪一类。
+ * 演讲 02「AI 用得广，但用得浅」：四层数字，左边一个大圆环跟着走。
+ * ← → 或悬停右边每一层切换；圆环、大数字、出处一起换。
  */
 import { talk } from '../../i18n/talk';
 
 const g = talk.gap;
-const cells = g.cats.flatMap((c) => Array.from({ length: c.n }, () => c));
-const using = ['full', 'core', 'pilot', 'trial'];
+const R = 120;
+const L = 2 * Math.PI * R;
 ---
 
 <section class="slide t-slide gap" data-slide data-notes={g.notes} aria-labelledby="gap-title">
@@ -17,24 +17,20 @@ const using = ['full', 'core', 'pilot', 'trial'];
     <p class="lead">{g.lead}</p>
   </header>
 
-  <div class="body" data-stepper data-at="0">
-    <div class="left">
-      <div class="grid" data-grid aria-hidden="true">
-        {cells.map((c, i) => <i class={`c k-${c.k} ${using.includes(c.k) ? 'use' : ''}`} style={`--i:${i}`} data-k={c.k} />)}
-        <p class="tip" data-tip hidden></p>
-      </div>
-      <p class="t-hint">{g.unit}</p>
-      <ul class="legend">
-        {
-          g.cats.map((c) => (
-            <li class={`k-${c.k}`}>
-              <i class={`sw k-${c.k}`} />
-              <span>{c.v}</span>
-              <b>{c.n}</b>
-            </li>
-          ))
-        }
-      </ul>
+  <div class="body" data-stepper data-hover data-at="0" data-gap>
+    <div class="ring-box">
+      <svg viewBox="0 0 300 300" class="ring" aria-hidden="true">
+        <circle cx="150" cy="150" r={R} class="track" />
+        <circle cx="150" cy="150" r={R} class="arc" data-arc style={`stroke-dasharray:${L};stroke-dashoffset:${L * (1 - g.steps[0].v / 100)}`} data-len={L} transform="rotate(-90 150 150)" />
+      </svg>
+      {
+        g.steps.map((s, i) => (
+          <div class="mid" data-pane={String(i)} hidden={i !== 0}>
+            <b class="serif">{s.big}</b>
+            <span>{s.text}</span>
+          </div>
+        ))
+      }
     </div>
 
     <div class="right">
@@ -42,29 +38,32 @@ const using = ['full', 'core', 'pilot', 'trial'];
         {
           g.steps.map((s, i) => (
             <li>
-              <button type="button" role="tab" data-step aria-selected={i === 0 ? 'true' : 'false'}>
+              <button type="button" role="tab" data-step data-v={s.v} aria-selected={i === 0 ? 'true' : 'false'}>
                 <span class="k">{s.k}</span>
-                <b class="big serif">{s.big}</b>
-                <span class="txt">{s.text}</span>
+                <b class="serif">{s.big}</b>
+                <span class="t">{s.text}</span>
               </button>
             </li>
           ))
         }
       </ol>
 
+      {
+        g.steps.map((s, i) => (
+          <div class="detail" data-pane={String(i)} hidden={i !== 0}>
+            <p class="sub">{s.sub}</p>
+            <p class="t-src">{s.src}</p>
+          </div>
+        ))
+      }
+
       <blockquote class="quote">
-        <p class="qk">{g.quoteK}</p>
-        {g.quotes.map((q) => <p class="q serif">{q}</p>)}
+        <p class="q serif">{g.quote}</p>
+        <p class="qw">{g.quoteWho}</p>
       </blockquote>
-
       <p class="end serif">{g.end}</p>
-
-      <p class="t-src">
-        <b>{g.src.name}</b>，{g.src.when}。{g.src.why}<br />{g.src.calc}
-      </p>
     </div>
   </div>
-  <script type="application/json" data-gap-cats set:html={JSON.stringify(Object.fromEntries(g.cats.map((c) => [c.k, `${c.v} · ${c.raw}`])))} />
 </section>
 
 <style>
@@ -72,197 +71,111 @@ const using = ['full', 'core', 'pilot', 'trial'];
     flex: 1;
     min-height: 0;
     display: grid;
-    grid-template-columns: minmax(0, 1fr) minmax(0, 1.05fr);
-    gap: clamp(24px, 4vw, 72px);
+    grid-template-columns: minmax(0, 0.9fr) minmax(0, 1.1fr);
+    gap: clamp(24px, 4vw, 80px);
     align-items: center;
   }
 
-  .left {
+  .ring-box {
+    position: relative;
+    width: min(100%, 56vh, 560px);
+    aspect-ratio: 1;
+    justify-self: center;
+  }
+
+  .ring {
+    width: 100%;
+    height: 100%;
+  }
+
+  .track {
+    fill: none;
+    stroke: var(--heat-0);
+    stroke-width: 26;
+  }
+
+  .arc {
+    fill: none;
+    stroke: var(--accent);
+    stroke-width: 26;
+    stroke-linecap: round;
+    transition: stroke-dashoffset 0.8s cubic-bezier(0.2, 0.8, 0.2, 1);
+  }
+
+  .mid {
+    position: absolute;
+    inset: 0;
     display: flex;
     flex-direction: column;
-    gap: 12px;
     align-items: center;
+    justify-content: center;
+    text-align: center;
+    padding: 18%;
+    gap: 8px;
   }
 
-  .grid {
-    position: relative;
-    display: grid;
-    grid-template-columns: repeat(10, 1fr);
-    gap: clamp(4px, 0.5vw, 8px);
-    width: min(100%, 64vh, 640px);
-    aspect-ratio: 1;
+  .mid[hidden],
+  .detail[hidden] {
+    display: none;
   }
 
-  .c {
-    border-radius: var(--r-sm);
-    background: var(--heat-0);
-    border: 2px solid transparent;
-    transition:
-      background 0.45s ease calc(var(--i) * 6ms),
-      border-color 0.45s ease calc(var(--i) * 6ms),
-      opacity 0.45s ease,
-      transform 0.3s ease;
+  .mid b {
+    font-size: clamp(56px, 7vw, 128px);
+    line-height: 1;
+    color: var(--accent-ink);
+    font-weight: 600;
   }
 
-  .c:hover {
-    transform: scale(1.12);
-  }
-
-  /* 1 在用 */
-  [data-at='1'] .c.use,
-  [data-at='2'] .c.use,
-  [data-at='3'] .c.use {
-    background: var(--heat-3);
-  }
-  [data-at='1'] .k-plan,
-  [data-at='2'] .k-plan,
-  [data-at='3'] .k-plan {
-    background: transparent;
-    border-color: var(--heat-2);
-  }
-
-  /* 2 在试：拆开在用的四类 */
-  [data-at='2'] .c.k-pilot,
-  [data-at='3'] .c.k-pilot {
-    background: var(--heat-2);
-  }
-  [data-at='2'] .c.k-trial,
-  [data-at='3'] .c.k-trial {
-    background: var(--heat-1);
-  }
-  [data-at='2'] .c.k-full,
-  [data-at='3'] .c.k-full {
-    background: var(--heat-4);
-  }
-  [data-at='2'] .c.k-core,
-  [data-at='2'] .c.k-full {
-    opacity: 0.45;
-  }
-
-  /* 3 用深：只亮全流程那 2 格 */
-  [data-at='3'] .c:not(.k-full) {
-    opacity: 0.28;
-  }
-  [data-at='3'] .c.k-full {
-    box-shadow: 0 0 0 4px var(--accent-glow), 0 0 24px var(--accent-glow);
-    transform: scale(1.1);
-  }
-
-  .tip {
-    position: absolute;
-    z-index: 3;
-    margin: 0;
-    padding: 6px 10px;
-    border-radius: var(--r-sm);
-    background: var(--ink);
-    color: var(--bg);
-    font-size: 14px;
-    white-space: nowrap;
-    pointer-events: none;
-    transform: translate(-50%, calc(-100% - 10px));
-  }
-
-  .legend {
-    list-style: none;
-    margin: 0;
-    padding: 0;
-    display: grid;
-    grid-template-columns: repeat(3, auto);
-    gap: 6px 18px;
-    font-size: clamp(13px, 1vw, 16px);
-    color: var(--ink-2);
-    opacity: 0;
-    transition: opacity 0.4s;
-  }
-
-  [data-at='2'] .legend,
-  [data-at='3'] .legend {
-    opacity: 1;
-  }
-
-  .legend li {
-    display: flex;
-    align-items: center;
-    gap: 6px;
-  }
-
-  .legend b {
-    font-family: var(--mono);
-    font-weight: 400;
-    color: var(--ink-3);
-  }
-
-  .sw {
-    width: 12px;
-    height: 12px;
-    border-radius: 3px;
-    background: var(--heat-0);
-    border: 2px solid transparent;
-  }
-  .sw.k-full {
-    background: var(--heat-4);
-  }
-  .sw.k-core {
-    background: var(--heat-3);
-  }
-  .sw.k-pilot {
-    background: var(--heat-2);
-  }
-  .sw.k-trial {
-    background: var(--heat-1);
-  }
-  .sw.k-plan {
-    background: transparent;
-    border-color: var(--heat-2);
+  .mid span {
+    font-size: clamp(16px, 1.6vw, 28px);
+    line-height: 1.35;
   }
 
   .right {
     display: flex;
     flex-direction: column;
-    gap: clamp(14px, 2.2vh, 26px);
+    gap: clamp(14px, 2.4vh, 28px);
   }
 
   .steps {
     list-style: none;
     margin: 0;
     padding: 0;
-    display: grid;
-    grid-template-columns: repeat(4, 1fr);
-    gap: 8px;
+    display: flex;
+    flex-direction: column;
+    gap: 6px;
   }
 
   .steps button {
     width: 100%;
-    height: 100%;
-    display: flex;
-    flex-direction: column;
-    align-items: flex-start;
-    gap: 4px;
-    padding: 12px 14px;
+    display: grid;
+    grid-template-columns: 3em 5.2em 1fr;
+    align-items: baseline;
+    gap: 12px;
+    padding: 10px 16px;
     text-align: left;
     font: inherit;
     color: var(--ink-3);
     background: transparent;
-    border: 1.5px solid var(--line);
+    border: 1.5px solid transparent;
     border-radius: var(--r);
     cursor: pointer;
     transition: border-color 0.25s, background 0.25s, color 0.25s;
   }
 
   .steps .k {
-    font-size: 13px;
+    font-size: clamp(13px, 1vw, 16px);
     letter-spacing: 0.06em;
   }
 
-  .steps .big {
-    font-size: clamp(26px, 2.6vw, 46px);
+  .steps b {
+    font-size: clamp(22px, 2vw, 36px);
     line-height: 1;
     font-weight: 600;
   }
 
-  .steps .txt {
-    font-size: clamp(13px, 1vw, 16px);
-    line-height: 1.45;
+  .steps .t {
+    font-size: clamp(15px, 1.35vw, 23px);
   }
 
   .steps button.seen {
@@ -275,35 +188,44 @@ const using = ['full', 'core', 'pilot', 'trial'];
     background: var(--accent-soft);
   }
 
-  .steps button[aria-selected='true'] .big {
+  .steps button[aria-selected='true'] b {
     color: var(--accent-ink);
+  }
+
+  .detail {
+    min-height: 4.5em;
+  }
+
+  .detail p {
+    margin: 0 0 4px;
+  }
+
+  .sub {
+    font-size: clamp(16px, 1.4vw, 24px);
+    color: var(--ink-2);
   }
 
   .quote {
     margin: 0;
-    padding: 4px 0 4px 18px;
+    padding: 2px 0 2px 18px;
     border-left: 3px solid var(--accent);
-  }
-
-  .qk {
-    margin: 0 0 6px;
-    font-size: 13px;
-    color: var(--ink-3);
   }
 
   .q {
     margin: 0;
-    font-size: clamp(18px, 1.6vw, 28px);
-    line-height: 1.45;
+    font-size: clamp(22px, 2.1vw, 36px);
+    font-weight: 600;
   }
 
-  .q + .q {
-    margin-top: 6px;
+  .qw {
+    margin: 4px 0 0;
+    font-size: 13px;
+    color: var(--ink-3);
   }
 
   .end {
     margin: 0;
-    font-size: clamp(20px, 1.9vw, 32px);
+    font-size: clamp(22px, 2.1vw, 36px);
     font-weight: 600;
     color: var(--accent-ink);
   }
@@ -312,34 +234,27 @@ const using = ['full', 'core', 'pilot', 'trial'];
     .body {
       grid-template-columns: 1fr;
     }
-    .steps {
-      grid-template-columns: repeat(2, 1fr);
-    }
-    .legend {
-      grid-template-columns: repeat(2, auto);
+    .ring-box {
+      width: min(80vw, 320px);
     }
   }
 
   @media (prefers-reduced-motion: reduce) {
-    .c,
-    .legend {
+    .arc {
       transition: none;
     }
   }
 </style>
 
 <script>
-  document.querySelectorAll<HTMLElement>('[data-grid]').forEach((grid) => {
-    const names: Record<string, string> = JSON.parse(grid.closest('section')!.querySelector('[data-gap-cats]')!.textContent!);
-    const tip = grid.querySelector<HTMLElement>('[data-tip]')!;
-    grid.addEventListener('pointerover', (e) => {
-      const c = (e.target as HTMLElement).closest<HTMLElement>('[data-k]');
-      if (!c) return;
-      tip.textContent = names[c.dataset.k!];
-      tip.style.left = `${c.offsetLeft + c.offsetWidth / 2}px`;
-      tip.style.top = `${c.offsetTop}px`;
-      tip.hidden = false;
+  // 圆环跟着当前层走
+  document.querySelectorAll<HTMLElement>('[data-gap]').forEach((root) => {
+    const arc = root.querySelector<SVGCircleElement>('[data-arc]')!;
+    const len = Number(arc.dataset.len);
+    const steps = [...root.querySelectorAll<HTMLElement>('[data-step]')];
+    root.addEventListener('step', (e) => {
+      const v = Number(steps[(e as CustomEvent<number>).detail].dataset.v);
+      arc.style.strokeDashoffset = String(len * (1 - v / 100));
     });
-    grid.addEventListener('pointerleave', () => (tip.hidden = true));
   });
 </script>
