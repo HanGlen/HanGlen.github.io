@@ -258,14 +258,14 @@ const esc = (x: string) => x.replace(/&/g, '&amp;').replace(/</g, '&lt;').replac
     border-radius: var(--r);
     background: var(--card);
     box-shadow: var(--shadow);
-    animation: fade 0.3s ease both;
+    animation: keep-in 0.3s ease both;
   }
 
   .panel[hidden] {
     display: none;
   }
 
-  @keyframes fade {
+  @keyframes keep-in {
     from {
       opacity: 0;
       transform: translateY(6px);

@@ -151,14 +151,14 @@ const code = (t: string) => rich(t).replace(/`([^`]+)`/g, '<code>$1</code>');
   .pane {
     flex: 1;
     min-height: 0;
-    animation: fade 0.35s ease both;
+    animation: build-in 0.35s ease both;
   }
 
   .pane[hidden] {
     display: none;
   }
 
-  @keyframes fade {
+  @keyframes build-in {
     from {
       opacity: 0;
       transform: translateY(8px);
@@ -451,7 +451,7 @@ const code = (t: string) => rich(t).replace(/`([^`]+)`/g, '<code>$1</code>');
   }
 
   .wcard {
-    animation: fade 0.3s ease both;
+    animation: build-in 0.3s ease both;
   }
 
   .wk {
