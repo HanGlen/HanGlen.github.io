@@ -30,6 +30,7 @@
 | 规则问答：35 本书、抽测 12 题、P05 的改写 / 引文 / 核对 / 护栏记录 | 小程序仓库 `docs/rules-qa-player-sample.md`、`docs/rules-qa-claim-facts.md`、`docs/reports/rules-qa-spell-level-guard-2026-11-04.json`、`rules-qa-checker-negative-experiment-2026-11-04.json`；PR #3112、#3182 | 2026-11-06 |
 | 标题带「问答」的 PR 47 个 | GitHub 搜索小程序仓库已合入、标题含「问答」的 PR，编号 ≥ #2554（10-28 起） | 2026-11-07 |
 | 压力分类模型：77.57%、F1 0.786 / 0.764、5 分钟 83.3%、预处理和网络结构 | 车主硕士论文第 5.1、5.2、5.4 节（`HanGlen/Dissertation`） | 2025 |
+| 演讲 03 工具清单的月费、官网是否打得开、Home Repo 视频和公开库 | `docs/research/talk-03-tools.md` 文内链接。2026-11-17 当天打开官网；打不开或读不出的月费没有写进表 | 2026-11-17 |
 
 数据都在 `src/data/dnd.json`，更新数字只改这个文件和 `src/i18n/`。
 
