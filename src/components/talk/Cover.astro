@@ -39,8 +39,20 @@ const lines = c.title.split('\n');
         ))
       }
     </h1>
-    <p class="sub rise" style="--i:16">{c.sub}</p>
-    <p class="who rise" style="--i:20"><b class="serif">{c.name}</b><span>{c.role}</span></p>
+    <div class="pains">
+      <p class="sub rise" style="--i:16">{c.sub}</p>
+      <ol>
+        {
+          c.pains.map((p, i) => (
+            <li class="rise" style={`--i:${17 + i}`}>
+              <i>{String(i + 1).padStart(2, '0')}</i>
+              {p}
+            </li>
+          ))
+        }
+      </ol>
+    </div>
+    <p class="who rise" style="--i:21"><b class="serif">{c.name}</b><span>{c.role}</span></p>
   </div>
   <p class="field rise" style="--i:24">
     <i aria-hidden="true"></i>{c.field}<span>{c.fieldNote.replace('{n}', total.toLocaleString('en-US'))}</span>
@@ -115,12 +127,41 @@ const lines = c.title.split('\n');
     color: var(--accent);
   }
 
+  .pains {
+    margin: clamp(24px, 4vh, 48px) 0 0;
+  }
+
   .sub {
-    max-width: 30em;
-    margin: clamp(20px, 3vh, 36px) 0 0;
-    font-size: clamp(18px, 1.7vw, 28px);
-    line-height: 1.55;
-    color: var(--ink-2);
+    margin: 0 0 12px;
+    font-size: clamp(14px, 1.1vw, 18px);
+    letter-spacing: 0.08em;
+    color: var(--ink-3);
+  }
+
+  .pains ol {
+    list-style: none;
+    margin: 0;
+    padding: 0;
+    display: flex;
+    flex-wrap: wrap;
+    gap: 10px clamp(20px, 3vw, 56px);
+  }
+
+  .pains li {
+    display: flex;
+    align-items: baseline;
+    gap: 10px;
+    font-family: var(--serif);
+    font-size: clamp(20px, 2.1vw, 38px);
+    font-weight: 600;
+    color: var(--ink);
+  }
+
+  .pains li i {
+    font-style: normal;
+    font-family: var(--mono);
+    font-size: 0.5em;
+    color: var(--accent-ink);
   }
 
   .who {
