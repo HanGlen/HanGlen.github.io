@@ -20,6 +20,8 @@ for (const [d, n] of Object.entries(daily)) {
 const counts = [feat, fix, Math.max(0, total - feat - fix)];
 let ci = 0;
 const lines = c.title.split('\n');
+/** 最后一行里不标强调色的字：连接词和标点，其余（定制软件、AI 能力）标陶土红 */
+const plain = '与和？? ';
 ---
 
 <section class="slide cover" data-slide data-notes={c.notes} aria-label="封面">
@@ -28,10 +30,10 @@ const lines = c.title.split('\n');
     <p class="eyebrow rise" style="--i:0">{c.eyebrow}</p>
     <h1 aria-label={c.title.replace('\n', '')}>
       {
-        lines.map((l) => (
+        lines.map((l, li) => (
           <span class="ln" aria-hidden="true">
             {[...l].map((ch) => (
-              <span class="ch" style={`--i:${ci++}`}>
+              <span class={li === lines.length - 1 && !plain.includes(ch) ? 'ch hot' : 'ch'} style={`--i:${ci++}`}>
                 {ch === ' ' ? '\u00a0' : ch}
               </span>
             ))}
@@ -40,11 +42,11 @@ const lines = c.title.split('\n');
       }
     </h1>
     <div class="pains">
-      <p class="sub rise" style="--i:16">{c.sub}</p>
+      <p class="sub rise" style={`--i:${ci + 1}`}>{c.sub}</p>
       <ol>
         {
           c.pains.map((p, i) => (
-            <li class="rise" style={`--i:${17 + i}`}>
+            <li class="rise" style={`--i:${ci + 2 + i}`}>
               <i>{String(i + 1).padStart(2, '0')}</i>
               {p}
             </li>
@@ -52,9 +54,9 @@ const lines = c.title.split('\n');
         }
       </ol>
     </div>
-    <p class="who rise" style="--i:21"><b class="serif">{c.name}</b><span>{c.role}</span></p>
+    <p class="who rise" style={`--i:${ci + 6}`}><b class="serif">{c.name}</b><span>{c.role}</span></p>
   </div>
-  <p class="field rise" style="--i:24">
+  <p class="field rise" style={`--i:${ci + 9}`}>
     <i aria-hidden="true"></i>{c.field}<span>{c.fieldNote.replace('{n}', total.toLocaleString('en-US'))}</span>
   </p>
   <p class="next" aria-hidden="true">{c.next}<i></i></p>
@@ -123,7 +125,7 @@ const lines = c.title.split('\n');
     animation-delay: calc(0.15s + var(--i) * 0.04s);
   }
 
-  .ln:last-child .ch:nth-last-child(-n + 6):not(:last-child) {
+  .ch.hot {
     color: var(--accent);
   }
 
