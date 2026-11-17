@@ -676,8 +676,9 @@ const L = m.levels;
   /* 一个大需求 / 一堆需求：横着一条线 */
   .flow {
     display: flex;
+    flex-wrap: wrap;
     align-items: center;
-    gap: clamp(6px, 0.8vw, 14px);
+    gap: 12px clamp(6px, 0.8vw, 14px);
   }
 
   .req,
