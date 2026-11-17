@@ -1,0 +1,160 @@
+---
+/**
+ * 演讲 05「找人做定制软件，先问这五句」：给老板的验收清单。
+ * ← → 或悬停一句句讲；讲过的行保持展开，没讲到的只露问题。
+ */
+import { talk } from '../../i18n/talk';
+
+const c = talk.check;
+---
+
+<section class="slide t-slide check" data-slide data-notes={c.notes} aria-labelledby="check-title">
+  <header class="t-head">
+    <p class="no">{c.no}</p>
+    <h2 id="check-title">{c.title}</h2>
+    <p class="lead">{c.lead}</p>
+  </header>
+
+  <div class="list" data-stepper data-hover data-at="0">
+    <div class="row th" aria-hidden="true">
+      {c.head.map((h) => <span>{h}</span>)}
+    </div>
+    <ol role="tablist" aria-label={c.title}>
+      {
+        c.items.map((it, i) => (
+          <li>
+            <button type="button" role="tab" data-step class="row" aria-selected={i === 0 ? 'true' : 'false'}>
+              <span class="q serif">
+                <i>{i + 1}</i>
+                {it.q}
+              </span>
+              <span class="good">{it.good}</span>
+              <span class="mine">{it.mine}</span>
+            </button>
+          </li>
+        ))
+      }
+    </ol>
+    <p class="t-hint">{c.hint}</p>
+  </div>
+</section>
+
+<style>
+  .list {
+    flex: 1;
+    min-height: 0;
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    gap: 8px;
+  }
+
+  ol {
+    list-style: none;
+    margin: 0;
+    padding: 0;
+    display: flex;
+    flex-direction: column;
+    gap: clamp(6px, 1vh, 12px);
+  }
+
+  .row {
+    display: grid;
+    grid-template-columns: minmax(0, 1.15fr) minmax(0, 1.2fr) minmax(0, 1fr);
+    gap: clamp(12px, 2vw, 36px);
+    align-items: center;
+    width: 100%;
+    padding: clamp(10px, 1.6vh, 18px) clamp(14px, 1.6vw, 26px);
+    font: inherit;
+    text-align: left;
+    color: var(--ink);
+    background: transparent;
+    border: 1.5px solid var(--line);
+    border-radius: var(--r);
+  }
+
+  .th {
+    border: 0;
+    padding-block: 0;
+    font-size: 13px;
+    letter-spacing: 0.06em;
+    color: var(--ink-3);
+  }
+
+  button.row {
+    cursor: pointer;
+    transition: border-color 0.25s, background 0.25s, transform 0.25s;
+  }
+
+  .q {
+    display: flex;
+    align-items: baseline;
+    gap: 12px;
+    font-size: clamp(20px, 2vw, 36px);
+    font-weight: 600;
+    line-height: 1.25;
+  }
+
+  .q i {
+    font-style: normal;
+    font-family: var(--mono);
+    font-size: 0.55em;
+    color: var(--accent-ink);
+  }
+
+  .good,
+  .mine {
+    font-size: clamp(14px, 1.3vw, 22px);
+    line-height: 1.45;
+    opacity: 0;
+    transform: translateX(-8px);
+    transition: opacity 0.35s, transform 0.35s;
+  }
+
+  .mine {
+    color: var(--ink-2);
+    padding-left: 14px;
+    border-left: 3px solid var(--accent);
+  }
+
+  button.row.seen .good,
+  button.row.seen .mine {
+    opacity: 0.55;
+    transform: none;
+  }
+
+  button.row[aria-selected='true'] {
+    border-color: var(--accent);
+    background: var(--accent-soft);
+    transform: translateX(6px);
+  }
+
+  button.row[aria-selected='true'] .good,
+  button.row[aria-selected='true'] .mine {
+    opacity: 1;
+    transform: none;
+  }
+
+  @media (max-width: 900px) {
+    .row {
+      grid-template-columns: 1fr;
+      gap: 6px;
+    }
+    .th {
+      display: none;
+    }
+    .good,
+    .mine {
+      opacity: 1 !important;
+      transform: none !important;
+    }
+  }
+
+  @media (prefers-reduced-motion: reduce) {
+    button.row,
+    .good,
+    .mine {
+      transition: none;
+    }
+  }
+</style>

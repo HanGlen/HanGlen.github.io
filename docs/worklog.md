@@ -138,3 +138,15 @@
 - [ ] 车主提供：公众平台累计用户曲线（如果要写长期增长）
 - [x] 两篇草稿笔记已随完整版转正（2026-10-30）
 - [ ] 晨曦酒馆：车主决定放哪条片子
+- 2026-11-16（车主：演讲改成「中小企业低成本落地定制软件」，分「怎么做出来」「怎么维护」两半）：
+  - 演讲页加 02 问题在哪、03 怎么做出来、04 怎么维护、05 验收清单，封面换标题；规划改成第 4 版。
+  - 02 的数字：中国信通院《人工智能赋能中小企业高质量发展研究报告（2025 年）》，2026-03 发布（caict.ac.cn/kxyj/qwfb/bps/202603/P020260320385520043208.pdf）第 24–25 页：6000 余家中小企业问卷，33 个省、17 个行业大类，约 86.09% 制造业；50.23% 已应用 AI，26.76% 两年内有计划；已应用的企业里 45% 部分试点、28% 实验探索、23% 核心业务规模化、4% 全流程嵌入。「不愿、不敢、不会」和「供给侧缺乏轻量化、精准化、低成本的人工智能产品」是第 32 页原话。100 格是按 100 家折算后取整。
+  - METR 2025-07 随机对照实验（metr.org/blog/2025-07-10-early-2025-ai-experienced-os-dev-study，arXiv 2507.09089）：16 位资深开源开发者、246 个任务，用 AI 后耗时多 19%，本人事后仍以为快了 20%。页面暂未使用。
+  - 03、04 的事实沿用小程序页已有数据（`zh.dnd.relay`、`zh.dnd.gates`、`zh.dnd.agents`），规则文档的几行摘自小程序仓库 `AGENTS.md`（2026-11-16 版）。
+  - 第二轮（车主：数据要最新的，补 AI 化和数字化；做出来要讲清 Linear 到上线的几层；维护要大白话、少字）：
+    - 02 换成 2026 年数据：CNNIC《生成式人工智能应用发展报告（2026）》2026-09-29 发布，用户超 7 亿、普及率超 50%，规上制造业 AI 应用普及率超三成（光明网等报道）；OECD《Empowering SMEs in the age of AI》2026-04，D4SME 调查 12 国 2,018 家（日本 1,376 家，按国家平均，样本偏数字化程度高、不代表总体），61% 至少用一个 AI 应用，75% 用现成工具、5% 用定制 AI，用 AI 的企业里 76% 是 AI Novices，原话「broad but still shallow」；《企业数字化转型指数报告（2025）》（中关村信息技术和实体经济融合发展联盟、点亮智库），《中国城市报》2026-04-06 报道 86.92% 中小企业仍处于基础信息化应用阶段，样本量未披露。
+    - 04 流水线每层的依据：Anthropic《Building a C compiler with a team of parallel Claudes》（Nicholas Carlini，2026-02-05：16 个 Claude 并行，锁文件占任务，while true 循环每轮开新会话，测试和 CI 是主要把关）；《Harness design for long-running application development》（Prithvi Rajasekaran，2026-03-24：规划 agent 扩写规格，sprint contract 先约定「做完」，「Separating the agent doing the work from the agent judging it proves to be a strong lever」）；《Redesigning source control at Anthropic》（2026-10-13：2026 年 9 月每天合入 3 万多个改动，工程师的角色是对 Claude 说「不」）。
+    - 03 仓库是操作台的依据：Matt Pocock 2026-11-12 在 X 发的 Home Repo 做法。
+    - 05 维护流程按小程序仓库 `docs/routines/feedback.md`、`docs/routines/triage.md`、`docs/automation-routines.md`（2026-11-16 的 dev）和 `cloudfunctions/submitFeedback`（每小时把飞书表里的回复和奖励档位回写到「我的反馈」）。
+- 2026-11-17：演讲 02 改成「先数字化，再 AI 化」两块色块图，03 合并成一页五层（地基 → 一张单 → 一轮 → 一个需求 → 一支 AI 研发团队）。新增来源：工信部国新办发布会 2026-07-20（截至 6 月底重点工业企业数字化研发设计工具普及率 86.3%、关键工序数控化率 69.5%，规上制造业 AI 应用普及率超 30%）；长江商学院 2026 年二季度 2,000 余家规上工业企业 AI 采用率 10.4%、小企业下降（《澎湃新闻》2026-08-12，未找到原报告）；美国人口普查局 BTOS 截至 2026-05-03 企业 AI 使用率 19.8%；OECD 2026 D4SME 51% 的中小企业处于 basic 或 developing 数字成熟度；信通院报告第 29 页「试点城市企业的 AI 年均投入高出其他非试点城市 6 个百分点」。03 的案例：小程序 `app.json` 25 个分包，两套皮肤配色全在 `styles/variables.wxss`（`docs/UI_STYLE.md`），「约团排期」6 片见 `zh.dnd.day`。
+

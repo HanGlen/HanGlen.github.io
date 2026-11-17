@@ -1,0 +1,783 @@
+---
+/**
+ * 演讲 03「怎么做出来」：五层 地基 → 一张单 → 一轮 → 一个需求 → 一支 AI 研发团队。
+ * 顶上是时间线 tab，← → 往外翻一层：上一层的图缩成一个色块，成了新一层里的一步。
+ * 右边每层三句要点、一个案例、一条依据；最后一层底下出要点条，拍一张就带走全部要点。
+ */
+import { talk } from '../../i18n/talk';
+
+const m = talk.make;
+const L = m.levels;
+---
+
+<section class="slide t-slide make" data-slide data-notes={m.notes} aria-labelledby="make-title">
+  <header class="t-head">
+    <p class="kicker">{m.no} · {m.kicker}</p>
+    <h2 id="make-title">{m.title}</h2>
+    <p class="lead">{m.lead}</p>
+  </header>
+
+  <div class="body" data-stepper data-at="0">
+    <ol class="line" role="tablist" aria-label={m.title}>
+      {
+        L.map((l, i) => (
+          <li>
+            <button type="button" role="tab" data-step aria-selected={i === 0 ? 'true' : 'false'} class={`lv${i}`}>
+              <i aria-hidden="true">{i + 1}</i>
+              <span>{l.k}</span>
+            </button>
+          </li>
+        ))
+      }
+    </ol>
+
+    <div class="main">
+      <div class="stage">
+        <!-- 1 地基 -->
+        <div class="frame f0" data-pane="0">
+          <div class="base">
+            {
+              m.base.map((b) => (
+                <div class="bc fin">
+                  <p class="bk serif">{b.k}</p>
+                  <p class="tags">
+                    {b.v.map((v) => (
+                      <span>{v}</span>
+                    ))}
+                  </p>
+                  {b.links && (
+                    <p class="links">
+                      {b.links.map((x) => (
+                        <a href={x.href} target="_blank" rel="noopener">
+                          {x.k} ↗
+                        </a>
+                      ))}
+                    </p>
+                  )}
+                </div>
+              ))
+            }
+          </div>
+        </div>
+
+        <!-- 2 一张单 -->
+        <div class="frame f1" data-pane="1" hidden>
+          <div class="ticket">
+            <ol class="row">
+              {
+                m.ticket.map((t, i) => (
+                  <li class="fin" style={`--d:${i}`}>
+                    <span class={`chip ${i === 3 ? 'gate' : ''} ${i === 4 ? 'done' : ''}`}>{t}</span>
+                  </li>
+                ))
+              }
+            </ol>
+            <p class="retry fin" style="--d:5"><span>↻ {m.retry}</span></p>
+          </div>
+          <p class="ground grow">{m.ground}</p>
+        </div>
+
+        <!-- 3 一轮 -->
+        <div class="frame f2" data-pane="2" hidden>
+          <div class="round">
+            <ol class="row">
+              <li class="fin" style="--d:0"><span class="chip">{m.round.start}</span></li>
+              <li class="fin" style="--d:1"><span class="chip">{m.round.merge}</span></li>
+              <li class="fin" style="--d:2"><span class="chip">{m.round.claim}</span></li>
+              <li class="grow">
+                <span class="blk b1">
+                  <b>{L[1].k}</b>
+                  <small>{m.ticket.join(' → ')}</small>
+                </span>
+              </li>
+              <li class="fin" style="--d:3"><span class="chip">{m.round.end}</span></li>
+            </ol>
+            <p class="retry fin wide" style="--d:4"><span>↻ {m.round.loop}</span></p>
+          </div>
+          <p class="ground">{m.ground}</p>
+        </div>
+
+        <!-- 4 一个需求 -->
+        <div class="frame f3" data-pane="3" hidden>
+          <div class="need">
+            <div class="col fin" style="--d:0">
+              <span class="chip">{m.need.plan}</span>
+              <span class="arr">↓</span>
+              <span class="chip">{m.need.slice}</span>
+            </div>
+            <span class="arr side fin" style="--d:1">→</span>
+            <ol class="lanes">
+              {
+                m.need.lanes.map((l, i) => (
+                  <li class="grow" style={`--d:${i}`}>
+                    <span class="ln">{l}</span>
+                    <span class="blk b2 mini">
+                      <b>{L[2].k}</b>
+                      <small>◷ → {L[1].k} → ↻</small>
+                    </span>
+                  </li>
+                ))
+              }
+            </ol>
+            <span class="arr side fin" style="--d:5">→</span>
+            <div class="col fin" style="--d:6">
+              <span class="chip done">{m.need.done}</span>
+              <span class="arr">↓</span>
+              <span class="chip">{m.need.ship}</span>
+            </div>
+          </div>
+          <p class="ground">{m.ground}</p>
+        </div>
+
+        <!-- 5 一支 AI 研发团队 -->
+        <div class="frame f4" data-pane="4" hidden>
+          <div class="team">
+            <ul class="src fin" style="--d:0">
+              {m.team.sources.map((s) => <li class="chip">{s}</li>)}
+            </ul>
+            <span class="arr side fin" style="--d:1">→</span>
+            <div class="pool fin" style="--d:1">
+              <p class="ph">
+                <b>{m.team.pool}</b>
+                <span>{m.team.butler}：{m.team.butlerV}</span>
+              </p>
+              <ol class="needs">
+                {
+                  [0, 1, 2].map((i) => (
+                    <li class="blk b3 grow" style={`--d:${i}`}>
+                      <b>{L[3].k}</b>
+                      <span class="bars" aria-hidden="true">
+                        {m.need.lanes.map(() => (
+                          <i />
+                        ))}
+                      </span>
+                    </li>
+                  ))
+                }
+              </ol>
+            </div>
+            <span class="arr side fin" style="--d:4">→</span>
+            <span class="chip done fin" style="--d:5">{m.team.ship}</span>
+          </div>
+          <p class="ground">{m.ground}</p>
+        </div>
+      </div>
+
+      <aside class="side" aria-live="polite">
+        {
+          L.map((l, i) => (
+            <div class="sp" data-pane={String(i)} hidden={i !== 0}>
+              <p class="lk">第 {i + 1} 层</p>
+              <h3 class="serif">{l.k}</h3>
+              <ul class="pts">
+                {l.points.map((p) => (
+                  <li>{p}</li>
+                ))}
+              </ul>
+              <p class="case">
+                <b>{m.caseK}</b>
+                {l.case}
+              </p>
+              <p class="src">
+                <b>{m.srcK}</b>
+                {l.src}
+              </p>
+            </div>
+          ))
+        }
+        <p class="t-hint">{m.hint}</p>
+      </aside>
+    </div>
+
+    <ol class="sum" aria-label="要点">
+      {
+        m.summary.map((s, i) => (
+          <li style={`--d:${i}`}>
+            <b>{s.k}</b>
+            <span>{s.v}</span>
+          </li>
+        ))
+      }
+    </ol>
+  </div>
+</section>
+
+<style>
+  .make {
+    --b1: var(--heat-2);
+    --b2: var(--heat-3);
+    --b3: var(--heat-4);
+  }
+
+  .body {
+    flex: 1;
+    min-height: 0;
+    display: flex;
+    flex-direction: column;
+    gap: clamp(10px, 2vh, 24px);
+  }
+
+  /* 顶部时间线 */
+  .line {
+    list-style: none;
+    margin: 0;
+    padding: 0;
+    display: grid;
+    grid-template-columns: repeat(5, minmax(0, 1fr));
+    position: relative;
+  }
+
+  .line::before {
+    content: '';
+    position: absolute;
+    left: 14px;
+    right: 14px;
+    top: 14px;
+    height: 2px;
+    background: var(--line-2);
+  }
+
+  .line button {
+    position: relative;
+    display: flex;
+    flex-direction: column;
+    align-items: flex-start;
+    gap: 6px;
+    padding: 0;
+    font: inherit;
+    color: var(--ink-3);
+    background: none;
+    border: 0;
+    cursor: pointer;
+    text-align: left;
+  }
+
+  .line i {
+    width: 30px;
+    height: 30px;
+    display: grid;
+    place-items: center;
+    border-radius: 50%;
+    font-style: normal;
+    font-family: var(--mono);
+    font-size: 13px;
+    background: var(--bg);
+    border: 2px solid var(--line-2);
+    transition: background 0.3s, border-color 0.3s, color 0.3s, transform 0.3s;
+  }
+
+  .line span {
+    font-size: clamp(15px, 1.35vw, 24px);
+    font-weight: 600;
+  }
+
+  .line button.seen {
+    color: var(--ink-2);
+  }
+
+  .line button.seen i {
+    border-color: var(--accent);
+    color: var(--accent-ink);
+  }
+
+  .line button[aria-selected='true'] {
+    color: var(--ink);
+  }
+
+  .line button[aria-selected='true'] i {
+    background: var(--accent);
+    border-color: var(--accent);
+    color: var(--bg);
+    transform: scale(1.15);
+    box-shadow: 0 0 0 6px var(--accent-glow);
+  }
+
+  .main {
+    flex: 1;
+    min-height: 0;
+    display: grid;
+    grid-template-columns: minmax(0, 1.6fr) minmax(280px, 1fr);
+    gap: clamp(20px, 3vw, 56px);
+    align-items: center;
+  }
+
+  /* 画面 */
+  .frame {
+    display: flex;
+    flex-direction: column;
+    gap: clamp(12px, 2vh, 22px);
+  }
+
+  .frame[hidden],
+  .sp[hidden] {
+    display: none;
+  }
+
+  .chip {
+    display: inline-flex;
+    align-items: center;
+    padding: 0.5em 0.9em;
+    border-radius: var(--r-sm);
+    border: 1.5px solid var(--line-2);
+    background: var(--card);
+    font-size: clamp(14px, 1.35vw, 25px);
+    white-space: nowrap;
+  }
+
+  .chip.gate {
+    border-color: var(--ok);
+    color: var(--ok);
+    font-weight: 600;
+  }
+
+  .chip.done {
+    background: var(--ink);
+    border-color: var(--ink);
+    color: var(--bg);
+  }
+
+  .row {
+    list-style: none;
+    margin: 0;
+    padding: 0;
+    display: flex;
+    flex-wrap: wrap;
+    align-items: center;
+    gap: 8px 6px;
+  }
+
+  .row > li + li::before {
+    content: '→';
+    margin-right: 6px;
+    color: var(--ink-3);
+  }
+
+  .row > li {
+    display: inline-flex;
+    align-items: center;
+  }
+
+  .retry {
+    margin: 0;
+    height: 26px;
+    border: 2px dashed var(--accent);
+    border-top: 0;
+    border-radius: 0 0 var(--r) var(--r);
+    margin-left: 22%;
+    margin-right: 22%;
+    position: relative;
+  }
+
+  .retry.wide {
+    margin-left: 4%;
+    margin-right: 10%;
+  }
+
+  .retry span {
+    position: absolute;
+    left: 50%;
+    bottom: -0.8em;
+    transform: translateX(-50%);
+    padding: 0 10px;
+    background: var(--bg);
+    color: var(--accent-ink);
+    font-size: clamp(13px, 1.1vw, 18px);
+    white-space: nowrap;
+  }
+
+  .ground {
+    margin: clamp(10px, 2vh, 24px) 0 0;
+    padding: 10px 16px;
+    border-radius: var(--r-sm);
+    background: var(--bg-2);
+    border-top: 3px solid var(--ink-3);
+    font-size: clamp(14px, 1.2vw, 21px);
+    color: var(--ink-2);
+    text-align: center;
+  }
+
+  /* 色块：上一层缩成的那一块 */
+  .blk {
+    display: inline-flex;
+    flex-direction: column;
+    gap: 4px;
+    padding: 0.7em 1em;
+    border-radius: var(--r);
+    color: var(--ink);
+    box-shadow: var(--shadow);
+  }
+
+  .blk b {
+    font-size: clamp(18px, 1.9vw, 34px);
+  }
+
+  .blk small {
+    max-width: 15em;
+    font-size: clamp(12px, 0.95vw, 16px);
+    line-height: 1.4;
+    opacity: 0.85;
+  }
+
+  .b1 {
+    background: var(--b1);
+  }
+  .b2 {
+    background: var(--b2);
+    color: var(--bg);
+  }
+  .b3 {
+    background: var(--b3);
+    color: var(--bg);
+  }
+
+  /* 地基 */
+  .base {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: clamp(10px, 1.4vw, 22px);
+  }
+
+  .bc {
+    padding: clamp(16px, 2vw, 34px);
+    border: 1px solid var(--line);
+    border-radius: var(--r);
+    background: var(--card);
+    box-shadow: var(--shadow);
+  }
+
+  .bc p {
+    margin: 0;
+  }
+
+  .bk {
+    font-size: clamp(24px, 2.4vw, 44px);
+    font-weight: 600;
+    margin-bottom: 10px !important;
+  }
+
+  .tags {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 6px;
+  }
+
+  .tags span {
+    padding: 3px 10px;
+    border-radius: var(--r-pill);
+    background: var(--accent-soft);
+    color: var(--accent-ink);
+    font-size: clamp(14px, 1.3vw, 23px);
+  }
+
+  .links {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 4px 12px;
+    margin-top: 10px !important;
+  }
+
+  .links a {
+    font-size: 13px;
+    color: var(--ink-3);
+    text-decoration: none;
+    border-bottom: 1px solid var(--line-2);
+  }
+
+  .links a:hover {
+    color: var(--accent-ink);
+  }
+
+  /* 一个需求 */
+  .need,
+  .team {
+    display: flex;
+    align-items: center;
+    gap: clamp(8px, 1vw, 16px);
+  }
+
+  .col {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 4px;
+  }
+
+  .arr {
+    color: var(--ink-3);
+    font-size: clamp(14px, 1.2vw, 20px);
+  }
+
+  .lanes {
+    list-style: none;
+    margin: 0;
+    padding: 0;
+    flex: 1;
+    display: flex;
+    flex-direction: column;
+    gap: 6px;
+  }
+
+  .lanes li {
+    display: grid;
+    grid-template-columns: 7.5em 1fr;
+    align-items: center;
+    gap: 12px;
+  }
+
+  .lanes {
+    gap: 10px;
+  }
+
+  .ln {
+    font-size: clamp(13px, 1.15vw, 20px);
+    color: var(--ink-2);
+  }
+
+  .blk.mini {
+    padding: 0.6em 1em;
+    flex-direction: row;
+    align-items: baseline;
+    gap: 10px;
+  }
+
+  .blk.mini b {
+    font-size: clamp(16px, 1.5vw, 26px);
+  }
+
+  /* 一支团队 */
+  .src {
+    list-style: none;
+    margin: 0;
+    padding: 0;
+    display: flex;
+    flex-direction: column;
+    gap: 6px;
+  }
+
+  .pool {
+    flex: 1;
+    border: 1.5px solid var(--ink-3);
+    border-radius: var(--r);
+    overflow: hidden;
+    background: var(--card);
+  }
+
+  .ph {
+    margin: 0;
+    padding: 8px 14px;
+    background: var(--bg-2);
+    border-bottom: 1px solid var(--line);
+    display: flex;
+    flex-wrap: wrap;
+    gap: 4px 12px;
+    align-items: baseline;
+  }
+
+  .ph b {
+    font-size: clamp(16px, 1.5vw, 26px);
+  }
+
+  .ph span {
+    font-size: clamp(13px, 1.1vw, 19px);
+    color: var(--accent-ink);
+  }
+
+  .needs {
+    list-style: none;
+    margin: 0;
+    padding: 16px;
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
+    gap: 10px;
+  }
+
+  .bars {
+    display: flex;
+    flex-direction: column;
+    gap: 3px;
+    margin-top: 4px;
+  }
+
+  .bars {
+    gap: 5px;
+    margin-top: 8px;
+  }
+
+  .bars i {
+    height: 10px;
+    border-radius: 4px;
+    background: var(--b2);
+  }
+
+  /* 右边 */
+  .side {
+    display: flex;
+    flex-direction: column;
+    gap: 12px;
+  }
+
+  .sp p {
+    margin: 0;
+  }
+
+  .lk {
+    font-size: 14px;
+    letter-spacing: 0.06em;
+    color: var(--accent-ink);
+  }
+
+  .sp h3 {
+    margin: 2px 0 12px;
+    font-size: clamp(30px, 3vw, 54px);
+    font-weight: 600;
+    line-height: 1.1;
+  }
+
+  .pts {
+    margin: 0 0 14px;
+    padding-left: 1.1em;
+    display: flex;
+    flex-direction: column;
+    gap: 6px;
+  }
+
+  .pts li {
+    font-size: clamp(16px, 1.45vw, 25px);
+    line-height: 1.45;
+  }
+
+  .pts li::marker {
+    color: var(--accent);
+  }
+
+  .case,
+  .src {
+    padding-left: 12px;
+    border-left: 3px solid var(--accent);
+    font-size: clamp(14px, 1.15vw, 19px);
+    line-height: 1.5;
+    color: var(--ink-2);
+  }
+
+  .src {
+    margin-top: 10px !important;
+    border-left-color: var(--line-2);
+    font-size: clamp(12px, 0.95vw, 15px);
+    color: var(--ink-3);
+  }
+
+  .case b,
+  .src b {
+    display: block;
+    font-size: 12px;
+    font-weight: 500;
+    letter-spacing: 0.08em;
+    color: var(--ink-3);
+  }
+
+  /* 最后一层：要点条 */
+  .sum {
+    list-style: none;
+    margin: 0;
+    padding: 12px 0 0;
+    border-top: 1px solid var(--line);
+    display: grid;
+    grid-template-columns: repeat(5, minmax(0, 1fr));
+    gap: 12px;
+    visibility: hidden;
+  }
+
+  [data-at='4'] .sum {
+    visibility: visible;
+  }
+
+  [data-at='4'] .sum li {
+    animation: make-fin 0.4s ease both;
+    animation-delay: calc(0.6s + var(--d) * 0.08s);
+  }
+
+  .sum li {
+    display: flex;
+    flex-direction: column;
+    gap: 2px;
+  }
+
+  .sum b {
+    font-size: clamp(14px, 1.2vw, 20px);
+    color: var(--accent-ink);
+  }
+
+  .sum span {
+    font-size: clamp(13px, 1.05vw, 18px);
+    color: var(--ink-2);
+  }
+
+  /* 翻页动效：上一层从大缩成色块，其余元素随后淡入 */
+  .frame:not([hidden]) .grow {
+    animation: make-collapse 0.7s cubic-bezier(0.2, 0.8, 0.2, 1) both;
+    animation-delay: calc(var(--d, 0) * 0.06s);
+  }
+
+  .frame:not([hidden]) .fin {
+    animation: make-fin 0.45s ease both;
+    animation-delay: calc(0.35s + var(--d, 0) * 0.06s);
+  }
+
+  .sp:not([hidden]) {
+    animation: make-fin 0.4s ease both;
+  }
+
+  @keyframes make-collapse {
+    from {
+      opacity: 0;
+      transform: scale(2.4);
+    }
+    to {
+      opacity: 1;
+      transform: none;
+    }
+  }
+
+  @keyframes make-fin {
+    from {
+      opacity: 0;
+      transform: translateY(8px);
+    }
+  }
+
+  @media (max-width: 900px) {
+    .main {
+      grid-template-columns: 1fr;
+    }
+    .line span {
+      font-size: 12px;
+    }
+    .need,
+    .team {
+      flex-direction: column;
+      align-items: stretch;
+    }
+    .arr.side {
+      transform: rotate(90deg);
+      align-self: center;
+    }
+    .needs {
+      grid-template-columns: 1fr;
+    }
+    .sum {
+      grid-template-columns: 1fr 1fr;
+    }
+    .base {
+      grid-template-columns: 1fr;
+    }
+  }
+
+  @media (prefers-reduced-motion: reduce) {
+    .frame .grow,
+    .frame .fin,
+    .sp,
+    .sum li {
+      animation: none !important;
+    }
+  }
+</style>

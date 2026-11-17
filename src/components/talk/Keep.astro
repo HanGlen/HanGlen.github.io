@@ -1,0 +1,255 @@
+---
+/**
+ * 演讲 05「做出来，怎么维护」：用户提反馈 → AI 审核 → 开发 → 上线告诉用户，四步大白话。
+ * 两条回到用户的弧线；下面一排是谁在什么时候动（定时任务）。← → 或悬停一步步讲。
+ */
+import { talk } from '../../i18n/talk';
+
+const k = talk.keep;
+---
+
+<section class="slide t-slide keep" data-slide data-notes={k.notes} aria-labelledby="keep-title">
+  <header class="t-head">
+    <p class="kicker">{k.no} · {k.kicker}</p>
+    <h2 id="keep-title">{k.title}</h2>
+    <p class="lead">{k.lead}</p>
+  </header>
+
+  <div class="body" data-stepper data-hover data-at="0">
+    <ol class="flow" role="tablist" aria-label={k.title}>
+      {
+        k.nodes.map((n, i) => (
+          <li class={n.back ? 'back' : ''}>
+            <button type="button" role="tab" data-step aria-selected={i === 0 ? 'true' : 'false'}>
+              <span class="n">{i + 1}</span>
+              <b class="serif">{n.k}</b>
+              <span class="who">{n.who}</span>
+              <span class="what">{n.what}</span>
+            </button>
+            {n.back && <span class="ret" aria-hidden="true">↩ {k.backLabel}</span>}
+          </li>
+        ))
+      }
+    </ol>
+
+    <div class="more">
+      {
+        k.nodes.map((n, i) => (
+          <p data-pane={String(i)} hidden={i !== 0}>
+            {n.more}
+          </p>
+        ))
+      }
+    </div>
+
+    <div class="clocks">
+      <p class="ck">{k.clocksK}</p>
+      <ul>
+        {
+          k.clocks.map((c) => (
+            <li>
+              <i aria-hidden="true">◷</i>
+              <b>{c.k}</b>
+              <span>{c.v}</span>
+            </li>
+          ))
+        }
+      </ul>
+    </div>
+
+    <p class="proof serif">{k.proof}</p>
+  </div>
+</section>
+
+<style>
+  .body {
+    flex: 1;
+    min-height: 0;
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    gap: clamp(16px, 3vh, 36px);
+  }
+
+  .flow {
+    list-style: none;
+    margin: 0;
+    padding: 0;
+    display: grid;
+    grid-template-columns: repeat(4, minmax(0, 1fr));
+    gap: clamp(18px, 2.4vw, 44px);
+  }
+
+  .flow li {
+    position: relative;
+    display: flex;
+    flex-direction: column;
+    gap: 10px;
+  }
+
+  /* 步与步之间的箭头 */
+  .flow li + li::before {
+    content: '→';
+    position: absolute;
+    left: calc(-1 * clamp(18px, 2.4vw, 44px));
+    width: clamp(18px, 2.4vw, 44px);
+    top: clamp(40px, 6vh, 64px);
+    text-align: center;
+    font-size: clamp(18px, 1.8vw, 30px);
+    color: var(--ink-3);
+  }
+
+  .flow button {
+    display: flex;
+    flex-direction: column;
+    align-items: flex-start;
+    gap: 6px;
+    min-height: clamp(170px, 24vh, 250px);
+    padding: clamp(16px, 2vw, 28px);
+    text-align: left;
+    font: inherit;
+    color: var(--ink-2);
+    background: var(--card);
+    border: 1.5px solid var(--line);
+    border-radius: var(--r);
+    box-shadow: var(--shadow);
+    cursor: pointer;
+    transition: border-color 0.25s, background 0.25s, transform 0.25s, opacity 0.25s;
+    opacity: 0.55;
+  }
+
+  .flow button.seen {
+    opacity: 1;
+  }
+
+  .flow button[aria-selected='true'] {
+    opacity: 1;
+    border-color: var(--accent);
+    background: var(--accent-soft);
+    transform: translateY(-4px);
+  }
+
+  .n {
+    font-family: var(--mono);
+    font-size: 14px;
+    color: var(--accent-ink);
+  }
+
+  .flow b {
+    font-size: clamp(24px, 2.4vw, 42px);
+    font-weight: 600;
+    line-height: 1.15;
+    color: var(--ink);
+  }
+
+  .who {
+    font-size: clamp(12px, 1vw, 16px);
+    color: var(--ink-3);
+    letter-spacing: 0.04em;
+  }
+
+  .what {
+    font-size: clamp(16px, 1.45vw, 25px);
+    line-height: 1.45;
+    color: var(--ink);
+  }
+
+  .ret {
+    align-self: flex-start;
+    padding: 4px 12px;
+    border-radius: var(--r-pill);
+    font-size: clamp(13px, 1.1vw, 18px);
+    color: var(--bg);
+    background: var(--ok);
+  }
+
+  .more {
+    min-height: 1.6em;
+  }
+
+  .more p {
+    margin: 0;
+    font-size: clamp(18px, 1.7vw, 30px);
+    color: var(--accent-ink);
+    animation: keep-in 0.3s ease both;
+  }
+
+  .more p[hidden] {
+    display: none;
+  }
+
+  @keyframes keep-in {
+    from {
+      opacity: 0;
+      transform: translateY(6px);
+    }
+  }
+
+  .clocks {
+    display: flex;
+    flex-wrap: wrap;
+    align-items: center;
+    gap: 10px 20px;
+    padding: clamp(12px, 1.6vh, 18px) clamp(14px, 1.6vw, 24px);
+    border-radius: var(--r);
+    background: var(--bg-2);
+  }
+
+  .ck {
+    margin: 0;
+    font-size: 14px;
+    color: var(--ink-3);
+  }
+
+  .clocks ul {
+    list-style: none;
+    margin: 0;
+    padding: 0;
+    display: flex;
+    flex-wrap: wrap;
+    gap: 8px 22px;
+  }
+
+  .clocks li {
+    display: flex;
+    align-items: baseline;
+    gap: 6px;
+    font-size: clamp(14px, 1.25vw, 21px);
+  }
+
+  .clocks i {
+    font-style: normal;
+    color: var(--accent);
+  }
+
+  .clocks span {
+    color: var(--ink-3);
+    font-size: 0.85em;
+  }
+
+  .proof {
+    margin: 0;
+    font-size: clamp(18px, 1.7vw, 30px);
+    font-weight: 600;
+  }
+
+  @media (max-width: 900px) {
+    .flow {
+      grid-template-columns: 1fr 1fr;
+    }
+    .flow li + li::before {
+      display: none;
+    }
+    .flow button {
+      opacity: 1;
+    }
+  }
+
+  @media (prefers-reduced-motion: reduce) {
+    .flow button,
+    .more p {
+      transition: none;
+      animation: none;
+    }
+  }
+</style>
