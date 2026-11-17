@@ -58,7 +58,7 @@ export const zh = {
       line: '帮玩家建 D&D 角色卡、开团的小程序。从 6 月起交给 AI 维护。',
       shot: '/shots/dnd/premade.jpg',
       shot2: '/shots/dnd/sheet.jpg',
-      badges: ['8 个 AI 定时任务轮班', '183 道自动检查', '玩家反馈 2.5 小时合入'],
+      badges: ['8 个 AI 定时任务轮班', '714 个测试文件', '玩家反馈 2.5 小时合入'],
     },
     {
       slug: 'signal',
@@ -204,7 +204,7 @@ export const zh = {
         { v: '写方案', who: 'Claude' },
         { v: '写代码', who: 'Claude · Codex · Trae' },
         { v: '交叉评审', who: 'Codex' },
-        { v: '183 道检查', who: 'CI' },
+        { v: '714 个测试文件', who: 'CI' },
         { v: '自动合并', who: 'Cursor' },
       ],
     },
@@ -267,7 +267,7 @@ export const zh = {
         t: '11:15', who: 'CI', role: 'gate', v: '测试和门禁', d: '15 分钟',
         detail: {
           kind: 'checks', head: 'GitHub Actions 检查', ref: 'PR #2598',
-          checks: [['probe-fallback', 'ok', '10 秒'], ['test（183 道检查）', 'ok', '15 分 52 秒'], ['gate', 'ok', '15 秒']],
+          checks: [['probe-fallback', 'ok', '10 秒'], ['test（714 个测试文件）', 'ok', '15 分 52 秒'], ['gate', 'ok', '15 秒']],
         },
       },
       {
@@ -393,7 +393,7 @@ export const zh = {
     dayNote: '方案里有一处取舍值得一提：AI 翻到我 10 月 3 日说过「开团提醒用处不大」，这一版就没做提醒。',
 
     gateTitle: 'AI 犯过的错，都写成了检查',
-    gateBody: '同一类错 AI 会反复犯，所以每发现一类，就加一道自动检查。现在一共 183 道，下面是几个例子，点开看它是哪天、为什么加的：',
+    gateBody: '同一类错 AI 会反复犯，每发现一类就加一道检查。按测试文件计，现在是 714 个（2026年11月18日）。点开看它是哪天、为什么加的：',
     gates: [
       { k: '按名字写死逻辑', v: 'if (name === "圣武士") 这种写法会被拦下，要改成看数据字段', when: '2026-08-14', ref: 'PR #672', why: '规则早就写在 CLAUDE.md 里，AI 还是会写。于是改成脚本扫描：已有的写法记进基线放行，只拦新增的。' },
       { k: '译名不统一', v: '同一个英文名冒出第二种中文译法就拦下', when: '2026-08-25', ref: 'PR #858', why: '第一版只加了脚本，忘了接进 CI，跑不起来；同一个 PR 里补上了。已有的冲突记进基线，只拦新增的。' },

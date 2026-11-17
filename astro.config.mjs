@@ -7,4 +7,7 @@ export default defineConfig({
     locales: ['zh', 'en'],
     routing: { prefixDefaultLocale: false },
   },
+  redirects: {
+    '/notes/183-gates': '/notes/automated-checks/',
+  },
 });

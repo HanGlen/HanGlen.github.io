@@ -60,7 +60,7 @@ export const en: Content = {
       line: 'Build D&D characters and run games. Maintained by AI agents since June.',
       shot: '/shots/dnd/premade.jpg',
       shot2: '/shots/dnd/sheet.jpg',
-      badges: ['8 scheduled AI shifts', '183 automated checks', 'Feedback to fix in 2.5 h'],
+      badges: ['8 scheduled AI shifts', '714 test files', 'Feedback to fix in 2.5 h'],
     },
     {
       slug: 'signal',
@@ -206,7 +206,7 @@ export const en: Content = {
         { v: 'Plan', who: 'Claude' },
         { v: 'Code', who: 'Claude · Codex · Trae' },
         { v: 'Cross-review', who: 'Codex' },
-        { v: '183 checks', who: 'CI' },
+        { v: '714 test files', who: 'CI' },
         { v: 'Auto-merge', who: 'Cursor' },
       ],
     },
@@ -269,7 +269,7 @@ export const en: Content = {
         t: '11:15', who: 'CI', role: 'gate', v: 'Tests and gates', d: '15 min',
         detail: {
           kind: 'checks', head: 'GitHub Actions', ref: 'PR #2598',
-          checks: [['probe-fallback', 'ok', '10 s'], ['test (183 checks)', 'ok', '15 m 52 s'], ['gate', 'ok', '15 s']],
+          checks: [['probe-fallback', 'ok', '10 s'], ['test (714 test files)', 'ok', '15 m 52 s'], ['gate', 'ok', '15 s']],
         },
       },
       {
@@ -394,7 +394,7 @@ export const en: Content = {
     dayNote: 'One call in the plan: the AI found that on October 3 I had said game reminders were "not that useful", so this version ships without them.',
 
     gateTitle: 'Every AI mistake became a check',
-    gateBody: 'AI repeats the same kind of mistake, so each new kind becomes an automated check. There are 183 now. Open one to see when and why it was added:',
+    gateBody: 'AI repeats the same kind of mistake, so each new kind becomes a check: 714 test files as of 18 Nov 2026. Open one to see when and why it was added:',
     gates: [
       { k: 'Logic keyed on names', v: 'if (name === "Paladin") is blocked; read data fields instead', when: '2026-08-14', ref: 'PR #672', why: 'The rule was already in CLAUDE.md and the AI kept breaking it. So a script now scans for it: existing cases sit in a baseline, only new ones fail.' },
       { k: 'Inconsistent translations', v: 'a second Chinese rendering of the same English term is blocked', when: '2026-08-25', ref: 'PR #858', why: 'The first version added the script but never wired it into CI, so it never ran. The same PR fixed that. Existing conflicts are baselined; only new ones fail.' },
