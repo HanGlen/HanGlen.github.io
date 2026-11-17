@@ -24,7 +24,11 @@
   --heat-2: #df9677;
   --heat-3: #c9643f;
   --heat-4: #96351a;
+  --cat-gold: #a8780f;
+  --cat-blue: #3570b0;
+  --blue-soft: #b7cce4;
   --shadow: 0 1px 0 rgba(255, 255, 255, 0.6) inset, 0 24px 48px -32px rgba(28, 26, 23, 0.35);
+  --shadow-drop: 0 24px 32px rgba(28, 26, 23, 0.25);
 
   --serif: 'Newsreader Variable', 'Noto Serif SC', 'Songti SC', 'STSong', serif;
   --sans: 'Inter Variable', 'PingFang SC', 'Hiragino Sans GB', 'Microsoft YaHei', 'Noto Sans SC', system-ui, sans-serif;
@@ -63,7 +67,11 @@
     --heat-2: #7a3e25;
     --heat-3: #b85a35;
     --heat-4: #f0a07f;
+    --cat-gold: #c08a1e;
+    --cat-blue: #4f8ad0;
+    --blue-soft: #233650;
     --shadow: 0 24px 48px -32px rgba(0, 0, 0, 0.8);
+    --shadow-drop: 0 24px 32px rgba(0, 0, 0, 0.6);
     color-scheme: dark;
   }
 }
@@ -89,7 +97,11 @@
   --heat-2: #7a3e25;
   --heat-3: #b85a35;
   --heat-4: #f0a07f;
+  --cat-gold: #c08a1e;
+  --cat-blue: #4f8ad0;
+  --blue-soft: #233650;
   --shadow: 0 24px 48px -32px rgba(0, 0, 0, 0.8);
+  --shadow-drop: 0 24px 32px rgba(0, 0, 0, 0.6);
   color-scheme: dark;
 }
 

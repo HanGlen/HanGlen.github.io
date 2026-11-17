@@ -9,6 +9,7 @@ import Network from '../talk/Network.astro';
 import Gap from '../talk/Gap.astro';
 import Make from '../talk/Make.astro';
 import Keep from '../talk/Keep.astro';
+import Ai from '../talk/Ai.astro';
 import Checklist from '../talk/Checklist.astro';
 import { talk } from '../../i18n/talk';
 ---
@@ -30,6 +31,7 @@ import { talk } from '../../i18n/talk';
       <Gap />
       <Make />
       <Keep />
+      <Ai />
       <Checklist />
     </main>
 
@@ -60,28 +62,70 @@ import { talk } from '../../i18n/talk';
         dots.append(b);
       });
 
+      // 宽屏：整页切换（旧页向上淡出、新页从下方浮上来，方向随翻页方向）；窄屏退回普通滚动
+      const wide = matchMedia('(min-width: 901px)');
+      const fromHash = () => Math.max(0, Math.min(slides.length - 1, (parseInt(location.hash.slice(1), 10) || 1) - 1));
+      let lock = 0;
+
       function mark(i: number) {
         cur = i;
         slides.forEach((s, j) => s.classList.toggle('is-current', j === i));
         [...dots.children].forEach((d, j) => d.toggleAttribute('aria-current', j === i));
         count.textContent = `${String(i + 1).padStart(2, '0')} / ${String(slides.length).padStart(2, '0')}`;
         notesText.textContent = slides[i].dataset.notes || '';
+        history.replaceState(null, '', i ? `#${i + 1}` : location.pathname);
       }
 
       function go(i: number) {
         const t = Math.max(0, Math.min(slides.length - 1, i));
-        slides[t].scrollIntoView({ behavior: reduce ? 'auto' : 'smooth', block: 'start' });
+        if (!wide.matches) {
+          slides[t].scrollIntoView({ behavior: reduce ? 'auto' : 'smooth', block: 'start' });
+          mark(t);
+          return;
+        }
+        if (t === cur) return;
+        const dir = t > cur ? 'down' : 'up';
+        const old = slides[cur];
+        deck.dataset.dir = dir;
+        slides.forEach((s) => s.classList.remove('is-leaving'));
+        if (!reduce) {
+          old.classList.add('is-leaving');
+          setTimeout(() => old.classList.remove('is-leaving'), 750);
+        }
         mark(t);
+        lock = Date.now() + (reduce ? 200 : 750);
       }
 
-      // 跟着滚动更新当前页（滚轮、触摸、拖滚动条都算）
+      // 窄屏跟着滚动更新当前页
       const io = new IntersectionObserver(
         (es) => {
+          if (wide.matches) return;
           for (const e of es) if (e.isIntersecting) mark(slides.indexOf(e.target as HTMLElement));
         },
         { root: deck, threshold: 0.55 },
       );
       slides.forEach((s) => io.observe(s));
+
+      // 宽屏：滚轮和触摸滑动一次翻一页；页内能滚动的区域先滚完
+      deck.addEventListener(
+        'wheel',
+        (e) => {
+          if (!wide.matches) return;
+          const inner = (e.target as HTMLElement).closest<HTMLElement>('[data-scroll]');
+          if (inner && inner.scrollHeight > inner.clientHeight) return;
+          e.preventDefault();
+          if (Math.abs(e.deltaY) < 12 || Date.now() < lock) return;
+          go(cur + (e.deltaY > 0 ? 1 : -1));
+        },
+        { passive: false },
+      );
+      let ty = 0;
+      deck.addEventListener('touchstart', (e) => (ty = e.touches[0].clientY), { passive: true });
+      deck.addEventListener('touchend', (e) => {
+        if (!wide.matches) return;
+        const dy = ty - e.changedTouches[0].clientY;
+        if (Math.abs(dy) > 50) go(cur + (dy > 0 ? 1 : -1));
+      });
 
       document.addEventListener('keydown', (e) => {
         if (e.metaKey || e.ctrlKey || e.altKey) return;
@@ -104,6 +148,9 @@ import { talk } from '../../i18n/talk';
         const panes = [...root.querySelectorAll<HTMLElement>('[data-pane]')];
         const hover = root.hasAttribute('data-hover');
         const sel = (i: number) => {
+          const was = Number(root.dataset.at ?? -1);
+          if (was === i) return;
+          root.dataset.dir = i < was ? 'prev' : 'next';
           root.dataset.at = String(i);
           steps.forEach((s, j) => {
             s.setAttribute('aria-selected', String(i === j));
@@ -127,10 +174,14 @@ import { talk } from '../../i18n/talk';
           const n = e.key === 'ArrowRight' ? Math.min(steps.length - 1, at + 1) : Math.max(0, at - 1);
           steps[n].focus({ preventScroll: true });
         });
+        root.dataset.at = '-1';
         sel(0);
+        delete root.dataset.dir;
       });
 
-      mark(0);
+      const first = fromHash();
+      mark(first);
+      if (!wide.matches && first) slides[first].scrollIntoView({ block: 'start' });
       deck.focus({ preventScroll: true });
     </script>
   </body>
@@ -146,6 +197,34 @@ import { talk } from '../../i18n/talk';
   body {
     font-size: 18px;
     --pad: clamp(16px, 5vw, 96px);
+    --ease: cubic-bezier(0.2, 0.8, 0.2, 1);
+  }
+
+  /* 页内左右切换：新的一格按方向横向滑入（→ 从右边来，← 从左边来） */
+  [data-stepper][data-dir] [data-pane]:not([hidden]) {
+    animation: pane-in 0.5s var(--ease) both;
+  }
+  [data-stepper][data-dir='prev'] [data-pane]:not([hidden]) {
+    animation-name: pane-in-prev;
+  }
+  @keyframes pane-in {
+    from {
+      opacity: 0;
+      transform: translateX(48px);
+      filter: blur(6px);
+    }
+  }
+  @keyframes pane-in-prev {
+    from {
+      opacity: 0;
+      transform: translateX(-48px);
+      filter: blur(6px);
+    }
+  }
+  @media (prefers-reduced-motion: reduce) {
+    [data-stepper] [data-pane] {
+      animation: none !important;
+    }
   }
 
   body::after {
@@ -252,24 +331,101 @@ import { talk } from '../../i18n/talk';
 
 <style>
   .deck {
+    position: relative;
     height: 100svh;
-    overflow-y: auto;
-    overflow-x: hidden;
-    scroll-snap-type: y mandatory;
+    overflow: hidden;
     outline: none;
-    scrollbar-width: none;
   }
 
-  .deck::-webkit-scrollbar {
+  /* 宽屏：所有页叠在一起，只显示当前页和正在离开的那页 */
+  .deck :global(.slide) {
+    position: absolute;
+    inset: 0;
+    height: 100svh;
+    min-height: 560px;
+    pointer-events: none;
+  }
+
+  /* 不在台上的页直接不渲染：子元素的 visibility 盖不过它，再进来时动画也会重播 */
+  .deck :global(.slide:not(.is-current):not(.is-leaving)) {
     display: none;
   }
 
-  .deck :global(.slide) {
-    position: relative;
-    height: 100svh;
-    min-height: 560px;
-    scroll-snap-align: start;
-    scroll-snap-stop: always;
+  .deck :global(.slide.is-current) {
+    pointer-events: auto;
+    z-index: 2;
+    animation: deck-in 0.75s var(--ease) both;
+  }
+
+  .deck :global(.slide.is-leaving) {
+    z-index: 1;
+    animation: deck-out 0.6s var(--ease) both;
+  }
+
+  .deck[data-dir='up'] :global(.slide.is-current) {
+    animation-name: deck-in-up;
+  }
+
+  .deck[data-dir='up'] :global(.slide.is-leaving) {
+    animation-name: deck-out-up;
+  }
+
+  /* 新页里的标题、导语、正文错峰浮现（模糊 → 清晰） */
+  .deck :global(.slide.is-current .t-head > *),
+  .deck :global(.slide.is-current > .head > *),
+  .deck :global(.slide.is-current .t-body) {
+    animation: deck-rise 0.8s var(--ease) both;
+  }
+  .deck :global(.slide.is-current .t-head > :nth-child(2)),
+  .deck :global(.slide.is-current > .head > :nth-child(2)) {
+    animation-delay: 0.08s;
+  }
+  .deck :global(.slide.is-current .t-head > :nth-child(3)),
+  .deck :global(.slide.is-current > .head > :nth-child(3)) {
+    animation-delay: 0.16s;
+  }
+  .deck :global(.slide.is-current .t-body) {
+    animation-delay: 0.22s;
+  }
+
+  @keyframes deck-in {
+    from {
+      opacity: 0;
+      transform: translateY(7vh) scale(0.985);
+      filter: blur(10px);
+    }
+  }
+
+  @keyframes deck-out {
+    to {
+      opacity: 0;
+      transform: translateY(-7vh) scale(0.97);
+      filter: blur(8px);
+    }
+  }
+
+  @keyframes deck-in-up {
+    from {
+      opacity: 0;
+      transform: translateY(-7vh) scale(0.985);
+      filter: blur(10px);
+    }
+  }
+
+  @keyframes deck-out-up {
+    to {
+      opacity: 0;
+      transform: translateY(7vh) scale(0.97);
+      filter: blur(8px);
+    }
+  }
+
+  @keyframes deck-rise {
+    from {
+      opacity: 0;
+      transform: translateY(18px);
+      filter: blur(6px);
+    }
   }
 
   .dots {
@@ -359,15 +515,29 @@ import { talk } from '../../i18n/talk';
 
   @media (max-width: 900px) {
     .deck {
-      scroll-snap-type: none;
+      overflow-y: auto;
+      overflow-x: hidden;
     }
-    .deck :global(.slide) {
+    .deck :global(.slide),
+    .deck :global(.slide:not(.is-current):not(.is-leaving)) {
+      display: flex;
+      position: relative;
+      inset: auto;
       height: auto;
       min-height: 100svh;
+      pointer-events: auto;
+      animation: none !important;
     }
     .keys,
     .dots {
       display: none;
+    }
+  }
+
+  @media (prefers-reduced-motion: reduce) {
+    .deck :global(.slide),
+    .deck :global(.slide *) {
+      animation: none !important;
     }
   }
 </style>

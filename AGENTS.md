@@ -33,6 +33,7 @@
 - 文案：`src/i18n/zh.ts`、`src/i18n/en.ts`（结构一致，`en` 的类型来自 `zh`）。文案里可以用 `[文字](链接)` 写超链接，渲染时经 `src/lib/rich.ts` 转义。
 - 数据：`src/data/dnd.json`。更新数字只改这里和 `src/i18n/`，并在 `docs/worklog.md` 记来源。
 - 页面：`src/components/pages/*.astro`，路由文件 `src/pages/**` 只负责传语言。
+- 演讲页 `/talk/qingdao/`：改之前先读 `docs/talk-qingdao-plan.md`（主题、每页内容、过渡动画规范都在那里）。
 - 笔记：`src/content/notes/*.md`，车主没确认的加 `draft: true`。
 - 素材：`public/shots/<项目>/`，图片压缩到宽 1600px 以内。
 
