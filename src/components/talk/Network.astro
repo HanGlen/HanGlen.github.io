@@ -1,8 +1,8 @@
 ---
 /**
- * 演讲第 1 部分「我是谁」：中间是我，周围是做过和在做的事。
- * 颜色是关系（过去 / 自己的 / 合作），形状是状态（实心 / 空心 / 虚线）。
- * 悬停或聚焦一个点，右边出大字卡片；讲过的点一直亮着。← → 依次切换。
+ * 演讲第 1 部分「我是谁」：中间是我，周围是做过和在做的事，全部正常显示。
+ * 颜色是分组（学校 / 工作 / 跑团 / 现在合作），同组的点挨在一起；形状是状态（实心 / 空心 / 虚线）。
+ * 悬停或聚焦一个点，右边出大字卡片；← → 依次切换。点的圆心压在坐标上，文字挂在点下面。
  */
 import { talk } from '../../i18n/talk';
 
@@ -10,7 +10,7 @@ const m = talk.me;
 const nodes = m.nodes;
 const C = { x: 480, y: 370 };
 const pos = (id: string) => (id === 'center' ? C : nodes.find((n) => n.id === id)!);
-const edges = nodes.flatMap((n) => (n.links ?? ['center']).map((to) => ({ id: n.id, rel: n.rel, status: n.status, from: pos(to), to: n })));
+const edges = nodes.flatMap((n) => (n.links ?? ['center']).map((to) => ({ id: n.id, group: n.group, status: n.status, from: pos(to), to: n })));
 const pct = (v: number, of: number) => `${(v / of) * 100}%`;
 ---
 
@@ -21,7 +21,7 @@ const pct = (v: number, of: number) => `${(v / of) * 100}%`;
     <p class="lead">{m.lead}</p>
   </header>
 
-  <div class="body">
+  <div class="body t-body">
     <div class="graph">
       <div class="stage">
         <svg viewBox="0 0 1000 760" aria-hidden="true" preserveAspectRatio="none">
@@ -32,7 +32,7 @@ const pct = (v: number, of: number) => `${(v / of) * 100}%`;
                 y1={e.from.y}
                 x2={e.to.x}
                 y2={e.to.y}
-                class={`edge rel-${e.rel} st-${e.status}`}
+                class={`edge g-${e.group} st-${e.status}`}
                 data-edge={e.id}
                 vector-effect="non-scaling-stroke"
               />
@@ -48,16 +48,13 @@ const pct = (v: number, of: number) => `${(v / of) * 100}%`;
           nodes.map((n, i) => (
             <button
               type="button"
-              class={`node rel-${n.rel} st-${n.status}`}
+              class={`node g-${n.group} st-${n.status}`}
               style={`left:${pct(n.x, 1000)};top:${pct(n.y, 760)};--d:${0.25 + i * 0.05}s`}
               data-node={n.id}
               aria-label={`${n.title}：${n.lines.join('')}`}
             >
               <i class="dot" aria-hidden="true" />
-              <span class="lab">
-                {n.label}
-                {n.when && !n.quiet && <small>{n.when}</small>}
-              </span>
+              <span class="lab">{n.label}</span>
             </button>
           ))
         }
@@ -71,9 +68,9 @@ const pct = (v: number, of: number) => `${(v / of) * 100}%`;
         <div class="legend">
           <ul>
             {
-              m.legendRel.map((l) => (
+              m.legendGroup.map((l) => (
                 <li>
-                  <i class={`sw rel-${l.k}`} />
+                  <i class={`sw g-${l.k}`} />
                   {l.v}
                 </li>
               ))
@@ -95,11 +92,11 @@ const pct = (v: number, of: number) => `${(v / of) * 100}%`;
 
       {
         nodes.map((n) => (
-          <div class={`card rel-${n.rel}`} data-card={n.id} hidden>
+          <div class={`card g-${n.group}`} data-card={n.id} hidden>
             <p class="tag">
-              <i class={`sw rel-${n.rel}`} />
-              {m.relName[n.rel]} · {m.statusName[n.status]}
-              {n.when && !n.quiet && !n.stat && <span> · {n.when}</span>}
+              <i class={`sw g-${n.group}`} />
+              {m.groupName[n.group]} · {m.statusName[n.status]}
+              {n.when && !n.quiet && <span> · {n.when}</span>}
             </p>
             <h3 class="serif">{n.title}</h3>
             {n.lines.map((l) => <p class="line">{l}</p>)}
@@ -126,13 +123,9 @@ const pct = (v: number, of: number) => `${(v / of) * 100}%`;
         ))
       }
 
-      <p class="told">
-        <span data-told>{m.told.replace('{n}', '0').replace('{m}', String(nodes.length))}</span>
-        <b class="serif end" data-end>{m.end}</b>
-      </p>
+      <p class="end serif">{m.end}</p>
     </aside>
   </div>
-  <script type="application/json" data-told-tpl set:html={JSON.stringify(m.told)} />
 </section>
 
 <style>
@@ -141,8 +134,9 @@ const pct = (v: number, of: number) => `${(v / of) * 100}%`;
     flex-direction: column;
     padding: clamp(28px, 5vh, 64px) var(--pad) clamp(20px, 4vh, 44px);
     gap: clamp(12px, 2vh, 24px);
-    --past: var(--ink-2);
-    --own: var(--accent);
+    --school: var(--cat-gold);
+    --work: var(--cat-blue);
+    --trpg: var(--accent);
     --partner: var(--ok);
   }
 
@@ -216,18 +210,21 @@ const pct = (v: number, of: number) => `${(v / of) * 100}%`;
     stroke-dasharray: 4 5;
   }
 
-  .edge.lit.rel-past {
-    stroke: var(--past);
+  .edge {
+    stroke-width: 1.6;
+    opacity: 0.55;
   }
-  .edge.lit.rel-own {
-    stroke: var(--own);
+  .edge.g-school {
+    stroke: var(--school);
   }
-  .edge.lit.rel-partner {
+  .edge.g-work {
+    stroke: var(--work);
+  }
+  .edge.g-trpg {
+    stroke: var(--trpg);
+  }
+  .edge.g-partner {
     stroke: var(--partner);
-  }
-  .edge.lit {
-    stroke-width: 2;
-    opacity: 0.75;
   }
   .edge.on {
     opacity: 1;
@@ -250,41 +247,50 @@ const pct = (v: number, of: number) => `${(v / of) * 100}%`;
     z-index: 2;
   }
 
+  /* 按钮本身就是那个点，圆心压在坐标上；文字绝对定位挂在点下面 */
   .node {
-    --c: var(--past);
+    --c: var(--school);
+    --s: clamp(16px, 2.1cqw, 26px);
     position: absolute;
+    width: var(--s);
+    height: var(--s);
+    padding: 0;
     transform: translate(-50%, -50%);
-    display: flex;
-    flex-direction: column;
-    align-items: center;
-    gap: 6px;
-    padding: 6px;
     border: 0;
     background: none;
     color: var(--ink);
     font: inherit;
     cursor: pointer;
     z-index: 3;
-    opacity: 0.42;
-    transition: opacity 0.35s, transform 0.35s cubic-bezier(0.2, 0.7, 0.2, 1);
-    animation: pop 0.6s cubic-bezier(0.2, 0.7, 0.2, 1) both;
+    transition: transform 0.35s var(--ease);
+    animation: pop 0.6s var(--ease) both;
     animation-delay: var(--d);
   }
 
-  .node.rel-own {
-    --c: var(--own);
+  .node::before {
+    content: '';
+    position: absolute;
+    inset: -14px;
   }
-  .node.rel-partner {
+
+  .node.g-work {
+    --c: var(--work);
+  }
+  .node.g-trpg {
+    --c: var(--trpg);
+  }
+  .node.g-partner {
     --c: var(--partner);
   }
 
   .dot {
-    width: clamp(14px, 2cqw, 24px);
-    aspect-ratio: 1;
+    position: absolute;
+    inset: 0;
     border-radius: 50%;
     background: var(--c);
     border: 3px solid var(--c);
-    transition: box-shadow 0.35s, transform 0.35s;
+    box-shadow: 0 0 0 5px color-mix(in srgb, var(--c) 16%, transparent);
+    transition: box-shadow 0.35s;
   }
 
   .st-doing .dot {
@@ -292,15 +298,17 @@ const pct = (v: number, of: number) => `${(v / of) * 100}%`;
   }
 
   .st-idea .dot {
-    background: transparent;
+    background: var(--bg);
     border-style: dashed;
     border-width: 2px;
+    box-shadow: none;
   }
 
   .lab {
-    display: flex;
-    flex-direction: column;
-    align-items: center;
+    position: absolute;
+    left: 50%;
+    top: calc(100% + 6px);
+    transform: translateX(-50%);
     font-size: clamp(14px, 1.95cqw, 22px);
     font-weight: 600;
     line-height: 1.25;
@@ -308,33 +316,13 @@ const pct = (v: number, of: number) => `${(v / of) * 100}%`;
     text-shadow: 0 0 4px var(--bg), 0 0 8px var(--bg), 0 0 12px var(--bg);
   }
 
-  .lab small {
-    font-family: var(--mono);
-    font-size: 0.68em;
-    font-weight: 400;
-    color: var(--ink-3);
-  }
-
   .st-idea .lab {
-    font-weight: 400;
-    color: var(--ink-3);
-  }
-
-  .node.seen {
-    opacity: 1;
-  }
-
-  .node.seen.st-idea {
-    opacity: 0.7;
-  }
-
-  .node.seen .dot {
-    box-shadow: 0 0 0 6px color-mix(in srgb, var(--c) 18%, transparent);
+    font-weight: 500;
+    color: var(--ink-2);
   }
 
   .node.on {
-    opacity: 1;
-    transform: translate(-50%, -50%) scale(1.14);
+    transform: translate(-50%, -50%) scale(1.18);
     z-index: 4;
   }
 
@@ -363,22 +351,25 @@ const pct = (v: number, of: number) => `${(v / of) * 100}%`;
   }
 
   .card {
-    --c: var(--past);
+    --c: var(--school);
     padding: clamp(22px, 2.4vw, 40px);
     border: 1px solid var(--line);
     border-radius: var(--r);
     background: var(--card);
     box-shadow: var(--shadow);
     border-top: 4px solid var(--c);
-    animation: in 0.4s cubic-bezier(0.2, 0.7, 0.2, 1);
+    animation: in 0.45s var(--ease);
     overflow: auto;
     max-height: 100%;
   }
 
-  .card.rel-own {
-    --c: var(--own);
+  .card.g-work {
+    --c: var(--work);
   }
-  .card.rel-partner {
+  .card.g-trpg {
+    --c: var(--trpg);
+  }
+  .card.g-partner {
     --c: var(--partner);
   }
 
@@ -430,13 +421,16 @@ const pct = (v: number, of: number) => `${(v / of) * 100}%`;
     width: 12px;
     height: 12px;
     border-radius: 50%;
-    background: var(--past);
+    background: var(--school);
     flex: none;
   }
-  .sw.rel-own {
-    background: var(--own);
+  .sw.g-work {
+    background: var(--work);
   }
-  .sw.rel-partner {
+  .sw.g-trpg {
+    background: var(--trpg);
+  }
+  .sw.g-partner {
     background: var(--partner);
   }
 
@@ -554,44 +548,37 @@ const pct = (v: number, of: number) => `${(v / of) * 100}%`;
     color: var(--ink-3);
   }
 
-  .told {
-    flex-wrap: wrap;
-    margin: 14px 0 0;
-    min-height: 1.6em;
-    display: flex;
-    align-items: baseline;
-    justify-content: space-between;
-    gap: 12px;
-    font-family: var(--mono);
-    font-size: 13px;
-    color: var(--ink-3);
-  }
-
   .end {
-    font-family: var(--serif);
+    margin: 16px 0 0;
     font-size: clamp(18px, 1.6vw, 26px);
+    font-weight: 600;
     color: var(--ink);
-    opacity: 0;
-    transform: translateY(6px);
-    transition: opacity 0.6s, transform 0.6s;
-  }
-
-  .me.done .end {
-    opacity: 1;
-    transform: none;
   }
 
   @keyframes pop {
     from {
       opacity: 0;
-      transform: translate(-50%, -50%) scale(0.6);
+      transform: translate(-50%, -50%) scale(0.4);
     }
+  }
+
+  .card.back {
+    animation-name: in-back;
   }
 
   @keyframes in {
     from {
       opacity: 0;
-      transform: translateY(8px);
+      transform: translateX(40px);
+      filter: blur(6px);
+    }
+  }
+
+  @keyframes in-back {
+    from {
+      opacity: 0;
+      transform: translateX(-40px);
+      filter: blur(6px);
     }
   }
 
@@ -616,9 +603,6 @@ const pct = (v: number, of: number) => `${(v / of) * 100}%`;
     .lab {
       font-size: clamp(10px, 2.6cqw, 14px);
     }
-    .lab small {
-      display: none;
-    }
   }
 
   @media (prefers-reduced-motion: reduce) {
@@ -626,8 +610,7 @@ const pct = (v: number, of: number) => `${(v / of) * 100}%`;
     .card {
       animation: none;
     }
-    .node,
-    .end {
+    .node {
       transition: none;
     }
   }
@@ -638,32 +621,22 @@ const pct = (v: number, of: number) => `${(v / of) * 100}%`;
   if (root) init(root);
 
   function init(root: HTMLElement) {
-    const tpl: string = JSON.parse(root.querySelector('[data-told-tpl]')!.textContent!);
     const nodes = [...root.querySelectorAll<HTMLButtonElement>('[data-node]')];
     const idle = root.querySelector<HTMLElement>('[data-idle]')!;
-    const told = root.querySelector<HTMLElement>('[data-told]')!;
-    const seen = new Set<string>();
     let cur = -1;
 
     function show(i: number) {
-      cur = i;
+      if (i === cur) return;
       const id = nodes[i].dataset.node!;
-      seen.add(id);
-      nodes.forEach((n, j) => {
-        n.classList.toggle('on', j === i);
-        if (seen.has(n.dataset.node!)) n.classList.add('seen');
-      });
-      root.querySelectorAll<SVGLineElement>('[data-edge]').forEach((e) => {
-        const nid = e.dataset.edge!;
-        e.classList.toggle('lit', seen.has(nid));
-        e.classList.toggle('on', nid === id);
-      });
+      const back = cur > i;
+      cur = i;
+      nodes.forEach((n, j) => n.classList.toggle('on', j === i));
+      root.querySelectorAll<SVGLineElement>('[data-edge]').forEach((e) => e.classList.toggle('on', e.dataset.edge === id));
       idle.hidden = true;
       root.querySelectorAll<HTMLElement>('[data-card]').forEach((c) => {
         c.hidden = c.dataset.card !== id;
+        c.classList.toggle('back', back);
       });
-      told.textContent = tpl.replace('{n}', String(seen.size)).replace('{m}', String(nodes.length));
-      root.classList.toggle('done', seen.size === nodes.length);
     }
 
     nodes.forEach((n, i) => {

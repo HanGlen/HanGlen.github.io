@@ -1,6 +1,6 @@
 ---
 /**
- * 演讲 05「做出来，怎么维护」：用户提反馈 → AI 审核 → 开发 → 上线告诉用户，四步大白话。
+ * 演讲 04「怎么维护和迭代」：用户提反馈 → AI 审核 → 开发 → 上线告诉用户，四步大白话。
  * 两条回到用户的弧线；下面一排是谁在什么时候动（定时任务）。← → 或悬停一步步讲。
  */
 import { talk } from '../../i18n/talk';
@@ -15,7 +15,7 @@ const k = talk.keep;
     <p class="lead">{k.lead}</p>
   </header>
 
-  <div class="body" data-stepper data-hover data-at="0">
+  <div class="body t-body" data-stepper data-hover>
     <ol class="flow" role="tablist" aria-label={k.title}>
       {
         k.nodes.map((n, i) => (

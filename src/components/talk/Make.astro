@@ -17,7 +17,7 @@ const L = m.levels;
     <p class="lead">{m.lead}</p>
   </header>
 
-  <div class="body" data-stepper data-at="0">
+  <div class="body t-body" data-stepper>
     <ol class="line" role="tablist" aria-label={m.title}>
       {
         L.map((l, i) => (
@@ -25,6 +25,7 @@ const L = m.levels;
             <button type="button" role="tab" data-step aria-selected={i === 0 ? 'true' : 'false'} class={`lv${i}`}>
               <i aria-hidden="true">{i + 1}</i>
               <span>{l.k}</span>
+              <em>{l.tag}</em>
             </button>
           </li>
         ))
@@ -63,18 +64,34 @@ const L = m.levels;
         <!-- 2 一张单 -->
         <div class="frame f1" data-pane="1" hidden>
           <div class="ticket">
-            <ol class="row">
+            <ol class="pipe">
               {
                 m.ticket.map((t, i) => (
-                  <li class="fin" style={`--d:${i}`}>
-                    <span class={`chip ${i === 3 ? 'gate' : ''} ${i === 4 ? 'done' : ''}`}>{t}</span>
+                  <li class={`fin ${i === 0 ? 'spec-step' : ''} ${i === 4 ? 'gate' : ''} ${i === 5 ? 'done' : ''}`} style={`--d:${i}`}>
+                    <span class="pk">{t.k}</span>
+                    <span class="pe">{t.en}</span>
+                    <span class="pv">{t.v}</span>
                   </li>
                 ))
               }
             </ol>
-            <p class="retry fin" style="--d:5"><span>↻ {m.retry}</span></p>
+            <p class="retry fin" style="--d:6"><span>↻ {m.retry}</span></p>
           </div>
-          <p class="ground grow">{m.ground}</p>
+          <div class="spec fin" style="--d:7">
+            <p class="sk">{m.spec.k}</p>
+            <p class="st serif">{m.spec.title}</p>
+            <dl>
+              {
+                m.spec.rows.map((r) => (
+                  <div>
+                    <dt>{r.k}</dt>
+                    <dd>{r.v}</dd>
+                  </div>
+                ))
+              }
+            </dl>
+          </div>
+          <p class="trad fin" style="--d:8">{m.trad}</p>
         </div>
 
         <!-- 3 一轮 -->
@@ -87,7 +104,7 @@ const L = m.levels;
               <li class="grow">
                 <span class="blk b1">
                   <b>{L[1].k}</b>
-                  <small>{m.ticket.join(' → ')}</small>
+                  <small>{m.ticket.map((t) => t.k).join(' → ')}</small>
                 </span>
               </li>
               <li class="fin" style="--d:3"><span class="chip">{m.round.end}</span></li>
@@ -101,7 +118,16 @@ const L = m.levels;
         <div class="frame f3" data-pane="3" hidden>
           <div class="need">
             <div class="col fin" style="--d:0">
-              <span class="chip">{m.need.plan}</span>
+              <span class="chip">{m.need.req}</span>
+              <span class="arr">↓</span>
+              <div class="ana">
+                <b>{m.need.ana}</b>
+                <ul>
+                  {m.need.anaV.map((v) => (
+                    <li>{v}</li>
+                  ))}
+                </ul>
+              </div>
               <span class="arr">↓</span>
               <span class="chip">{m.need.slice}</span>
             </div>
@@ -168,7 +194,11 @@ const L = m.levels;
           L.map((l, i) => (
             <div class="sp" data-pane={String(i)} hidden={i !== 0}>
               <p class="lk">第 {i + 1} 层</p>
-              <h3 class="serif">{l.k}</h3>
+              <h3 class="serif">
+                {l.k}
+                <em>{l.tag}</em>
+              </h3>
+              <p class="plain">{l.plain}</p>
               <ul class="pts">
                 {l.points.map((p) => (
                   <li>{p}</li>
@@ -269,6 +299,18 @@ const L = m.levels;
   .line span {
     font-size: clamp(15px, 1.35vw, 24px);
     font-weight: 600;
+  }
+
+  .line em {
+    font-style: normal;
+    font-family: var(--mono);
+    font-size: clamp(11px, 0.85vw, 14px);
+    letter-spacing: 0.02em;
+    color: var(--ink-3);
+  }
+
+  .line button[aria-selected='true'] em {
+    color: var(--accent-ink);
   }
 
   .line button.seen {
@@ -394,6 +436,171 @@ const L = m.levels;
     font-size: clamp(14px, 1.2vw, 21px);
     color: var(--ink-2);
     text-align: center;
+  }
+
+  /* 一张单：专业说法一行，下面每一步一句大白话 */
+  .pipe {
+    list-style: none;
+    margin: 0;
+    padding: 0;
+    display: grid;
+    grid-template-columns: repeat(6, minmax(0, 1fr));
+    gap: 8px;
+  }
+
+  .pipe li {
+    position: relative;
+    display: flex;
+    flex-direction: column;
+    gap: 4px;
+    padding: 10px 12px 12px;
+    border: 1.5px solid var(--line-2);
+    border-radius: var(--r-sm);
+    background: var(--card);
+  }
+
+  .pipe li + li::before {
+    content: '→';
+    position: absolute;
+    left: -8px;
+    top: 14px;
+    transform: translateX(-50%);
+    font-size: 13px;
+    color: var(--ink-3);
+  }
+
+  .pk {
+    font-size: clamp(15px, 1.3vw, 23px);
+    font-weight: 600;
+    white-space: nowrap;
+  }
+
+  .pe {
+    font-family: var(--mono);
+    font-size: clamp(10px, 0.78vw, 13px);
+    color: var(--accent-ink);
+  }
+
+  .pv {
+    margin-top: 4px;
+    font-size: clamp(12px, 0.95vw, 16px);
+    line-height: 1.45;
+    color: var(--ink-2);
+  }
+
+  .pipe .spec-step {
+    border-color: var(--accent);
+    background: var(--accent-soft);
+  }
+
+  .pipe .gate {
+    border-color: var(--ok);
+  }
+
+  .pipe .gate .pk {
+    color: var(--ok);
+  }
+
+  .pipe .done {
+    background: var(--ink);
+    border-color: var(--ink);
+    color: var(--bg);
+  }
+
+  .pipe .done .pv,
+  .pipe .done .pe {
+    color: var(--bg);
+    opacity: 0.8;
+  }
+
+  .ticket .retry {
+    margin-left: 25%;
+    margin-right: 25%;
+  }
+
+  .spec {
+    padding: clamp(14px, 1.4vw, 22px) clamp(16px, 1.8vw, 28px);
+    border-radius: var(--r);
+    border: 1px solid var(--line);
+    border-left: 4px solid var(--accent);
+    background: var(--card);
+    box-shadow: var(--shadow);
+  }
+
+  .spec p {
+    margin: 0;
+  }
+
+  .sk {
+    font-size: 12px;
+    letter-spacing: 0.08em;
+    color: var(--ink-3);
+  }
+
+  .st {
+    margin: 2px 0 10px !important;
+    font-size: clamp(20px, 1.7vw, 30px);
+    font-weight: 600;
+  }
+
+  .spec dl {
+    margin: 0;
+    display: grid;
+    gap: 6px;
+  }
+
+  .spec dl div {
+    display: grid;
+    grid-template-columns: 3.2em 1fr;
+    gap: 10px;
+    align-items: baseline;
+  }
+
+  .spec dt {
+    font-weight: 600;
+    color: var(--accent-ink);
+    font-size: clamp(14px, 1.15vw, 19px);
+  }
+
+  .spec dd {
+    margin: 0;
+    font-size: clamp(14px, 1.15vw, 19px);
+    color: var(--ink-2);
+  }
+
+  .trad {
+    margin: 0;
+    font-family: var(--serif);
+    font-size: clamp(16px, 1.4vw, 24px);
+    color: var(--ink-2);
+  }
+
+  /* 一个需求：需求分析是重点 */
+  .ana {
+    padding: 0.7em 1em;
+    border-radius: var(--r);
+    border: 2px solid var(--accent);
+    background: var(--accent-soft);
+    box-shadow: 0 0 0 6px var(--accent-glow);
+    text-align: center;
+  }
+
+  .ana b {
+    display: block;
+    font-size: clamp(16px, 1.5vw, 26px);
+    color: var(--accent-ink);
+    white-space: nowrap;
+  }
+
+  .ana ul {
+    list-style: none;
+    margin: 6px 0 0;
+    padding: 0;
+    display: flex;
+    flex-direction: column;
+    gap: 2px;
+    font-size: clamp(12px, 1vw, 17px);
+    color: var(--ink-2);
   }
 
   /* 色块：上一层缩成的那一块 */
@@ -591,6 +798,11 @@ const L = m.levels;
     gap: 10px;
   }
 
+  .needs .blk b {
+    font-size: clamp(15px, 1.35vw, 24px);
+    white-space: nowrap;
+  }
+
   .bars {
     display: flex;
     flex-direction: column;
@@ -626,8 +838,28 @@ const L = m.levels;
     color: var(--accent-ink);
   }
 
+  .sp h3 em {
+    margin-left: 0.4em;
+    font-style: normal;
+    font-family: var(--mono);
+    font-size: 0.42em;
+    font-weight: 500;
+    color: var(--accent-ink);
+    vertical-align: middle;
+  }
+
+  .plain {
+    margin: 0 0 14px !important;
+    padding: 8px 12px;
+    border-radius: var(--r-sm);
+    background: var(--bg-2);
+    font-size: clamp(14px, 1.15vw, 19px);
+    line-height: 1.5;
+    color: var(--ink-2);
+  }
+
   .sp h3 {
-    margin: 2px 0 12px;
+    margin: 2px 0 10px;
     font-size: clamp(30px, 3vw, 54px);
     font-weight: 600;
     line-height: 1.1;
@@ -723,9 +955,6 @@ const L = m.levels;
     animation-delay: calc(0.35s + var(--d, 0) * 0.06s);
   }
 
-  .sp:not([hidden]) {
-    animation: make-fin 0.4s ease both;
-  }
 
   @keyframes make-collapse {
     from {
@@ -752,6 +981,12 @@ const L = m.levels;
     .line span {
       font-size: 12px;
     }
+    .pipe {
+      grid-template-columns: 1fr 1fr;
+    }
+    .pipe li + li::before {
+      display: none;
+    }
     .need,
     .team {
       flex-direction: column;
@@ -775,7 +1010,6 @@ const L = m.levels;
   @media (prefers-reduced-motion: reduce) {
     .frame .grow,
     .frame .fin,
-    .sp,
     .sum li {
       animation: none !important;
     }
