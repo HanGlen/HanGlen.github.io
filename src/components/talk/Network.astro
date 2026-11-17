@@ -95,7 +95,7 @@ const pct = (v: number, of: number) => `${(v / of) * 100}%`;
           <div class={`card g-${n.group}`} data-card={n.id} hidden>
             <p class="tag">
               <i class={`sw g-${n.group}`} />
-              {m.groupName[n.group]} · {m.statusName[n.status]}
+              {m.groupName[n.group]} · {n.statusText ?? m.statusName[n.status]}
               {n.when && !n.quiet && <span> · {n.when}</span>}
             </p>
             <h3 class="serif">{n.title}</h3>
@@ -123,7 +123,6 @@ const pct = (v: number, of: number) => `${(v / of) * 100}%`;
         ))
       }
 
-      <p class="end serif">{m.end}</p>
     </aside>
   </div>
 </section>
