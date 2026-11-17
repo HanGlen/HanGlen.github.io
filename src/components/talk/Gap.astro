@@ -1,15 +1,15 @@
 ---
 /**
- * 演讲 02「先数字化，再 AI 化」：左右两块色块图（每格 1%）。
- * 每个数一种颜色，全部同时画出来：数从大到小排，颜色从浅到深，越深 = 用得越深（后一个数是前一个的子集）。
- * ← → 或悬停一行，色块图只亮这一个数占的格；最下面一行小字是编号对应的来源。
+ * 演讲 02「企业的数字化和 AI，做到哪了」：一张横条图，同一把 0–100% 的尺子。
+ * 蓝 = 数字化，陶土红 = AI；中小企业的 AI 一行，浅色是「在用」、深色是「用进核心业务」。
+ * ← → 或悬停一行：这一行亮起，还没讲到的行先淡着（渐进披露）；页底是编号对应的来源。
  */
 import { talk } from '../../i18n/talk';
 
 const g = talk.gap;
 const circled = (n: number) => String.fromCharCode(0x2460 + n - 1);
-/** 第 i 格属于第几层：有几个数大于 i，就是第几层（0 = 没填） */
-const level = (items: { v: number }[], i: number) => items.filter((it) => it.v > i).length;
+let idx = 0;
+const groups = g.groups.map((gr) => ({ ...gr, rows: gr.rows.map((r) => ({ ...r, i: idx++ })) }));
 ---
 
 <section class="slide t-slide gap" data-slide data-notes={g.notes} aria-labelledby="gap-title">
@@ -19,62 +19,44 @@ const level = (items: { v: number }[], i: number) => items.filter((it) => it.v >
     <p class="lead">{g.lead}</p>
   </header>
 
-  <div class="body t-body" data-stepper data-hover data-gap>
-    <div class="blocks">
+  <div class="body t-body" data-stepper data-hover>
+    <div class="chart" role="tablist" aria-label={g.title}>
+      <div class="axis" aria-hidden="true">
+        {[0, 25, 50, 75, 100].map((t) => <span style={`--x:${t}%`}>{t}%</span>)}
+      </div>
       {
-        g.blocks.map((b, bi) => (
-          <section class={`block b${bi}`} data-block={bi}>
-            <header class="bh">
-              <h3 class="serif">{b.k}</h3>
-              <span>{b.who} · {g.unit}</span>
-            </header>
-            <div class="inner">
-              <div class="waffle" data-waffle={bi} aria-hidden="true">
-                {Array.from({ length: 100 }, (_, i) => (
-                  <i class={`lv${level(b.items, i)}`} style={`--i:${i}`} />
-                ))}
-              </div>
-              <ol class="items" role="tablist" aria-label={b.k}>
-                {b.items.map((it, k) => (
-                  <li>
-                    <button type="button" role="tab" data-step data-b={bi} data-lv={k + 1} aria-selected="false">
-                      <i class={`sw lv${k + 1}`} aria-hidden="true" />
-                      <b class="serif">{it.big}</b>
-                      <span>
-                        {it.text}
-                        <sup>{circled(it.ref)}</sup>
-                      </span>
-                    </button>
-                  </li>
-                ))}
-                {b.note && (
-                  <li class="note">
-                    <button type="button" role="tab" data-step data-b={bi} data-lv="0" aria-selected="false">
-                      <i class="sw low" aria-hidden="true" />
-                      <b class="serif">{b.note.big}</b>
-                      <span>
-                        {b.note.text}
-                        <sup>{circled(b.note.ref)}</sup>
-                      </span>
-                    </button>
-                  </li>
-                )}
-              </ol>
+        groups.map((gr) => (
+          <section class="grp">
+            <h3 class="gk serif">{gr.k}</h3>
+            <div class="rows">
+              {gr.rows.map((r) => (
+                <button type="button" role="tab" data-step data-i={r.i} class={`row k-${r.kind}`} aria-selected="false" style={`--i:${r.i}`}>
+                  <span class="txt">
+                    {r.text}
+                    <sup>{circled(r.ref)}</sup>
+                  </span>
+                  <span class="track">
+                    <i class="bar" style={`--v:${r.v}%`} aria-hidden="true" />
+                    {'deep' in r && <i class="bar deep" style={`--v:${r.deep}%`} aria-hidden="true" />}
+                    <b class="big serif" style={`--v:${r.v}%`}>{r.big}</b>
+                  </span>
+                </button>
+              ))}
             </div>
           </section>
         ))
       }
     </div>
 
-    <div class="tie">
-      <button type="button" role="tab" data-step data-b="link" aria-selected="false">
-        <span class="lk">数字化 → AI 化</span>
-        <b class="serif">{g.link.big}</b>
-        <span>
-          {g.link.text}
-          <sup>{circled(g.link.ref)}</sup>
-        </span>
-      </button>
+    <div class="foot">
+      <p class="legend" aria-hidden="true">
+        {g.legend.map((l) => (
+          <span class={`k-${l.k}`}>
+            <i />
+            {l.v}
+          </span>
+        ))}
+      </p>
       <p class="end serif">{g.end}</p>
     </div>
 
@@ -92,12 +74,9 @@ const level = (items: { v: number }[], i: number) => items.filter((it) => it.v >
 
 <style>
   .gap {
-    /* 每块一个色相，由浅到深 = 由浅到深地用 */
-    --d1: var(--blue-soft);
-    --d2: var(--cat-blue);
-    --a1: var(--heat-1);
-    --a2: var(--heat-3);
-    --a3: var(--heat-4);
+    --dig: var(--cat-blue);
+    --ai: var(--heat-3);
+    --ai-soft: var(--heat-1);
   }
 
   .body {
@@ -106,223 +85,204 @@ const level = (items: { v: number }[], i: number) => items.filter((it) => it.v >
     display: flex;
     flex-direction: column;
     justify-content: center;
-    gap: clamp(12px, 2.2vh, 26px);
+    gap: clamp(14px, 2.6vh, 30px);
   }
 
-  .blocks {
-    display: grid;
-    grid-template-columns: 1fr 1fr;
-    gap: clamp(16px, 2.4vw, 44px);
-  }
-
-  .block {
+  .chart {
+    position: relative;
     display: flex;
     flex-direction: column;
-    gap: 14px;
-    padding: clamp(16px, 1.8vw, 30px);
-    border: 1px solid var(--line);
-    border-radius: var(--r);
-    background: var(--card);
-    box-shadow: var(--shadow);
-    transition: border-color 0.3s, transform 0.4s var(--ease);
+    gap: clamp(10px, 2vh, 22px);
+    --lab: clamp(220px, 24vw, 420px);
+    --gk: clamp(120px, 10vw, 190px);
   }
 
-  .block.on {
-    border-color: var(--line-2);
-    transform: translateY(-3px);
-  }
-
-  .bh {
-    display: flex;
-    align-items: baseline;
-    justify-content: space-between;
-    gap: 12px;
-    flex-wrap: wrap;
-  }
-
-  .bh h3 {
-    margin: 0;
-    font-size: clamp(22px, 2vw, 36px);
-    font-weight: 600;
-  }
-
-  .bh span {
-    font-size: clamp(12px, 0.95vw, 15px);
+  .axis {
+    position: relative;
+    height: 1.4em;
+    margin-left: calc(var(--gk) + var(--lab));
+    margin-right: 4em;
+    font-family: var(--mono);
+    font-size: 12px;
     color: var(--ink-3);
   }
 
-  .inner {
+  .axis span {
+    position: absolute;
+    left: var(--x);
+    transform: translateX(-50%);
+  }
+
+  .grp {
     display: grid;
-    grid-template-columns: minmax(0, 0.8fr) minmax(0, 1.2fr);
-    gap: clamp(14px, 1.8vw, 32px);
+    grid-template-columns: var(--gk) 1fr;
     align-items: center;
+    padding-top: clamp(8px, 1.6vh, 18px);
+    border-top: 1px solid var(--line);
   }
 
-  .waffle {
-    display: grid;
-    grid-template-columns: repeat(10, 1fr);
-    gap: clamp(2px, 0.3vw, 5px);
-    width: min(100%, 32vh);
-    aspect-ratio: 1;
-  }
-
-  .waffle i {
-    border-radius: 3px;
-    background: var(--heat-0);
-    transition: opacity 0.35s ease calc(var(--i) * 3ms), transform 0.35s var(--ease) calc(var(--i) * 3ms);
-  }
-
-  .b0 .lv1 {
-    background: var(--d1);
-  }
-  .b0 .lv2 {
-    background: var(--d2);
-  }
-  .b1 .lv1 {
-    background: var(--a1);
-  }
-  .b1 .lv2 {
-    background: var(--a2);
-  }
-  .b1 .lv3 {
-    background: var(--a3);
-  }
-
-  /* 选中某个数：只亮这个数占的格（这一层和更深的层），其余变淡 */
-  .waffle[data-hl] i {
-    opacity: 0.22;
-  }
-  .waffle[data-hl='1'] i:is(.lv1, .lv2, .lv3),
-  .waffle[data-hl='2'] i:is(.lv2, .lv3),
-  .waffle[data-hl='3'] i.lv3 {
-    opacity: 1;
-    transform: scale(1.04);
-  }
-
-  .items {
-    list-style: none;
+  .gk {
     margin: 0;
-    padding: 0;
+    font-size: clamp(20px, 1.9vw, 34px);
+    font-weight: 600;
+  }
+
+  .rows {
     display: flex;
     flex-direction: column;
-    gap: 4px;
+    gap: clamp(6px, 1.2vh, 14px);
   }
 
-  .items button,
-  .tie button {
-    width: 100%;
+  .row {
     display: grid;
-    grid-template-columns: 14px clamp(78px, 6.6vw, 128px) 1fr;
-    align-items: baseline;
-    gap: 10px;
-    padding: 8px 12px;
-    text-align: left;
+    grid-template-columns: var(--lab) 1fr;
+    align-items: center;
+    padding: 4px 0;
     font: inherit;
-    color: var(--ink-2);
-    background: transparent;
-    border: 1.5px solid transparent;
+    color: var(--ink);
+    text-align: left;
+    background: none;
+    border: 0;
     border-radius: var(--r-sm);
     cursor: pointer;
-    transition: border-color 0.25s, background 0.25s, color 0.25s;
+    transition: opacity 0.45s var(--ease);
   }
 
-  .sw {
-    width: 14px;
-    height: 14px;
-    border-radius: 3px;
-    align-self: center;
-  }
-  .b0 .sw.lv1 {
-    background: var(--d1);
-  }
-  .b0 .sw.lv2 {
-    background: var(--d2);
-  }
-  .b1 .sw.lv1 {
-    background: var(--a1);
-  }
-  .b1 .sw.lv2 {
-    background: var(--a2);
-  }
-  .b1 .sw.lv3 {
-    background: var(--a3);
-  }
-  .sw.low {
-    background: transparent;
-    border: 1.5px dashed var(--ink-3);
+  .txt {
+    padding-right: 16px;
+    font-size: clamp(15px, 1.35vw, 24px);
+    color: var(--ink-2);
   }
 
-  .items b {
-    font-size: clamp(20px, 1.9vw, 34px);
-    line-height: 1;
-    font-weight: 600;
-    color: var(--ink);
-  }
-
-  .items span {
-    font-size: clamp(14px, 1.15vw, 20px);
-    line-height: 1.4;
-  }
-
-  .note {
-    margin-top: 8px;
-    padding-top: 8px;
-    border-top: 1px dashed var(--line-2);
-  }
-
-  .note b {
-    color: var(--ink-3) !important;
-  }
-
-  sup {
-    font-size: 0.7em;
-    color: var(--ink-3);
+  .txt sup {
     margin-left: 2px;
+    font-size: 0.6em;
+    color: var(--ink-3);
   }
 
-  .items button[aria-selected='true'],
-  .tie button[aria-selected='true'] {
-    color: var(--ink);
-    border-color: var(--line-2);
-    background: var(--bg-2);
+  .track {
+    position: relative;
+    height: clamp(26px, 3.4vh, 42px);
+    margin-right: 4em;
+    background: repeating-linear-gradient(to right, var(--line) 0 1px, transparent 1px 25%);
+    border-left: 1px solid var(--line-2);
   }
 
-  .tie {
-    display: flex;
-    flex-wrap: wrap;
-    align-items: center;
-    gap: 8px clamp(16px, 2.4vw, 44px);
+  .bar {
+    position: absolute;
+    left: 0;
+    top: 0;
+    bottom: 0;
+    width: var(--v);
+    border-radius: 0 var(--r-sm) var(--r-sm) 0;
+    background: var(--dig);
+    transform-origin: left;
+    transition: transform 0.7s var(--ease);
   }
 
-  .tie button {
-    width: auto;
-    grid-template-columns: auto auto auto;
-    gap: 14px;
-    padding: 10px 18px;
-    border-color: var(--line-2);
+  .k-ai .bar {
+    background: var(--ai);
   }
 
-  .lk {
-    font-size: 13px;
-    letter-spacing: 0.06em;
+  /* 中小企业的 AI：浅色在用，深色用进核心业务 */
+  .k-ai .bar:has(+ .deep) {
+    background: var(--ai-soft);
   }
 
-  .tie b {
-    font-size: clamp(22px, 2vw, 36px);
+  .bar.deep {
+    background: var(--ai);
+  }
+
+  .big {
+    position: absolute;
+    left: var(--v);
+    top: 50%;
+    transform: translate(10px, -50%);
+    font-size: clamp(22px, 2.3vw, 42px);
     font-weight: 600;
+    white-space: nowrap;
     line-height: 1;
+    transition: opacity 0.45s var(--ease);
+  }
+
+  .k-dig .big {
+    color: var(--dig);
+  }
+
+  .k-ai .big {
     color: var(--accent-ink);
   }
 
-  .tie span {
-    font-size: clamp(14px, 1.2vw, 21px);
+  /* 渐进披露：讲到的行亮着，没讲到的行淡着、条还没长出来 */
+  .row[aria-selected='true'] .txt {
+    color: var(--ink);
+    font-weight: 600;
+  }
+
+  [data-at] .row:not(.seen) {
+    opacity: 0.28;
+  }
+
+  [data-at] .row:not(.seen) .bar {
+    transform: scaleX(0);
+  }
+
+  [data-at] .row:not(.seen) .big {
+    opacity: 0;
+  }
+
+  /* 结论讲到最后一行才出来 */
+  .end {
+    transition: opacity 0.6s var(--ease), transform 0.6s var(--ease);
+  }
+
+  .body:not([data-at='4']) .end {
+    opacity: 0;
+    transform: translateY(8px);
+  }
+
+  .row:focus-visible {
+    outline: 2px solid var(--accent);
+    outline-offset: 4px;
+  }
+
+  .foot {
+    display: flex;
+    flex-wrap: wrap;
+    align-items: baseline;
+    justify-content: space-between;
+    gap: 10px 24px;
+  }
+
+  .legend {
+    margin: 0;
+    display: flex;
+    gap: 18px;
+    font-size: 14px;
+    color: var(--ink-2);
+  }
+
+  .legend span {
+    display: inline-flex;
+    align-items: center;
+    gap: 6px;
+  }
+
+  .legend i {
+    width: 14px;
+    height: 14px;
+    border-radius: 3px;
+    background: var(--dig);
+  }
+
+  .legend .k-ai i {
+    background: var(--ai);
   }
 
   .end {
     margin: 0;
-    font-size: clamp(20px, 1.9vw, 34px);
+    font-size: clamp(20px, 2vw, 36px);
     font-weight: 600;
-    color: var(--accent-ink);
   }
 
   .refs {
@@ -332,49 +292,48 @@ const level = (items: { v: number }[], i: number) => items.filter((it) => it.v >
     border-top: 1px solid var(--line);
     display: flex;
     flex-wrap: wrap;
-    gap: 2px 18px;
-    font-size: clamp(11px, 0.78vw, 13px);
-    line-height: 1.5;
+    gap: 2px 20px;
+    font-size: 11px;
     color: var(--ink-3);
   }
 
   @media (max-width: 900px) {
-    .blocks,
-    .inner {
-      grid-template-columns: 1fr;
+    .chart {
+      --lab: 0px;
+      --gk: 0px;
     }
-    .waffle {
-      width: min(70vw, 260px);
+    .axis {
+      display: none;
     }
-    .tie button {
+    .grp {
       grid-template-columns: 1fr;
+      gap: 8px;
+    }
+    .row {
+      grid-template-columns: 1fr;
+      gap: 6px;
+      opacity: 1 !important;
+    }
+    .track {
+      margin-right: 5em;
+    }
+    [data-at] .row:not(.seen) .bar {
+      transform: none;
+    }
+    [data-at] .row:not(.seen) .big {
+      opacity: 1;
+    }
+    .body:not([data-at='4']) .end {
+      opacity: 1;
+      transform: none;
     }
   }
 
   @media (prefers-reduced-motion: reduce) {
-    .waffle i,
-    .block {
+    .bar,
+    .big,
+    .row {
       transition: none;
     }
   }
 </style>
-
-<script>
-  // 选中一行：对应那块色块图只亮这个数占的格；note 行（不在色块图里的对比数）和底部连接行不高亮格子
-  document.querySelectorAll<HTMLElement>('[data-gap]').forEach((root) => {
-    const steps = [...root.querySelectorAll<HTMLElement>('[data-step]')];
-    const blocks = [...root.querySelectorAll<HTMLElement>('[data-block]')];
-    const waffles = [...root.querySelectorAll<HTMLElement>('[data-waffle]')];
-    const paint = (s: HTMLElement) => {
-      const b = s.dataset.b!;
-      const lv = s.dataset.lv;
-      waffles.forEach((w) => {
-        if (w.dataset.waffle === b && lv && lv !== '0') w.dataset.hl = lv;
-        else delete w.dataset.hl;
-      });
-      blocks.forEach((bl) => bl.classList.toggle('on', bl.dataset.block === b || b === 'link'));
-    };
-    root.addEventListener('step', (e) => paint(steps[(e as CustomEvent<number>).detail]));
-    paint(steps[Number(root.dataset.at ?? 0)] ?? steps[0]);
-  });
-</script>
