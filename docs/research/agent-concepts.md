@@ -10,7 +10,9 @@
 2. **「代码仓库 = Harness」说得不准。** Harness 是模型之外、让模型能动手的那套运行时。Anthropic《Demystifying evals for AI agents》（Mikaela Grace、Jeremy Hadfield、Rodrigo Olivares、Jiri De Jonghe，2026-01-09）原话：「An agent harness (or scaffold) is the system that enables a model to act as an agent: it processes inputs, orchestrates tool calls, and returns results」。同一篇把 Claude Code 叫做 “a flexible agent harness”。更早一篇把 Claude Agent SDK 叫做 “a powerful, general-purpose agent harness adept at coding”（[Effective harnesses for long-running agents](https://www.anthropic.com/research/effective-harnesses-for-long-running-agents)，Justin Young，2025-11-26）。所以 **Claude Code、Codex 才是现成的 Harness**；仓库里的 AGENTS.md、文档、检查，是你在 Harness 上加的东西。
 3. **仓库这部分有自己的叫法：Harness engineering。** OpenAI《Harness engineering: leveraging Codex in an agent-first world》（Ryan Lopopolo，2026-02-11，[原文](https://openai.com/index/harness-engineering/)）。原文没有给这个词下字典式定义。它讲的是：人不再亲手写代码，而是设计环境、写清意图、做反馈回路。原话：「Humans steer. Agents execute。」以及 “A short AGENTS.md (roughly 100 lines) is injected into context and serves primarily as a map”。深层知识放结构化的 `docs/`，当作 system of record。和车主小程序「AGENTS.md 限 60 行、细节下沉 `docs/`」是同一类做法。
 
-建议的大白话（待 HAN-1821 定稿）：**模型是大脑；Claude Code 这类工具是现成的 Harness（手脚和工作台）；你在仓库里写的规则、检查、任务记录，是给 Harness 加的那一层，这件事叫 Harness engineering。**
+建议的大白话（HAN-1821 定稿）：**Claude Code、Codex 是现成的 Harness。仓库里的规则和检查，是摔过一次就补上的。**
+
+这件事叫 Harness engineering。页上用哪句，见 `docs/research/talk-03-harness.md` 第 1 节。
 
 ## 2. 概念清单（HAN-1827，2026-11-17 已核）
 
