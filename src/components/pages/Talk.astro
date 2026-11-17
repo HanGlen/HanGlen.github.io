@@ -147,17 +147,29 @@ import { talk } from '../../i18n/talk';
         const steps = [...root.querySelectorAll<HTMLElement>('[data-step]')];
         const panes = [...root.querySelectorAll<HTMLElement>('[data-pane]')];
         const hover = root.hasAttribute('data-hover');
+        // data-vt：前后两格都有 view-transition-name 元素时，用 View Transition 让同名元素变形过去
+        const named = (n: number) => !!root.querySelector(`[data-pane="${n}"] [style*="view-transition-name"]`);
         const sel = (i: number) => {
           const was = Number(root.dataset.at ?? -1);
           if (was === i) return;
-          root.dataset.dir = i < was ? 'prev' : 'next';
-          root.dataset.at = String(i);
-          steps.forEach((s, j) => {
-            s.setAttribute('aria-selected', String(i === j));
-            s.classList.toggle('seen', j <= i || s.classList.contains('seen'));
-          });
-          panes.forEach((p) => (p.hidden = p.dataset.pane !== String(i)));
-          root.dispatchEvent(new CustomEvent('step', { detail: i }));
+          const apply = () => {
+            root.dataset.dir = i < was ? 'prev' : 'next';
+            root.dataset.at = String(i);
+            steps.forEach((s, j) => {
+              s.setAttribute('aria-selected', String(i === j));
+              s.classList.toggle('seen', j <= i || s.classList.contains('seen'));
+            });
+            panes.forEach((p) => (p.hidden = p.dataset.pane !== String(i)));
+            root.dispatchEvent(new CustomEvent('step', { detail: i }));
+          };
+          const morph = root.hasAttribute('data-vt') && 'startViewTransition' in document && !reduce && wide.matches && was >= 0 && named(was) && named(i);
+          if (!morph) {
+            delete root.dataset.morph;
+            apply();
+            return;
+          }
+          root.dataset.morph = '';
+          document.startViewTransition(apply).finished.finally(() => delete root.dataset.morph);
         };
         steps.forEach((s, i) => {
           s.addEventListener('click', () => sel(i));
@@ -203,6 +215,10 @@ import { talk } from '../../i18n/talk';
   /* 页内左右切换：新的一格按方向横向滑入（→ 从右边来，← 从左边来） */
   [data-stepper][data-dir] [data-pane]:not([hidden]) {
     animation: pane-in 0.5s var(--ease) both;
+  }
+  /* View Transition 在接管时，格子本身不再滑入，只让同名元素变形 */
+  [data-stepper][data-morph] [data-pane]:not([hidden]) {
+    animation: none;
   }
   [data-stepper][data-dir='prev'] [data-pane]:not([hidden]) {
     animation-name: pane-in-prev;
