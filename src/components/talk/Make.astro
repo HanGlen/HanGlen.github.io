@@ -1,8 +1,10 @@
 ---
 /**
- * 演讲 03「怎么做出来」：五层 地基 → 一张单 → 一轮 → 一个需求 → 一支 AI 研发团队。
- * 顶上是时间线 tab，← → 往外翻一层：上一层的图缩成一个色块，成了新一层里的一步。
- * 右边每层三句要点、一个案例、一条依据；最后一层底下出要点条，拍一张就带走全部要点。
+ * 演讲 03「怎么做出来」：工具准备 → 地基 Harness → 一张单 → 一个大需求（Project + 定时任务）→ 一堆需求（分诊）。
+ * 顶上是步骤 tab，← → 下一步；左边一张图，右边只放两层：一个问题、一句备注。
+ * 每步的例子统一放在底部一条独立色块里，依据在色块右边点开才看（渐进披露）。
+ * 3 → 4、4 → 5 用 View Transition 串起来（data-vt 列出哪两步之间变形，切换时写进 data-vt-pair）：
+ * 3 → 4 整条「一张单」流水线缩进定时任务里；4 → 5 整条「一个大需求」缩成一堆需求里的 Project A。
  */
 import { talk } from '../../i18n/talk';
 
@@ -17,12 +19,12 @@ const L = m.levels;
     <p class="lead">{m.lead}</p>
   </header>
 
-  <div class="body t-body" data-stepper>
+  <div class="body t-body" data-stepper data-vt="2-3 3-4">
     <ol class="line" role="tablist" aria-label={m.title}>
       {
         L.map((l, i) => (
           <li>
-            <button type="button" role="tab" data-step aria-selected={i === 0 ? 'true' : 'false'} class={`lv${i}`}>
+            <button type="button" role="tab" data-step aria-selected={i === 0 ? 'true' : 'false'}>
               <i aria-hidden="true">{i + 1}</i>
               <span>{l.k}</span>
               <em>{l.tag}</em>
@@ -34,158 +36,175 @@ const L = m.levels;
 
     <div class="main">
       <div class="stage">
-        <!-- 1 地基 -->
-        <div class="frame f0" data-pane="0">
-          <div class="base">
+        <!-- 1 工具准备：类型 × 入门 / 进阶 -->
+        <div class="frame" data-pane="0">
+          <table class="tools">
+            <thead>
+              <tr class="fin">
+                {m.toolsHead.map((h) => <th scope="col">{h}</th>)}
+              </tr>
+            </thead>
+            <tbody>
+              {
+                m.tools.map((t, i) => (
+                  <tr class="fin" style={`--d:${i + 1}`}>
+                    <th scope="row">
+                      {t.k}
+                      {t.opt && <em>{t.opt}</em>}
+                    </th>
+                    {t.same ? (
+                      <td colspan="2" class="same">
+                        <b class="serif">{t.v[0]}</b>
+                        <span>{t.same}</span>
+                      </td>
+                    ) : (
+                      <>
+                        <td>
+                          {t.v.map((v) => (
+                            <b class="serif">{v}</b>
+                          ))}
+                        </td>
+                        <td class="pro">
+                          {t.pro.map((v) => (
+                            <b class="serif">{v}</b>
+                          ))}
+                        </td>
+                      </>
+                    )}
+                  </tr>
+                ))
+              }
+            </tbody>
+          </table>
+          <p class="links fin" style="--d:5">
+            <b>{m.models.k}</b>
             {
-              m.base.map((b) => (
-                <div class="bc fin">
-                  <p class="bk serif">{b.k}</p>
-                  <p class="tags">
-                    {b.v.map((v) => (
-                      <span>{v}</span>
-                    ))}
-                  </p>
-                  {b.links && (
-                    <p class="links">
-                      {b.links.map((x) => (
-                        <a href={x.href} target="_blank" rel="noopener">
-                          {x.k} ↗
-                        </a>
-                      ))}
-                    </p>
-                  )}
-                </div>
+              m.models.links.map((x) => (
+                <a href={x.href} target="_blank" rel="noopener">
+                  {x.k} ↗
+                </a>
               ))
             }
-          </div>
+          </p>
         </div>
 
-        <!-- 2 一张单 -->
-        <div class="frame f1" data-pane="1" hidden>
-          <div class="ticket">
-            <ol class="pipe">
-              {
-                m.ticket.map((t, i) => (
-                  <li class={`fin ${i === 0 ? 'spec-step' : ''} ${i === 4 ? 'gate' : ''} ${i === 5 ? 'done' : ''}`} style={`--d:${i}`}>
-                    <span class="pk">{t.k}</span>
-                    <span class="pe">{t.en}</span>
-                    <span class="pv">{t.v}</span>
-                  </li>
-                ))
-              }
-            </ol>
-            <p class="retry fin" style="--d:6"><span>↻ {m.retry}</span></p>
-          </div>
-          <div class="spec fin" style="--d:7">
-            <p class="sk">{m.spec.k}</p>
-            <p class="st serif">{m.spec.title}</p>
-            <dl>
-              {
-                m.spec.rows.map((r) => (
-                  <div>
-                    <dt>{r.k}</dt>
-                    <dd>{r.v}</dd>
-                  </div>
-                ))
-              }
-            </dl>
-          </div>
-          <p class="trad fin" style="--d:8">{m.trad}</p>
-        </div>
-
-        <!-- 3 一轮 -->
-        <div class="frame f2" data-pane="2" hidden>
-          <div class="round">
-            <ol class="row">
-              <li class="fin" style="--d:0"><span class="chip">{m.round.start}</span></li>
-              <li class="fin" style="--d:1"><span class="chip">{m.round.merge}</span></li>
-              <li class="fin" style="--d:2"><span class="chip">{m.round.claim}</span></li>
-              <li class="grow">
-                <span class="blk b1">
-                  <b>{L[1].k}</b>
-                  <small>{m.ticket.map((t) => t.k).join(' → ')}</small>
-                </span>
-              </li>
-              <li class="fin" style="--d:3"><span class="chip">{m.round.end}</span></li>
-            </ol>
-            <p class="retry fin wide" style="--d:4"><span>↻ {m.round.loop}</span></p>
-          </div>
-          <p class="ground">{m.ground}</p>
-        </div>
-
-        <!-- 4 一个需求 -->
-        <div class="frame f3" data-pane="3" hidden>
-          <div class="need">
-            <div class="col fin" style="--d:0">
-              <span class="chip">{m.need.req}</span>
-              <span class="arr">↓</span>
-              <div class="ana">
-                <b>{m.need.ana}</b>
-                <ul>
-                  {m.need.anaV.map((v) => (
-                    <li>{v}</li>
-                  ))}
-                </ul>
+        <!-- 2 地基 Harness -->
+        <div class="frame" data-pane="1" hidden>
+          <div class="harness">
+            <div class="ring fin" style="--d:0">
+              <p class="rk"><b>{m.harness.ring}</b>{m.harness.ringV}</p>
+              <ul class="parts">
+                {m.harness.parts.map((p, i) => (
+                  <li class={`p${i}`}>{p}</li>
+                ))}
+              </ul>
+              <div class="core fin" style="--d:2">
+                <b class="serif">{m.harness.model}</b>
+                <span>{m.harness.modelV}</span>
               </div>
-              <span class="arr">↓</span>
-              <span class="chip">{m.need.slice}</span>
             </div>
-            <span class="arr side fin" style="--d:1">→</span>
-            <ol class="lanes">
+          </div>
+        </div>
+
+        <!-- 3 一张单：上面专业说法，下面同一个过程的真实例子 -->
+        <div class="frame" data-pane="2" hidden>
+          <ol class="pipe vt-ticket">
+            {
+              m.ticket.map((t, i) => (
+                <li class={`fin ${i === 0 ? 'spec-step' : ''} ${i === 3 || i === 4 ? 'gate' : ''} ${i === 5 ? 'done' : ''}`} style={`--d:${i}`}>
+                  <span class="pk">{t.k}</span>
+                  <span class="pe">{t.en}</span>
+                  <span class="px">{t.ex}</span>
+                </li>
+              ))
+            }
+          </ol>
+          <div class="retry fin" style="--d:6" aria-label={m.retry}>
+            <i class="tick" aria-hidden="true" />
+            <span>↻ {m.retry}</span>
+          </div>
+        </div>
+
+        <!-- 4 一个大需求：横着一条线；上一步那张单缩进「定时任务」里（View Transition） -->
+        <div class="frame" data-pane="3" hidden>
+          <div class="flow vt-need">
+            <div class="req">
+              <em>{m.need.project}</em>
+              <b class="serif">{m.need.req}</b>
+            </div>
+            <span class="arr fin" style="--d:1">→</span>
+            <span class="chip hot fin" style="--d:2">{m.need.ana}</span>
+            <span class="arr fin" style="--d:3">→</span>
+            <div class="slices fin" style="--d:4">
+              <p>{m.need.slice}</p>
+              <ol>{[1, 2, 3, 4, 5, 6].map(() => <li />)}</ol>
+            </div>
+            <span class="arr fin" style="--d:5">→</span>
+            <div class="loopbox">
+              <p class="lh"><span class="clock" aria-hidden="true">◷</span>{m.need.loop}<small>{m.need.loopV}</small></p>
+              <div class="one vt-ticket">
+                <span>{m.need.one}</span>
+                <ol aria-hidden="true">
+                  {m.ticket.map((_, i) => (
+                    <li class={i === 0 ? 'spec-step' : i === 3 || i === 4 ? 'gate' : i === 5 ? 'done' : ''} />
+                  ))}
+                </ol>
+              </div>
+              <span class="spin" aria-hidden="true">↻</span>
+            </div>
+            <span class="arr fin" style="--d:7">→</span>
+            <span class="chip done fin" style="--d:8">{m.need.done}</span>
+          </div>
+          <p class="who fin" style="--d:9">
+            <b>{m.need.whoK}</b>
+            {
+              m.need.who.map((w) => (
+                <span>
+                  <i class="serif">{w.ai}</i>
+                  {w.v}
+                </span>
+              ))
+            }
+          </p>
+        </div>
+
+        <!-- 5 一堆需求：先框成一堆 → 分诊 → 一个个 Project（里面全是最小的单）→ 定时任务一直跑 -->
+        <div class="frame" data-pane="4" hidden>
+          <div class="flow">
+            <div class="pile">
+              <em>{m.triage.pile}</em>
+              <ul>
+                {m.triage.sources.map((x) => <li class="chip">{x}</li>)}
+              </ul>
+            </div>
+            <span class="arr fin" style="--d:1">→</span>
+            <div class="butler fin" style="--d:2">
+              <b>{m.triage.butler}</b>
+              <span>{m.triage.butlerV}</span>
+            </div>
+            <span class="arr fin" style="--d:3">→</span>
+            <ul class="projects">
               {
-                m.need.lanes.map((l, i) => (
-                  <li class="grow" style={`--d:${i}`}>
-                    <span class="ln">{l}</span>
-                    <span class="blk b2 mini">
-                      <b>{L[2].k}</b>
-                      <small>◷ → {L[1].k} → ↻</small>
-                    </span>
+                m.triage.projects.map((x, i) => (
+                  <li class={i === 0 ? 'vt-need' : 'fin'} style={`--d:${4 + i}`}>
+                    <em>{x}</em>
+                    <ol>
+                      {Array.from({ length: 6 - i }, () => (
+                        <li />
+                      ))}
+                    </ol>
                   </li>
                 ))
               }
-            </ol>
-            <span class="arr side fin" style="--d:5">→</span>
-            <div class="col fin" style="--d:6">
-              <span class="chip done">{m.need.done}</span>
-              <span class="arr">↓</span>
-              <span class="chip">{m.need.ship}</span>
-            </div>
-          </div>
-          <p class="ground">{m.ground}</p>
-        </div>
-
-        <!-- 5 一支 AI 研发团队 -->
-        <div class="frame f4" data-pane="4" hidden>
-          <div class="team">
-            <ul class="src fin" style="--d:0">
-              {m.team.sources.map((s) => <li class="chip">{s}</li>)}
             </ul>
-            <span class="arr side fin" style="--d:1">→</span>
-            <div class="pool fin" style="--d:1">
-              <p class="ph">
-                <b>{m.team.pool}</b>
-                <span>{m.team.butler}：{m.team.butlerV}</span>
-              </p>
-              <ol class="needs">
-                {
-                  [0, 1, 2].map((i) => (
-                    <li class="blk b3 grow" style={`--d:${i}`}>
-                      <b>{L[3].k}</b>
-                      <span class="bars" aria-hidden="true">
-                        {m.need.lanes.map(() => (
-                          <i />
-                        ))}
-                      </span>
-                    </li>
-                  ))
-                }
-              </ol>
+            <span class="arr fin" style="--d:7">→</span>
+            <div class="loopbox small">
+              <p class="lh"><span class="clock" aria-hidden="true">◷</span>{m.triage.loop}<small>{m.triage.loopV}</small></p>
+              <span class="spin" aria-hidden="true">↻</span>
             </div>
-            <span class="arr side fin" style="--d:4">→</span>
-            <span class="chip done fin" style="--d:5">{m.team.ship}</span>
+            <span class="arr fin" style="--d:9">→</span>
+            <span class="chip done fin" style="--d:10">{m.triage.done}</span>
           </div>
-          <p class="ground">{m.ground}</p>
         </div>
       </div>
 
@@ -193,25 +212,8 @@ const L = m.levels;
         {
           L.map((l, i) => (
             <div class="sp" data-pane={String(i)} hidden={i !== 0}>
-              <p class="lk">第 {i + 1} 层</p>
-              <h3 class="serif">
-                {l.k}
-                <em>{l.tag}</em>
-              </h3>
+              <h3 class="serif">{l.q}</h3>
               <p class="plain">{l.plain}</p>
-              <ul class="pts">
-                {l.points.map((p) => (
-                  <li>{p}</li>
-                ))}
-              </ul>
-              <p class="case">
-                <b>{m.caseK}</b>
-                {l.case}
-              </p>
-              <p class="src">
-                <b>{m.srcK}</b>
-                {l.src}
-              </p>
             </div>
           ))
         }
@@ -219,35 +221,34 @@ const L = m.levels;
       </aside>
     </div>
 
-    <ol class="sum" aria-label="要点">
-      {
-        m.summary.map((s, i) => (
-          <li style={`--d:${i}`}>
-            <b>{s.k}</b>
-            <span>{s.v}</span>
-          </li>
-        ))
-      }
-    </ol>
+    <!-- 每步的例子：固定在底部，单独一条色块 -->
+    {
+      L.map((l, i) => (
+        <div class="ex" data-pane={String(i)} hidden={i !== 0}>
+          <b>{m.caseK}</b>
+          <p>{l.case}</p>
+          {l.src && (
+            <details class="src">
+              <summary>{m.srcK}</summary>
+              <p>{l.src}</p>
+            </details>
+          )}
+        </div>
+      ))
+    }
   </div>
 </section>
 
 <style>
-  .make {
-    --b1: var(--heat-2);
-    --b2: var(--heat-3);
-    --b3: var(--heat-4);
-  }
-
   .body {
     flex: 1;
     min-height: 0;
     display: flex;
     flex-direction: column;
-    gap: clamp(10px, 2vh, 24px);
+    gap: clamp(12px, 2.4vh, 28px);
   }
 
-  /* 顶部时间线 */
+  /* 顶部步骤 */
   .line {
     list-style: none;
     margin: 0;
@@ -297,20 +298,15 @@ const L = m.levels;
   }
 
   .line span {
-    font-size: clamp(15px, 1.35vw, 24px);
+    font-size: clamp(15px, 1.3vw, 23px);
     font-weight: 600;
   }
 
   .line em {
     font-style: normal;
     font-family: var(--mono);
-    font-size: clamp(11px, 0.85vw, 14px);
-    letter-spacing: 0.02em;
+    font-size: clamp(11px, 0.8vw, 14px);
     color: var(--ink-3);
-  }
-
-  .line button[aria-selected='true'] em {
-    color: var(--accent-ink);
   }
 
   .line button.seen {
@@ -326,6 +322,10 @@ const L = m.levels;
     color: var(--ink);
   }
 
+  .line button[aria-selected='true'] em {
+    color: var(--accent-ink);
+  }
+
   .line button[aria-selected='true'] i {
     background: var(--accent);
     border-color: var(--accent);
@@ -338,12 +338,11 @@ const L = m.levels;
     flex: 1;
     min-height: 0;
     display: grid;
-    grid-template-columns: minmax(0, 1.6fr) minmax(280px, 1fr);
-    gap: clamp(20px, 3vw, 56px);
+    grid-template-columns: minmax(0, 1.65fr) minmax(280px, 1fr);
+    gap: clamp(24px, 3.4vw, 64px);
     align-items: center;
   }
 
-  /* 画面 */
   .frame {
     display: flex;
     flex-direction: column;
@@ -358,18 +357,21 @@ const L = m.levels;
   .chip {
     display: inline-flex;
     align-items: center;
+    justify-content: center;
     padding: 0.5em 0.9em;
     border-radius: var(--r-sm);
     border: 1.5px solid var(--line-2);
     background: var(--card);
-    font-size: clamp(14px, 1.35vw, 25px);
+    font-size: clamp(14px, 1.3vw, 24px);
     white-space: nowrap;
   }
 
-  .chip.gate {
-    border-color: var(--ok);
-    color: var(--ok);
+  .chip.hot {
+    border: 2px solid var(--accent);
+    background: var(--accent-soft);
+    color: var(--accent-ink);
     font-weight: 600;
+    box-shadow: 0 0 0 6px var(--accent-glow);
   }
 
   .chip.done {
@@ -378,74 +380,186 @@ const L = m.levels;
     color: var(--bg);
   }
 
-  .row {
-    list-style: none;
-    margin: 0;
-    padding: 0;
-    display: flex;
-    flex-wrap: wrap;
-    align-items: center;
-    gap: 8px 6px;
-  }
-
-  .row > li + li::before {
-    content: '→';
-    margin-right: 6px;
+  .arr {
     color: var(--ink-3);
+    font-size: clamp(14px, 1.2vw, 20px);
   }
 
-  .row > li {
-    display: inline-flex;
-    align-items: center;
+  /* 工具准备：类型 × 入门 / 进阶 */
+  .tools {
+    width: 100%;
+    border-collapse: collapse;
   }
 
-  .retry {
-    margin: 0;
-    height: 26px;
-    border: 2px dashed var(--accent);
-    border-top: 0;
-    border-radius: 0 0 var(--r) var(--r);
-    margin-left: 22%;
-    margin-right: 22%;
-    position: relative;
+  .tools th,
+  .tools td {
+    padding: clamp(10px, 1.6vh, 18px) clamp(10px, 1.2vw, 20px);
+    border-bottom: 1px solid var(--line);
+    text-align: left;
+    vertical-align: baseline;
   }
 
-  .retry.wide {
-    margin-left: 4%;
-    margin-right: 10%;
+  .tools thead th {
+    padding-top: 0;
+    font-size: clamp(12px, 0.95vw, 15px);
+    font-weight: 500;
+    letter-spacing: 0.08em;
+    color: var(--ink-3);
+    border-bottom: 1.5px solid var(--line-2);
   }
 
-  .retry span {
-    position: absolute;
-    left: 50%;
-    bottom: -0.8em;
-    transform: translateX(-50%);
-    padding: 0 10px;
-    background: var(--bg);
+  .tools thead th:last-child {
     color: var(--accent-ink);
-    font-size: clamp(13px, 1.1vw, 18px);
+  }
+
+  .tools tbody th {
+    width: 26%;
+    font-size: clamp(15px, 1.25vw, 22px);
+    font-weight: 500;
+    color: var(--ink-2);
     white-space: nowrap;
   }
 
-  .ground {
-    margin: clamp(10px, 2vh, 24px) 0 0;
-    padding: 10px 16px;
-    border-radius: var(--r-sm);
-    background: var(--bg-2);
-    border-top: 3px solid var(--ink-3);
-    font-size: clamp(14px, 1.2vw, 21px);
-    color: var(--ink-2);
-    text-align: center;
+  .tools tbody th em {
+    margin-left: 8px;
+    padding: 1px 8px;
+    border: 1px dashed var(--ink-3);
+    border-radius: var(--r-pill);
+    font-style: normal;
+    font-size: 0.7em;
+    color: var(--ink-3);
   }
 
-  /* 一张单：专业说法一行，下面每一步一句大白话 */
+  .tools td b {
+    display: inline-block;
+    margin-right: clamp(12px, 1.2vw, 22px);
+    font-size: clamp(20px, 2vw, 36px);
+    font-weight: 600;
+    line-height: 1.2;
+  }
+
+  .tools td.pro b {
+    color: var(--accent-ink);
+  }
+
+  .tools td.same span {
+    font-size: clamp(13px, 1.05vw, 17px);
+    color: var(--ink-3);
+  }
+
+  .links {
+    margin: 0;
+    display: flex;
+    flex-wrap: wrap;
+    align-items: baseline;
+    gap: 4px 14px;
+    font-size: 14px;
+  }
+
+  .links b {
+    font-weight: 500;
+    color: var(--ink-3);
+  }
+
+  .links a {
+    color: var(--ink-2);
+    text-decoration: none;
+    border-bottom: 1px solid var(--line-2);
+  }
+
+  .links a:hover {
+    color: var(--accent-ink);
+  }
+
+  /* 地基：模型在中间，Harness 是一圈 */
+  .harness {
+    display: grid;
+    place-items: center;
+  }
+
+  .ring {
+    position: relative;
+    width: min(100%, 62vh);
+    aspect-ratio: 1.35;
+    border-radius: 50%;
+    border: 3px dashed var(--accent);
+    background: var(--accent-soft);
+    display: grid;
+    place-items: center;
+  }
+
+  .rk {
+    position: absolute;
+    top: 7%;
+    left: 50%;
+    transform: translateX(-50%);
+    margin: 0;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    color: var(--accent-ink);
+    font-size: clamp(13px, 1.1vw, 19px);
+    white-space: nowrap;
+  }
+
+  .rk b {
+    font-family: var(--mono);
+    font-size: clamp(18px, 1.7vw, 30px);
+  }
+
+  .parts {
+    list-style: none;
+    margin: 0;
+    padding: 0;
+  }
+
+  .parts li {
+    position: absolute;
+    padding: 0.35em 0.8em;
+    border-radius: var(--r-pill);
+    background: var(--card);
+    border: 1.5px solid var(--accent);
+    font-size: clamp(14px, 1.3vw, 24px);
+    white-space: nowrap;
+    transform: translate(-50%, -50%);
+  }
+
+  .p0 { left: 14%; top: 42%; }
+  .p1 { left: 86%; top: 42%; }
+  .p2 { left: 24%; top: 80%; }
+  .p3 { left: 76%; top: 80%; }
+
+  .core {
+    width: 34%;
+    aspect-ratio: 1;
+    border-radius: 50%;
+    background: var(--ink);
+    color: var(--bg);
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    gap: 2px;
+    box-shadow: var(--shadow);
+  }
+
+  .core b {
+    font-size: clamp(22px, 2.4vw, 44px);
+  }
+
+  .core span {
+    font-size: clamp(12px, 1vw, 17px);
+    opacity: 0.8;
+  }
+
+  /* 一张单：每一步下面直接是例子 */
   .pipe {
     list-style: none;
     margin: 0;
     padding: 0;
     display: grid;
     grid-template-columns: repeat(6, minmax(0, 1fr));
-    gap: 8px;
+    gap: 10px;
   }
 
   .pipe li {
@@ -453,7 +567,7 @@ const L = m.levels;
     display: flex;
     flex-direction: column;
     gap: 4px;
-    padding: 10px 12px 12px;
+    padding: 12px 12px 14px;
     border: 1.5px solid var(--line-2);
     border-radius: var(--r-sm);
     background: var(--card);
@@ -462,8 +576,8 @@ const L = m.levels;
   .pipe li + li::before {
     content: '→';
     position: absolute;
-    left: -8px;
-    top: 14px;
+    left: -5px;
+    top: 16px;
     transform: translateX(-50%);
     font-size: 13px;
     color: var(--ink-3);
@@ -478,14 +592,16 @@ const L = m.levels;
   .pe {
     font-family: var(--mono);
     font-size: clamp(10px, 0.78vw, 13px);
-    color: var(--accent-ink);
+    color: var(--ink-3);
   }
 
-  .pv {
-    margin-top: 4px;
-    font-size: clamp(12px, 0.95vw, 16px);
+  .px {
+    margin-top: 10px;
+    padding-top: 10px;
+    border-top: 1px dashed var(--line-2);
+    font-size: clamp(13px, 1.05vw, 18px);
     line-height: 1.45;
-    color: var(--ink-2);
+    color: var(--accent-ink);
   }
 
   .pipe .spec-step {
@@ -507,321 +623,338 @@ const L = m.levels;
     color: var(--bg);
   }
 
-  .pipe .done .pv,
-  .pipe .done .pe {
+  .pipe .done .pe,
+  .pipe .done .px {
     color: var(--bg);
-    opacity: 0.8;
+    opacity: 0.85;
   }
 
-  .ticket .retry {
-    margin-left: 25%;
-    margin-right: 25%;
+  /* 打回：评审（第 4 格）和门禁（第 5 格）各伸下来一根，连回 AI 开发（第 2 格） */
+  .retry {
+    position: relative;
+    height: 30px;
+    margin: -6px calc(100% / 12 * 3 - 5px) 8px calc(100% / 12 * 3 - 5px);
+    border: 2px dashed var(--accent);
+    border-top: 0;
+    border-radius: 0 0 var(--r) var(--r);
   }
 
-  .spec {
-    padding: clamp(14px, 1.4vw, 22px) clamp(16px, 1.8vw, 28px);
+  .retry::before {
+    content: '▲';
+    position: absolute;
+    left: -7px;
+    top: -10px;
+    font-size: 10px;
+    color: var(--accent);
+  }
+
+  .retry .tick {
+    position: absolute;
+    left: calc(200% / 3);
+    top: 0;
+    bottom: 0;
+    border-left: 2px solid var(--accent);
+    opacity: 0.6;
+  }
+
+  .retry span {
+    position: absolute;
+    left: 33%;
+    bottom: -0.8em;
+    transform: translateX(-50%);
+    padding: 0 10px;
+    background: var(--bg);
+    color: var(--accent-ink);
+    font-size: clamp(13px, 1.1vw, 18px);
+    font-weight: 600;
+    white-space: nowrap;
+  }
+
+  /* 一个大需求 / 一堆需求：横着一条线 */
+  .flow {
+    display: flex;
+    flex-wrap: wrap;
+    align-items: center;
+    gap: 12px clamp(6px, 0.8vw, 14px);
+  }
+
+  .req,
+  .pile {
+    display: flex;
+    flex-direction: column;
+    gap: 6px;
+    padding: clamp(10px, 1vw, 18px) clamp(12px, 1.2vw, 20px);
     border-radius: var(--r);
-    border: 1px solid var(--line);
-    border-left: 4px solid var(--accent);
+    border: 2px solid var(--ink);
     background: var(--card);
-    box-shadow: var(--shadow);
   }
 
-  .spec p {
-    margin: 0;
-  }
-
-  .sk {
-    font-size: 12px;
-    letter-spacing: 0.08em;
+  .req em,
+  .pile em,
+  .projects em {
+    font-style: normal;
+    font-family: var(--mono);
+    font-size: clamp(11px, 0.85vw, 14px);
+    letter-spacing: 0.04em;
     color: var(--ink-3);
   }
 
-  .st {
-    margin: 2px 0 10px !important;
-    font-size: clamp(20px, 1.7vw, 30px);
+  .req b {
+    font-size: clamp(18px, 1.6vw, 30px);
     font-weight: 600;
+    white-space: nowrap;
   }
 
-  .spec dl {
+  /* 一堆需求先框起来：虚线框表示「这是一堆」 */
+  .pile {
+    border-style: dashed;
+  }
+
+  .pile ul {
+    list-style: none;
     margin: 0;
-    display: grid;
+    padding: 0;
+    display: flex;
+    flex-direction: column;
     gap: 6px;
   }
 
-  .spec dl div {
+  .pile .chip {
+    font-size: clamp(13px, 1.05vw, 19px);
+  }
+
+  .slices p,
+  .lh {
+    margin: 0 0 6px;
+    font-size: clamp(13px, 1.05vw, 18px);
+    color: var(--ink-2);
+    white-space: nowrap;
+  }
+
+  .slices ol,
+  .projects ol,
+  .one ol {
+    list-style: none;
+    margin: 0;
+    padding: 0;
+    display: flex;
+    gap: 4px;
+  }
+
+  .slices ol {
     display: grid;
-    grid-template-columns: 3.2em 1fr;
-    gap: 10px;
-    align-items: baseline;
+    grid-template-columns: repeat(3, 1fr);
   }
 
-  .spec dt {
-    font-weight: 600;
-    color: var(--accent-ink);
-    font-size: clamp(14px, 1.15vw, 19px);
+  .slices li,
+  .projects ol li {
+    width: clamp(14px, 1.3vw, 24px);
+    aspect-ratio: 1;
+    border-radius: 3px;
+    background: var(--heat-2);
   }
 
-  .spec dd {
-    margin: 0;
-    font-size: clamp(14px, 1.15vw, 19px);
-    color: var(--ink-2);
-  }
-
-  .trad {
-    margin: 0;
-    font-family: var(--serif);
-    font-size: clamp(16px, 1.4vw, 24px);
-    color: var(--ink-2);
-  }
-
-  /* 一个需求：需求分析是重点 */
-  .ana {
-    padding: 0.7em 1em;
+  .loopbox {
+    position: relative;
+    padding: clamp(10px, 1vw, 16px);
     border-radius: var(--r);
     border: 2px solid var(--accent);
     background: var(--accent-soft);
     box-shadow: 0 0 0 6px var(--accent-glow);
-    text-align: center;
   }
 
-  .ana b {
-    display: block;
-    font-size: clamp(16px, 1.5vw, 26px);
+  .lh {
+    display: flex;
+    align-items: baseline;
+    gap: 6px;
+    font-weight: 600;
     color: var(--accent-ink);
+  }
+
+  .lh small {
+    font-weight: 400;
+    font-size: 0.85em;
+    color: var(--ink-2);
+  }
+
+  .clock {
+    font-size: 1.1em;
+  }
+
+  .one {
+    display: flex;
+    flex-direction: column;
+    gap: 8px;
+    padding: 10px 12px;
+    border: 1.5px solid var(--line-2);
+    border-radius: var(--r-sm);
+    background: var(--card);
+  }
+
+  .one span {
+    font-size: clamp(14px, 1.2vw, 21px);
+    font-weight: 600;
     white-space: nowrap;
   }
 
-  .ana ul {
-    list-style: none;
-    margin: 6px 0 0;
-    padding: 0;
+  .one li {
+    width: clamp(12px, 1vw, 18px);
+    height: clamp(12px, 1vw, 18px);
+    border-radius: 3px;
+    border: 1.5px solid var(--line-2);
+    background: var(--card);
+  }
+
+  .one li.spec-step {
+    border-color: var(--accent);
+    background: var(--accent-soft);
+  }
+
+  .one li.gate {
+    border-color: var(--ok);
+  }
+
+  .one li.done {
+    border-color: var(--ink);
+    background: var(--ink);
+  }
+
+  .spin {
+    position: absolute;
+    right: -0.55em;
+    bottom: -0.55em;
+    display: grid;
+    place-items: center;
+    width: 1.5em;
+    height: 1.5em;
+    border-radius: 50%;
+    background: var(--bg);
+    font-size: clamp(18px, 1.6vw, 28px);
+    line-height: 1;
+    color: var(--accent);
+  }
+
+  .frame:not([hidden]) .spin {
+    animation: make-spin 2.4s linear infinite;
+  }
+
+  @keyframes make-spin {
+    to {
+      transform: rotate(360deg);
+    }
+  }
+
+  .who {
+    margin: clamp(14px, 3vh, 36px) 0 0;
+    display: flex;
+    flex-wrap: wrap;
+    align-items: baseline;
+    gap: 8px clamp(16px, 2vw, 36px);
+    font-size: clamp(14px, 1.15vw, 20px);
+    color: var(--ink-2);
+  }
+
+  .who b {
+    font-weight: 500;
+    font-size: 0.85em;
+    letter-spacing: 0.04em;
+    color: var(--ink-3);
+  }
+
+  .who i {
+    margin-right: 8px;
+    font-style: normal;
+    font-size: 1.35em;
+    font-weight: 600;
+    color: var(--ink);
+  }
+
+  .butler {
     display: flex;
     flex-direction: column;
-    gap: 2px;
+    gap: 4px;
+    max-width: 9em;
+    padding: 0.8em 1em;
+    border-radius: var(--r);
+    border: 2px solid var(--ink);
+    background: var(--card);
+  }
+
+  .butler b {
+    font-size: clamp(18px, 1.7vw, 30px);
+    white-space: nowrap;
+  }
+
+  .butler span {
     font-size: clamp(12px, 1vw, 17px);
     color: var(--ink-2);
   }
 
-  /* 色块：上一层缩成的那一块 */
-  .blk {
-    display: inline-flex;
-    flex-direction: column;
-    gap: 4px;
-    padding: 0.7em 1em;
-    border-radius: var(--r);
-    color: var(--ink);
-    box-shadow: var(--shadow);
-  }
-
-  .blk b {
-    font-size: clamp(18px, 1.9vw, 34px);
-  }
-
-  .blk small {
-    max-width: 15em;
-    font-size: clamp(12px, 0.95vw, 16px);
-    line-height: 1.4;
-    opacity: 0.85;
-  }
-
-  .b1 {
-    background: var(--b1);
-  }
-  .b2 {
-    background: var(--b2);
-    color: var(--bg);
-  }
-  .b3 {
-    background: var(--b3);
-    color: var(--bg);
-  }
-
-  /* 地基 */
-  .base {
-    display: grid;
-    grid-template-columns: 1fr 1fr;
-    gap: clamp(10px, 1.4vw, 22px);
-  }
-
-  .bc {
-    padding: clamp(16px, 2vw, 34px);
-    border: 1px solid var(--line);
-    border-radius: var(--r);
-    background: var(--card);
-    box-shadow: var(--shadow);
-  }
-
-  .bc p {
-    margin: 0;
-  }
-
-  .bk {
-    font-size: clamp(24px, 2.4vw, 44px);
-    font-weight: 600;
-    margin-bottom: 10px !important;
-  }
-
-  .tags {
-    display: flex;
-    flex-wrap: wrap;
-    gap: 6px;
-  }
-
-  .tags span {
-    padding: 3px 10px;
-    border-radius: var(--r-pill);
-    background: var(--accent-soft);
-    color: var(--accent-ink);
-    font-size: clamp(14px, 1.3vw, 23px);
-  }
-
-  .links {
-    display: flex;
-    flex-wrap: wrap;
-    gap: 4px 12px;
-    margin-top: 10px !important;
-  }
-
-  .links a {
-    font-size: 13px;
-    color: var(--ink-3);
-    text-decoration: none;
-    border-bottom: 1px solid var(--line-2);
-  }
-
-  .links a:hover {
-    color: var(--accent-ink);
-  }
-
-  /* 一个需求 */
-  .need,
-  .team {
-    display: flex;
-    align-items: center;
-    gap: clamp(8px, 1vw, 16px);
-  }
-
-  .col {
-    display: flex;
-    flex-direction: column;
-    align-items: center;
-    gap: 4px;
-  }
-
-  .arr {
-    color: var(--ink-3);
-    font-size: clamp(14px, 1.2vw, 20px);
-  }
-
-  .lanes {
-    list-style: none;
-    margin: 0;
-    padding: 0;
-    flex: 1;
-    display: flex;
-    flex-direction: column;
-    gap: 6px;
-  }
-
-  .lanes li {
-    display: grid;
-    grid-template-columns: 7.5em 1fr;
-    align-items: center;
-    gap: 12px;
-  }
-
-  .lanes {
-    gap: 10px;
-  }
-
-  .ln {
-    font-size: clamp(13px, 1.15vw, 20px);
-    color: var(--ink-2);
-  }
-
-  .blk.mini {
-    padding: 0.6em 1em;
-    flex-direction: row;
-    align-items: baseline;
-    gap: 10px;
-  }
-
-  .blk.mini b {
-    font-size: clamp(16px, 1.5vw, 26px);
-  }
-
-  /* 一支团队 */
-  .src {
+  .projects {
     list-style: none;
     margin: 0;
     padding: 0;
     display: flex;
     flex-direction: column;
-    gap: 6px;
+    gap: 8px;
   }
 
-  .pool {
-    flex: 1;
-    border: 1.5px solid var(--ink-3);
-    border-radius: var(--r);
-    overflow: hidden;
+  .projects > li {
+    display: flex;
+    flex-direction: column;
+    gap: 6px;
+    padding: 8px 10px;
+    border: 1.5px solid var(--line-2);
+    border-radius: var(--r-sm);
     background: var(--card);
   }
 
-  .ph {
-    margin: 0;
-    padding: 8px 14px;
-    background: var(--bg-2);
-    border-bottom: 1px solid var(--line);
-    display: flex;
-    flex-wrap: wrap;
-    gap: 4px 12px;
-    align-items: baseline;
+  /* Project A 就是上一步那一整套，描深一点 */
+  .projects > li.vt-need {
+    border-color: var(--ink);
   }
 
-  .ph b {
-    font-size: clamp(16px, 1.5vw, 26px);
+  .loopbox.small {
+    padding: clamp(14px, 1.4vw, 24px) clamp(12px, 1.2vw, 20px);
   }
 
-  .ph span {
-    font-size: clamp(13px, 1.1vw, 19px);
-    color: var(--accent-ink);
-  }
-
-  .needs {
-    list-style: none;
-    margin: 0;
-    padding: 16px;
-    display: grid;
-    grid-template-columns: repeat(3, 1fr);
-    gap: 10px;
-  }
-
-  .needs .blk b {
-    font-size: clamp(15px, 1.35vw, 24px);
-    white-space: nowrap;
-  }
-
-  .bars {
-    display: flex;
+  .loopbox.small .lh {
     flex-direction: column;
-    gap: 3px;
-    margin-top: 4px;
+    align-items: center;
+    margin: 0;
+    font-size: clamp(16px, 1.4vw, 24px);
   }
 
-  .bars {
-    gap: 5px;
-    margin-top: 8px;
+  /* View Transition：只在相邻两步之间命名，同名元素从上一步变形过来 */
+  [data-vt-pair='2-3'] .vt-ticket {
+    view-transition-name: mk-ticket;
   }
 
-  .bars i {
-    height: 10px;
-    border-radius: 4px;
-    background: var(--b2);
+  [data-vt-pair='3-4'] .vt-need {
+    view-transition-name: mk-need;
   }
 
-  /* 右边 */
+  ::view-transition-group(mk-ticket),
+  ::view-transition-group(mk-need) {
+    animation-duration: 0.7s;
+    animation-timing-function: var(--ease);
+  }
+
+  ::view-transition-old(mk-ticket),
+  ::view-transition-new(mk-ticket) {
+    height: 100%;
+    object-fit: fill;
+  }
+
+  /* 整条流水线缩成一个 Project：保持比例，不压扁 */
+  ::view-transition-old(mk-need),
+  ::view-transition-new(mk-need) {
+    width: 100%;
+    height: 100%;
+    object-fit: contain;
+  }
+
+  /* 右边：一个问题、一句大白话、一个例子 */
   .side {
     display: flex;
     flex-direction: column;
@@ -832,139 +965,91 @@ const L = m.levels;
     margin: 0;
   }
 
-  .lk {
-    font-size: 14px;
-    letter-spacing: 0.06em;
-    color: var(--accent-ink);
-  }
-
-  .sp h3 em {
-    margin-left: 0.4em;
-    font-style: normal;
-    font-family: var(--mono);
-    font-size: 0.42em;
-    font-weight: 500;
-    color: var(--accent-ink);
-    vertical-align: middle;
+  .sp h3 {
+    margin: 0 0 14px;
+    font-size: clamp(28px, 2.6vw, 46px);
+    font-weight: 600;
+    line-height: 1.15;
   }
 
   .plain {
-    margin: 0 0 14px !important;
-    padding: 8px 12px;
-    border-radius: var(--r-sm);
-    background: var(--bg-2);
-    font-size: clamp(14px, 1.15vw, 19px);
-    line-height: 1.5;
+    margin: 0 !important;
     color: var(--ink-2);
+    font-size: clamp(17px, 1.5vw, 26px);
+    line-height: 1.5;
   }
 
-  .sp h3 {
-    margin: 2px 0 10px;
-    font-size: clamp(30px, 3vw, 54px);
-    font-weight: 600;
-    line-height: 1.1;
-  }
-
-  .pts {
-    margin: 0 0 14px;
-    padding-left: 1.1em;
+  /* 底部例子色块 */
+  .ex {
     display: flex;
-    flex-direction: column;
-    gap: 6px;
+    align-items: baseline;
+    gap: 8px clamp(12px, 1.4vw, 24px);
+    padding: clamp(10px, 1.6vh, 18px) clamp(16px, 1.6vw, 28px);
+    border-radius: var(--r);
+    background: var(--accent-soft);
+    color: var(--ink);
   }
 
-  .pts li {
-    font-size: clamp(16px, 1.45vw, 25px);
+  .ex[hidden] {
+    display: none;
+  }
+
+  .ex > b {
+    flex: none;
+    padding: 2px 10px;
+    border-radius: var(--r-pill);
+    background: var(--accent);
+    color: var(--bg);
+    font-size: clamp(12px, 0.95vw, 15px);
+    font-weight: 600;
+    letter-spacing: 0.08em;
+  }
+
+  .ex > p {
+    flex: 1;
+    margin: 0;
+    font-size: clamp(16px, 1.35vw, 24px);
     line-height: 1.45;
   }
 
-  .pts li::marker {
-    color: var(--accent);
-  }
-
-  .case,
-  .src {
-    padding-left: 12px;
-    border-left: 3px solid var(--accent);
-    font-size: clamp(14px, 1.15vw, 19px);
-    line-height: 1.5;
-    color: var(--ink-2);
-  }
-
-  .src {
-    margin-top: 10px !important;
-    border-left-color: var(--line-2);
+  details.src {
+    position: relative;
+    flex: none;
     font-size: clamp(12px, 0.95vw, 15px);
     color: var(--ink-3);
   }
 
-  .case b,
-  .src b {
-    display: block;
-    font-size: 12px;
-    font-weight: 500;
+  details.src summary {
+    cursor: pointer;
     letter-spacing: 0.08em;
-    color: var(--ink-3);
   }
 
-  /* 最后一层：要点条 */
-  .sum {
-    list-style: none;
+  details.src summary:focus-visible {
+    outline: 2px solid var(--accent);
+    outline-offset: 2px;
+  }
+
+  /* 依据向上弹出，不把色块撑高 */
+  details.src p {
+    position: absolute;
+    right: 0;
+    bottom: calc(100% + 10px);
+    width: min(36em, 60vw);
     margin: 0;
-    padding: 12px 0 0;
-    border-top: 1px solid var(--line);
-    display: grid;
-    grid-template-columns: repeat(5, minmax(0, 1fr));
-    gap: 12px;
-    visibility: hidden;
-  }
-
-  [data-at='4'] .sum {
-    visibility: visible;
-  }
-
-  [data-at='4'] .sum li {
-    animation: make-fin 0.4s ease both;
-    animation-delay: calc(0.6s + var(--d) * 0.08s);
-  }
-
-  .sum li {
-    display: flex;
-    flex-direction: column;
-    gap: 2px;
-  }
-
-  .sum b {
-    font-size: clamp(14px, 1.2vw, 20px);
-    color: var(--accent-ink);
-  }
-
-  .sum span {
-    font-size: clamp(13px, 1.05vw, 18px);
+    padding: 12px 14px;
+    border: 1px solid var(--line);
+    border-radius: var(--r-sm);
+    background: var(--card);
+    box-shadow: var(--shadow);
+    line-height: 1.55;
     color: var(--ink-2);
+    z-index: 5;
   }
 
-  /* 翻页动效：上一层从大缩成色块，其余元素随后淡入 */
-  .frame:not([hidden]) .grow {
-    animation: make-collapse 0.7s cubic-bezier(0.2, 0.8, 0.2, 1) both;
-    animation-delay: calc(var(--d, 0) * 0.06s);
-  }
-
+  /* 翻页动效：元素错峰淡入 */
   .frame:not([hidden]) .fin {
-    animation: make-fin 0.45s ease both;
-    animation-delay: calc(0.35s + var(--d, 0) * 0.06s);
-  }
-
-
-  @keyframes make-collapse {
-    from {
-      opacity: 0;
-      transform: scale(2.4);
-    }
-    to {
-      opacity: 1;
-      transform: none;
-    }
+    animation: make-fin 0.45s var(--ease) both;
+    animation-delay: calc(0.2s + var(--d, 0) * 0.07s);
   }
 
   @keyframes make-fin {
@@ -978,39 +1063,64 @@ const L = m.levels;
     .main {
       grid-template-columns: 1fr;
     }
+    .line {
+      grid-template-columns: repeat(3, minmax(0, 1fr));
+      row-gap: 12px;
+    }
+    .line::before {
+      display: none;
+    }
     .line span {
-      font-size: 12px;
+      font-size: 13px;
     }
     .pipe {
       grid-template-columns: 1fr 1fr;
     }
-    .pipe li + li::before {
+    .tools td b {
+      font-size: 17px;
+    }
+    .tools tbody th {
+      white-space: normal;
+    }
+    .pipe li + li::before,
+    .retry::before,
+    .retry .tick {
       display: none;
     }
-    .need,
-    .team {
+    /* 手机上不画回路线，只留打回说明 */
+    .retry {
+      height: auto;
+      margin: 0;
+      border: 0;
+    }
+    .retry span {
+      position: static;
+      transform: none;
+      padding: 0;
+      white-space: normal;
+    }
+    .flow {
       flex-direction: column;
       align-items: stretch;
     }
-    .arr.side {
+    .flow > .arr {
       transform: rotate(90deg);
       align-self: center;
     }
-    .needs {
-      grid-template-columns: 1fr;
+    .slices ol {
+      display: flex;
     }
-    .sum {
-      grid-template-columns: 1fr 1fr;
+    .ring {
+      width: 100%;
     }
-    .base {
-      grid-template-columns: 1fr;
+    .parts li {
+      font-size: 12px;
     }
   }
 
   @media (prefers-reduced-motion: reduce) {
-    .frame .grow,
     .frame .fin,
-    .sum li {
+    .frame .spin {
       animation: none !important;
     }
   }
