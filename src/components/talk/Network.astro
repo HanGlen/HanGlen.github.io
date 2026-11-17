@@ -18,7 +18,6 @@ const pct = (v: number, of: number) => `${(v / of) * 100}%`;
   <header class="head">
     <p class="no">{m.no}</p>
     <h2 id="me-title">{m.title}</h2>
-    <p class="lead">{m.lead}</p>
   </header>
 
   <div class="body t-body">
@@ -48,7 +47,7 @@ const pct = (v: number, of: number) => `${(v / of) * 100}%`;
           nodes.map((n, i) => (
             <button
               type="button"
-              class={`node g-${n.group} st-${n.status}`}
+              class={`node g-${n.group} st-${n.status} ${n.lab ? `lab-${n.lab}` : ''}`}
               style={`left:${pct(n.x, 1000)};top:${pct(n.y, 760)};--d:${0.25 + i * 0.05}s`}
               data-node={n.id}
               aria-label={`${n.title}：${n.lines.join('')}`}
@@ -311,8 +310,21 @@ const pct = (v: number, of: number) => `${(v / of) * 100}%`;
     font-size: clamp(14px, 1.95cqw, 22px);
     font-weight: 600;
     line-height: 1.25;
-    white-space: nowrap;
+    white-space: pre;
+    text-align: center;
     text-shadow: 0 0 4px var(--bg), 0 0 8px var(--bg), 0 0 12px var(--bg);
+  }
+
+  .lab-top .lab {
+    top: auto;
+    bottom: calc(100% + 6px);
+  }
+
+  .lab-right .lab {
+    left: calc(100% + 10px);
+    top: 50%;
+    transform: translateY(-50%);
+    text-align: left;
   }
 
   .st-idea .lab {

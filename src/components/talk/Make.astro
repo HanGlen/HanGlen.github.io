@@ -1,9 +1,10 @@
 ---
 /**
  * 演讲 03「怎么做出来」：工具准备 → 地基 Harness → 一张单 → 一个大需求（Project + 定时任务）→ 一堆需求（分诊）。
- * 顶上是步骤 tab，← → 下一步；左边一张图，右边只放一个问题、一句大白话、一个例子，依据点开才看（渐进披露）。
- * 3 → 4、4 → 5 用 View Transition 串起来：同名的 view-transition-name 元素从上一步的位置变形到下一步
- * （整条「一张单」流水线缩进定时任务里；一个大需求变成框起来的一堆需求）。
+ * 顶上是步骤 tab，← → 下一步；左边一张图，右边只放两层：一个问题、一句备注。
+ * 每步的例子统一放在底部一条独立色块里，依据在色块右边点开才看（渐进披露）。
+ * 3 → 4、4 → 5 用 View Transition 串起来（data-vt 列出哪两步之间变形，切换时写进 data-vt-pair）：
+ * 3 → 4 整条「一张单」流水线缩进定时任务里；4 → 5 整条「一个大需求」缩成一堆需求里的 Project A。
  */
 import { talk } from '../../i18n/talk';
 
@@ -18,7 +19,7 @@ const L = m.levels;
     <p class="lead">{m.lead}</p>
   </header>
 
-  <div class="body t-body" data-stepper data-vt>
+  <div class="body t-body" data-stepper data-vt="2-3 3-4">
     <ol class="line" role="tablist" aria-label={m.title}>
       {
         L.map((l, i) => (
@@ -107,8 +108,7 @@ const L = m.levels;
 
         <!-- 3 一张单：上面专业说法，下面同一个过程的真实例子 -->
         <div class="frame" data-pane="2" hidden>
-          <p class="exk fin">{m.exK}</p>
-          <ol class="pipe" style="view-transition-name: mk-ticket">
+          <ol class="pipe vt-ticket">
             {
               m.ticket.map((t, i) => (
                 <li class={`fin ${i === 0 ? 'spec-step' : ''} ${i === 3 || i === 4 ? 'gate' : ''} ${i === 5 ? 'done' : ''}`} style={`--d:${i}`}>
@@ -127,8 +127,8 @@ const L = m.levels;
 
         <!-- 4 一个大需求：横着一条线；上一步那张单缩进「定时任务」里（View Transition） -->
         <div class="frame" data-pane="3" hidden>
-          <div class="flow">
-            <div class="req" style="view-transition-name: mk-req">
+          <div class="flow vt-need">
+            <div class="req">
               <em>{m.need.project}</em>
               <b class="serif">{m.need.req}</b>
             </div>
@@ -140,9 +140,9 @@ const L = m.levels;
               <ol>{[1, 2, 3, 4, 5, 6].map(() => <li />)}</ol>
             </div>
             <span class="arr fin" style="--d:5">→</span>
-            <div class="loopbox" style="view-transition-name: mk-loop">
+            <div class="loopbox">
               <p class="lh"><span class="clock" aria-hidden="true">◷</span>{m.need.loop}<small>{m.need.loopV}</small></p>
-              <div class="one" style="view-transition-name: mk-ticket">
+              <div class="one vt-ticket">
                 <span>{m.need.one}</span>
                 <ol aria-hidden="true">
                   {m.ticket.map((_, i) => (
@@ -171,7 +171,7 @@ const L = m.levels;
         <!-- 5 一堆需求：先框成一堆 → 分诊 → 一个个 Project（里面全是最小的单）→ 定时任务一直跑 -->
         <div class="frame" data-pane="4" hidden>
           <div class="flow">
-            <div class="pile" style="view-transition-name: mk-req">
+            <div class="pile">
               <em>{m.triage.pile}</em>
               <ul>
                 {m.triage.sources.map((x) => <li class="chip">{x}</li>)}
@@ -186,7 +186,7 @@ const L = m.levels;
             <ul class="projects">
               {
                 m.triage.projects.map((x, i) => (
-                  <li class="fin" style={`--d:${4 + i}`}>
+                  <li class={i === 0 ? 'vt-need' : 'fin'} style={`--d:${4 + i}`}>
                     <em>{x}</em>
                     <ol>
                       {Array.from({ length: 6 - i }, () => (
@@ -198,7 +198,7 @@ const L = m.levels;
               }
             </ul>
             <span class="arr fin" style="--d:7">→</span>
-            <div class="loopbox small" style="view-transition-name: mk-loop">
+            <div class="loopbox small">
               <p class="lh"><span class="clock" aria-hidden="true">◷</span>{m.triage.loop}<small>{m.triage.loopV}</small></p>
               <span class="spin" aria-hidden="true">↻</span>
             </div>
@@ -212,27 +212,30 @@ const L = m.levels;
         {
           L.map((l, i) => (
             <div class="sp" data-pane={String(i)} hidden={i !== 0}>
-              <p class="lk">
-                {l.k} · <span>{l.tag}</span>
-              </p>
               <h3 class="serif">{l.q}</h3>
               <p class="plain">{l.plain}</p>
-              <p class="case">
-                <b>{m.caseK}</b>
-                {l.case}
-              </p>
-              {l.src && (
-                <details class="src">
-                  <summary>{m.srcK}</summary>
-                  {l.src}
-                </details>
-              )}
             </div>
           ))
         }
         <p class="t-hint">{m.hint}</p>
       </aside>
     </div>
+
+    <!-- 每步的例子：固定在底部，单独一条色块 -->
+    {
+      L.map((l, i) => (
+        <div class="ex" data-pane={String(i)} hidden={i !== 0}>
+          <b>{m.caseK}</b>
+          <p>{l.case}</p>
+          {l.src && (
+            <details class="src">
+              <summary>{m.srcK}</summary>
+              <p>{l.src}</p>
+            </details>
+          )}
+        </div>
+      ))
+    }
   </div>
 </section>
 
@@ -550,12 +553,6 @@ const L = m.levels;
   }
 
   /* 一张单：每一步下面直接是例子 */
-  .exk {
-    margin: 0;
-    font-size: clamp(13px, 1.05vw, 17px);
-    color: var(--ink-3);
-  }
-
   .pipe {
     list-style: none;
     margin: 0;
@@ -912,6 +909,11 @@ const L = m.levels;
     background: var(--card);
   }
 
+  /* Project A 就是上一步那一整套，描深一点 */
+  .projects > li.vt-need {
+    border-color: var(--ink);
+  }
+
   .loopbox.small {
     padding: clamp(14px, 1.4vw, 24px) clamp(12px, 1.2vw, 20px);
   }
@@ -923,20 +925,33 @@ const L = m.levels;
     font-size: clamp(16px, 1.4vw, 24px);
   }
 
-  /* View Transition：同名元素从上一步变形过来 */
+  /* View Transition：只在相邻两步之间命名，同名元素从上一步变形过来 */
+  [data-vt-pair='2-3'] .vt-ticket {
+    view-transition-name: mk-ticket;
+  }
+
+  [data-vt-pair='3-4'] .vt-need {
+    view-transition-name: mk-need;
+  }
+
   ::view-transition-group(mk-ticket),
-  ::view-transition-group(mk-req),
-  ::view-transition-group(mk-loop) {
-    animation-duration: 0.65s;
+  ::view-transition-group(mk-need) {
+    animation-duration: 0.7s;
     animation-timing-function: var(--ease);
   }
 
   ::view-transition-old(mk-ticket),
-  ::view-transition-new(mk-ticket),
-  ::view-transition-old(mk-req),
-  ::view-transition-new(mk-req) {
+  ::view-transition-new(mk-ticket) {
     height: 100%;
     object-fit: fill;
+  }
+
+  /* 整条流水线缩成一个 Project：保持比例，不压扁 */
+  ::view-transition-old(mk-need),
+  ::view-transition-new(mk-need) {
+    width: 100%;
+    height: 100%;
+    object-fit: contain;
   }
 
   /* 右边：一个问题、一句大白话、一个例子 */
@@ -950,63 +965,85 @@ const L = m.levels;
     margin: 0;
   }
 
-  .lk {
-    font-size: 14px;
-    letter-spacing: 0.04em;
-    color: var(--ink-3);
-  }
-
-  .lk span {
-    font-family: var(--mono);
-    color: var(--accent-ink);
-  }
-
   .sp h3 {
-    margin: 4px 0 14px;
+    margin: 0 0 14px;
     font-size: clamp(28px, 2.6vw, 46px);
     font-weight: 600;
     line-height: 1.15;
   }
 
   .plain {
-    margin: 0 0 16px !important;
+    margin: 0 !important;
+    color: var(--ink-2);
     font-size: clamp(17px, 1.5vw, 26px);
     line-height: 1.5;
   }
 
-  .case {
-    padding-left: 12px;
-    border-left: 3px solid var(--accent);
-    font-size: clamp(14px, 1.15vw, 19px);
-    line-height: 1.5;
-    color: var(--ink-2);
+  /* 底部例子色块 */
+  .ex {
+    display: flex;
+    align-items: baseline;
+    gap: 8px clamp(12px, 1.4vw, 24px);
+    padding: clamp(10px, 1.6vh, 18px) clamp(16px, 1.6vw, 28px);
+    border-radius: var(--r);
+    background: var(--accent-soft);
+    color: var(--ink);
   }
 
-  .case b {
-    display: block;
-    font-size: 12px;
-    font-weight: 500;
+  .ex[hidden] {
+    display: none;
+  }
+
+  .ex > b {
+    flex: none;
+    padding: 2px 10px;
+    border-radius: var(--r-pill);
+    background: var(--accent);
+    color: var(--bg);
+    font-size: clamp(12px, 0.95vw, 15px);
+    font-weight: 600;
     letter-spacing: 0.08em;
-    color: var(--ink-3);
+  }
+
+  .ex > p {
+    flex: 1;
+    margin: 0;
+    font-size: clamp(16px, 1.35vw, 24px);
+    line-height: 1.45;
   }
 
   details.src {
-    margin-top: 12px;
+    position: relative;
+    flex: none;
     font-size: clamp(12px, 0.95vw, 15px);
-    line-height: 1.5;
     color: var(--ink-3);
   }
 
   details.src summary {
     cursor: pointer;
-    width: fit-content;
-    font-size: 12px;
     letter-spacing: 0.08em;
   }
 
   details.src summary:focus-visible {
     outline: 2px solid var(--accent);
     outline-offset: 2px;
+  }
+
+  /* 依据向上弹出，不把色块撑高 */
+  details.src p {
+    position: absolute;
+    right: 0;
+    bottom: calc(100% + 10px);
+    width: min(36em, 60vw);
+    margin: 0;
+    padding: 12px 14px;
+    border: 1px solid var(--line);
+    border-radius: var(--r-sm);
+    background: var(--card);
+    box-shadow: var(--shadow);
+    line-height: 1.55;
+    color: var(--ink-2);
+    z-index: 5;
   }
 
   /* 翻页动效：元素错峰淡入 */

@@ -27,6 +27,8 @@ export interface Node {
   img?: { src: string; alt: string; cap: string };
   /** 在谈的不写名字，卡片也只给一句 */
   quiet?: boolean;
+  /** 文字挂在点的哪一边，默认挂下面；用来避开连线和别的字 */
+  lab?: 'right' | 'top';
 }
 
 export const talk = {
@@ -49,8 +51,7 @@ export const talk = {
 
   me: {
     no: '01',
-    title: '我是谁',
-    lead: '中间是我，周围是我做过和正在做的事，颜色是分组。',
+    title: '自我介绍',
     name: '李睿涵',
     role: 'AI 应用工程师 · 西电本硕 · 后端出身',
     hint: '鼠标放到点上，看每件事是什么',
@@ -120,28 +121,29 @@ export const talk = {
       },
       {
         id: 'dnd',
-        label: '洛山达 DND 助手',
+        label: '洛山达 DND 助手\n微信小程序',
         group: 'trpg',
         status: 'done',
+        lab: 'right',
         x: 690,
         y: 440,
-        title: '洛山达 DND 助手',
+        title: '洛山达 DND 助手 · 微信小程序',
         lines: ['帮玩家建 D&D 角色卡、开团的微信小程序。', '今年 6 月起交给几种 AI 分工维护，我只提想法、审方案、发版。'],
         stat: { v: '1.46 万', k: '累计用户（截至 11 月 6 日）' },
       },
       {
         id: 'box',
-        label: '冒险匣子',
+        label: '冒险匣子\n跑团店定制规则',
         group: 'trpg',
         status: 'done',
-        x: 905,
-        y: 290,
-        title: '冒险匣子 · 店家合作',
-        lines: ['和西安的跑团店冒险匣子合作，订制规则。', '店家原创的「诸神之匣」做进了小程序。'],
+        x: 890,
+        y: 265,
+        title: '冒险匣子 · 跑团店定制规则',
+        lines: ['和西安的跑团店冒险匣子合作，给店里定制规则。', '店家原创的「诸神之匣」做进了小程序。'],
       },
       {
         id: 'tavern',
-        label: '晨曦酒馆',
+        label: '自媒体',
         group: 'trpg',
         status: 'doing',
         x: 625,
@@ -149,6 +151,7 @@ export const talk = {
         links: ['dnd'],
         title: '晨曦酒馆 · 跑团自媒体',
         lines: ['一个人做的跑团动画账号，脚本、画面、配音、剪辑分给不同的 AI。', '目标是国内跑团领域的大号。'],
+        img: { src: '/shots/tavern/cover.jpg', alt: '晨曦酒馆封面：酒馆里举杯的矮人老板和抱着书跑进来的半身人', cap: '第一条《晨曦酒馆今天开张》的封面' },
       },
       {
         id: 'studio',
@@ -163,13 +166,14 @@ export const talk = {
       },
       {
         id: 'talk-trpg',
-        label: '跑团店 · 订制规则',
+        label: '跑团店 · 定制规则',
         group: 'trpg',
         status: 'idea',
-        x: 915,
-        y: 420,
-        title: '一家跑团店 · 订制规则',
-        lines: ['跑团店家合作，订制规则，在谈。'],
+        lab: 'top',
+        x: 950,
+        y: 400,
+        title: '一家跑团店 · 定制规则',
+        lines: ['跑团店家合作，定制规则，在谈。'],
         quiet: true,
       },
       {
@@ -196,13 +200,13 @@ export const talk = {
       },
       {
         id: 'talk-trade',
-        label: '外贸行业',
+        label: '外贸平台',
         group: 'partner',
         status: 'idea',
         x: 110,
         y: 410,
-        title: '外贸行业 · 平台开发',
-        lines: ['外贸行业的平台开发，在谈。'],
+        title: '外贸平台',
+        lines: ['外贸平台的开发，在谈。'],
         quiet: true,
       },
     ] as Node[],
@@ -305,7 +309,7 @@ export const talk = {
         tag: 'Spec',
         q: '最简单的一个改动，怎么做？',
         plain: '写清一张单，AI 开发，另一个 AI 评审，检查全过才合并。',
-        case: '传统软件团队也是这套流程，只是每一步换成了 AI。',
+        case: '10 月 29 日一条玩家反馈：把「灵感」改成「激励」，2.5 小时合入。',
         src: 'Anthropic 2026-03：把干活的和评判的 agent 分开。',
       },
       {
@@ -355,7 +359,6 @@ export const talk = {
       { k: '门禁检查', en: 'CI', ex: '183 道 · 15 分钟' },
       { k: '合并', en: 'Merge', ex: '11:21 合入' },
     ],
-    exK: '例：10 月 29 日一条玩家反馈',
     retry: '代码评审、门禁检查，任一不过都打回重改',
     need: {
       req: '一个大需求',
@@ -385,7 +388,7 @@ export const talk = {
     caseK: '例子',
     srcK: '依据',
     notes:
-      '6 分钟。← → 一步步讲。工具：先看需求再挑，分四类，入门用 WorkBuddy、Trae 这些国产的，顺手了换 Claude Code、Codex；代码直接放 GitHub；任务入门用 GitHub Issues，进阶用 Linear；收反馈的表格可有可无。地基：代码仓库就是 AI 的 Harness，模型是攀岩的人，规则、检查、规范是绳子和安全带；东西都在仓库里，AI 哪家好用换哪家。一张单：先抛问题「最简单的一个改动怎么做」，上面一行是说法，下面一行是同一张单的真实记录；评审和检查任一不过都打回。大需求：这张单缩进一条横线里，一个大需求就是一个 Project，AI 先分析、切成小单，一个定时任务每轮领一张；补一句不同 AI 擅长不同的单，Claude 做前端，Codex 做后端和美术。一堆需求：先把一堆需求框起来交给分诊 AI，拆成一个个 Project，Project 里全是最小的单，定时任务一直跑就行。',
+      '6 分钟。← → 一步步讲。工具：先看需求再挑，分四类，入门用 WorkBuddy、Trae 这些国产的，顺手了换 Claude Code、Codex；代码直接放 GitHub；任务入门用 GitHub Issues，进阶用 Linear；收反馈的表格可有可无。地基：代码仓库就是 AI 的 Harness，模型是攀岩的人，规则、检查、规范是绳子和安全带；东西都在仓库里，AI 哪家好用换哪家。一张单：先抛问题「最简单的一个改动怎么做」，上面一行是说法，下面一行是同一张单的真实记录；评审和检查任一不过都打回。传统软件团队也是这套流程，只是每一步换成了 AI。大需求：这张单缩进定时任务里，一个大需求就是一个 Project，AI 先分析、切成小单，一个定时任务每轮领一张；补一句不同 AI 擅长不同的单，Claude 做前端，Codex 做后端和美术。一堆需求：上一步那一整套缩成一个 Project；一堆需求先框起来交给分诊 AI，拆成一个个 Project，Project 里全是最小的单，定时任务一直跑就行。',
   },
 
   /** 04 痛点二：怎么维护和迭代 */

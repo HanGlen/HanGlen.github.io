@@ -27,7 +27,6 @@ const level = (items: { v: number }[], i: number) => items.filter((it) => it.v >
           <section class={`block k-${b.kind}`} data-block={bi}>
             <header class="bh">
               <h3 class="serif">{b.k}</h3>
-              <span>{b.who}</span>
             </header>
             <div class="waffle" data-waffle={bi} aria-hidden="true">
               {Array.from({ length: 100 }, (_, i) => (
@@ -35,6 +34,11 @@ const level = (items: { v: number }[], i: number) => items.filter((it) => it.v >
               ))}
             </div>
             <ol class="items" role="tablist" aria-label={b.k}>
+              <li class="base">
+                <i class="sw lv0" aria-hidden="true" />
+                <b class="serif">100%</b>
+                <span>{b.who}</span>
+              </li>
               {b.items.map((it, k) => (
                 <li>
                   <button type="button" role="tab" data-step data-b={bi} data-lv={k + 1} aria-selected="false">
@@ -218,6 +222,27 @@ const level = (items: { v: number }[], i: number) => items.filter((it) => it.v >
     border-radius: var(--r-sm);
     cursor: pointer;
     transition: border-color 0.25s, background 0.25s, color 0.25s;
+  }
+
+  /* 100% 那一行：底色格子就是全体，也有自己的颜色和说明 */
+  .base {
+    display: grid;
+    grid-template-columns: 12px clamp(70px, 5.4vw, 108px) 1fr;
+    align-items: baseline;
+    gap: 8px;
+    padding: 2px 9.5px 6px;
+    margin-bottom: 2px;
+    border-bottom: 1px solid var(--line);
+    color: var(--ink-3);
+  }
+
+  .base b {
+    color: var(--ink-3) !important;
+  }
+
+  .sw.lv0 {
+    background: var(--heat-0);
+    box-shadow: inset 0 0 0 1px var(--line-2);
   }
 
   .sw {
