@@ -76,7 +76,7 @@ const L = m.levels;
               }
             </tbody>
           </table>
-          <p class="links fin" style="--d:5">
+          <p class="links fin" style="--d:6">
             <b>{m.models.k}</b>
             {
               m.models.links.map((x) => (
@@ -90,19 +90,32 @@ const L = m.levels;
 
         <!-- 2 地基 Harness -->
         <div class="frame" data-pane="1" hidden>
-          <div class="harness">
+          <div class="harness" data-harness>
             <div class="ring fin" style="--d:0">
-              <p class="rk"><b>{m.harness.ring}</b>{m.harness.ringV}</p>
+              <p class="rk"><b class="serif">{m.harness.ring}</b>{m.harness.ringV}</p>
               <ul class="parts">
                 {m.harness.parts.map((p, i) => (
-                  <li class={`p${i}`}>{p}</li>
+                  <li class={`p${i}`}>
+                    <button type="button" data-tip={p.tip}>{p.k}</button>
+                  </li>
                 ))}
               </ul>
-              <div class="core fin" style="--d:2">
-                <b class="serif">{m.harness.model}</b>
-                <span>{m.harness.modelV}</span>
+              <div class="mid fin" style="--d:1">
+                <p class="mk"><b class="serif">{m.harness.mid}</b>{m.harness.midV}</p>
+                <ul class="mparts">
+                  {m.harness.midParts.map((p, i) => (
+                    <li class={`m${i}`}>
+                      <button type="button" data-tip={p.tip}>{p.k}</button>
+                    </li>
+                  ))}
+                </ul>
+                <div class="core fin" style="--d:2">
+                  <b class="serif">{m.harness.model}</b>
+                  <span>{m.harness.modelV}</span>
+                </div>
               </div>
             </div>
+            <p class="tip" aria-live="polite" data-tip-out data-hint={m.harness.hint}>{m.harness.hint}</p>
           </div>
         </div>
 
@@ -471,16 +484,18 @@ const L = m.levels;
     color: var(--accent-ink);
   }
 
-  /* 地基：模型在中间，Harness 是一圈 */
+  /* 地基：三圈。中间模型，中圈现成 Harness，外圈你加上的规矩 */
   .harness {
-    display: grid;
-    place-items: center;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: clamp(8px, 1.4vh, 16px);
   }
 
   .ring {
     position: relative;
-    width: min(100%, 62vh);
-    aspect-ratio: 1.35;
+    width: min(100%, 66vh);
+    aspect-ratio: 1.45;
     border-radius: 50%;
     border: 3px dashed var(--accent);
     background: var(--accent-soft);
@@ -488,49 +503,118 @@ const L = m.levels;
     place-items: center;
   }
 
-  .rk {
+  .rk,
+  .mk {
     position: absolute;
-    top: 7%;
     left: 50%;
     transform: translateX(-50%);
     margin: 0;
     display: flex;
     flex-direction: column;
     align-items: center;
-    color: var(--accent-ink);
-    font-size: clamp(13px, 1.1vw, 19px);
     white-space: nowrap;
+    line-height: 1.25;
+  }
+
+  .rk {
+    top: 5%;
+    color: var(--accent-ink);
+    font-size: clamp(12px, 1vw, 17px);
   }
 
   .rk b {
-    font-family: var(--mono);
-    font-size: clamp(18px, 1.7vw, 30px);
+    font-size: clamp(17px, 1.6vw, 28px);
+    font-weight: 600;
   }
 
-  .parts {
+  .mid {
+    position: relative;
+    width: 52%;
+    aspect-ratio: 1.45;
+    margin-top: 10%;
+    border-radius: 50%;
+    border: 2px solid var(--line-2);
+    background: var(--card);
+    box-shadow: var(--shadow);
+    display: grid;
+    place-items: center;
+  }
+
+  .mk {
+    top: 6%;
+    color: var(--ink-2);
+    font-size: clamp(11px, 0.85vw, 14px);
+  }
+
+  .mk b {
+    font-size: clamp(14px, 1.25vw, 22px);
+    font-weight: 600;
+    color: var(--ink);
+  }
+
+  .parts,
+  .mparts {
     list-style: none;
     margin: 0;
     padding: 0;
   }
 
-  .parts li {
+  .parts li,
+  .mparts li {
     position: absolute;
-    padding: 0.35em 0.8em;
-    border-radius: var(--r-pill);
-    background: var(--card);
-    border: 1.5px solid var(--accent);
-    font-size: clamp(14px, 1.3vw, 24px);
-    white-space: nowrap;
     transform: translate(-50%, -50%);
   }
 
-  .p0 { left: 14%; top: 42%; }
-  .p1 { left: 86%; top: 42%; }
-  .p2 { left: 24%; top: 80%; }
-  .p3 { left: 76%; top: 80%; }
+  .harness button {
+    padding: 0.3em 0.8em;
+    border-radius: var(--r-pill);
+    font: inherit;
+    white-space: nowrap;
+    cursor: pointer;
+    transition: transform 0.25s var(--ease), background 0.25s, color 0.25s;
+  }
+
+  .parts button {
+    background: var(--card);
+    border: 1.5px solid var(--accent);
+    color: var(--ink);
+    font-size: clamp(13px, 1.2vw, 22px);
+  }
+
+  .mparts button {
+    background: var(--bg-2);
+    border: 1px solid var(--line-2);
+    color: var(--ink-2);
+    font-size: clamp(11px, 0.9vw, 16px);
+    padding: 0.2em 0.65em;
+  }
+
+  .harness button:hover,
+  .harness button[aria-pressed='true'] {
+    transform: translateY(-2px);
+    background: var(--accent);
+    border-color: var(--accent);
+    color: var(--bg);
+  }
+
+  .harness button:focus-visible {
+    outline: 2px solid var(--accent);
+    outline-offset: 2px;
+  }
+
+  .p0 { left: 13%; top: 38%; }
+  .p1 { left: 87%; top: 38%; }
+  .p2 { left: 13%; top: 70%; }
+  .p3 { left: 87%; top: 70%; }
+
+  .m0 { left: 14%; top: 42%; }
+  .m1 { left: 86%; top: 42%; }
+  .m2 { left: 22%; top: 76%; }
+  .m3 { left: 78%; top: 76%; }
 
   .core {
     width: 34%;
+    margin-top: 10%;
     aspect-ratio: 1;
     border-radius: 50%;
     background: var(--ink);
@@ -540,16 +624,27 @@ const L = m.levels;
     align-items: center;
     justify-content: center;
     gap: 2px;
-    box-shadow: var(--shadow);
   }
 
   .core b {
-    font-size: clamp(22px, 2.4vw, 44px);
+    font-size: clamp(18px, 1.9vw, 34px);
   }
 
   .core span {
-    font-size: clamp(12px, 1vw, 17px);
+    font-size: clamp(11px, 0.85vw, 15px);
     opacity: 0.8;
+  }
+
+  .tip {
+    margin: 0;
+    min-height: 1.5em;
+    font-size: clamp(13px, 1.05vw, 18px);
+    color: var(--ink-3);
+    text-align: center;
+  }
+
+  .tip.on {
+    color: var(--ink);
   }
 
   /* 一张单：每一步下面直接是例子 */
@@ -1113,8 +1208,26 @@ const L = m.levels;
     .ring {
       width: 100%;
     }
-    .parts li {
+    .parts button {
       font-size: 12px;
+    }
+    .mparts button {
+      font-size: 10px;
+    }
+    .rk {
+      font-size: 11px;
+    }
+    .rk b {
+      font-size: 14px;
+    }
+    .mk {
+      display: none;
+    }
+  }
+
+  @media (max-height: 800px) and (min-width: 901px) {
+    .ring {
+      width: min(100%, 58vh);
     }
   }
 
@@ -1125,3 +1238,28 @@ const L = m.levels;
     }
   }
 </style>
+
+<script>
+  // 地基图：悬停或点一个词，下面一行说它指什么
+  document.querySelectorAll<HTMLElement>('[data-harness]').forEach((root) => {
+    const out = root.querySelector<HTMLElement>('[data-tip-out]')!;
+    const btns = [...root.querySelectorAll<HTMLButtonElement>('button[data-tip]')];
+    let pinned: HTMLButtonElement | null = null;
+    const show = (b: HTMLButtonElement | null) => {
+      out.textContent = b ? `${b.textContent}：${b.dataset.tip}` : out.dataset.hint!;
+      out.classList.toggle('on', !!b);
+      btns.forEach((x) => x.setAttribute('aria-pressed', String(x === b)));
+    };
+    btns.forEach((b) => {
+      b.setAttribute('aria-pressed', 'false');
+      b.addEventListener('mouseenter', () => show(b));
+      b.addEventListener('mouseleave', () => show(pinned));
+      b.addEventListener('focus', () => show(b));
+      b.addEventListener('blur', () => show(pinned));
+      b.addEventListener('click', () => {
+        pinned = pinned === b ? null : b;
+        show(pinned ?? b);
+      });
+    });
+  });
+</script>
