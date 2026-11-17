@@ -76,7 +76,7 @@
 
 - **过渡**：3 → 4，整条「一张单」流水线缩进定时任务里那张单；4 → 5，整条「一个大需求」流水线缩成第 5 步里的 Project A（车主 2026-11-17：一个大需求这一整套就是一个 Project）。用 View Transition（同名 `view-transition-name`），不支持的浏览器退回普通滑入。
 - 推荐流程挪到后面（见第 2 节最后一行）。
-- 车主说的「home rope」暂按攀岩比喻里的「绳子」理解（Harness = 安全带和绳子），出处是 Tejas Kumar 在 AI Engineer World's Fair 的演讲（经 basic-harness 文档转引），**待车主确认**。「graph engineering」仍未对上，不上页面。
+- **2026-11-17 初步调研：「home rope」很可能是 Matt Pocock 的 Home Repo**（一个专门放 AI 配置的仓库，见 `docs/research/agent-concepts.md`），待车主确认。原先暂按攀岩比喻里的「绳子」理解（Harness = 安全带和绳子），出处是 Tejas Kumar 在 AI Engineer World's Fair 的演讲（经 basic-harness 文档转引），**待车主确认**。「graph engineering」仍未对上，不上页面。
 
 ### 04 怎么维护和迭代
 用户提反馈 → AI 审核（回到用户）→ 开发 → 上线告诉用户（回到用户）；下面一排是定时任务。实例：10 月 29 日一条反馈 2.5 小时合入。
