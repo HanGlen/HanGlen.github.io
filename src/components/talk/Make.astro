@@ -937,8 +937,21 @@ const L = m.levels;
     }
     .pipe li + li::before,
     .flow li + li::before,
-    .retry {
+    .retry::before,
+    .retry .tick {
       display: none;
+    }
+    /* 手机上不画回路线，只留打回说明 */
+    .retry {
+      height: auto;
+      margin: 0;
+      border: 0;
+    }
+    .retry span {
+      position: static;
+      transform: none;
+      padding: 0;
+      white-space: normal;
     }
     .need,
     .team {

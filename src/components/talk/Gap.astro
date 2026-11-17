@@ -35,9 +35,9 @@ const groups = g.groups.map((gr) => ({ ...gr, rows: gr.rows.map((r) => ({ ...r, 
                     {r.text}
                     <sup>{circled(r.ref)}</sup>
                   </span>
-                  <span class="track" aria-hidden="true">
-                    <i class="bar" style={`--v:${r.v}%`} />
-                    {'deep' in r && <i class="bar deep" style={`--v:${r.deep}%`} />}
+                  <span class="track">
+                    <i class="bar" style={`--v:${r.v}%`} aria-hidden="true" />
+                    {'deep' in r && <i class="bar deep" style={`--v:${r.deep}%`} aria-hidden="true" />}
                     <b class="big serif" style={`--v:${r.v}%`}>{r.big}</b>
                   </span>
                 </button>
