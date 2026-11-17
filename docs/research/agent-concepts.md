@@ -1,7 +1,7 @@
 # Agent 开发概念
 
 > 2026-11-17 Claude 做了初稿。同日 Cursor Grok 按 HAN-1827 把第 2 节全部核实：待核的要么改成已核，要么删掉。只记查到原文的；拿不准的标「推测」。
-> 细查仍分开：HAN-1821（Harness 怎么上演讲）、HAN-1828（Anthropic 文章逐篇）。
+> 细查仍分开：HAN-1821（Harness）已定稿，见 `docs/research/talk-03-harness.md`；HAN-1828（Anthropic 文章逐篇）。
 > 手册已有、这里不展开：digital-me `career/study-guide.md` 第 4 章的 Agent、工具调用、MCP、Skill、上下文工程、AGENTS.md、多 Agent 编排、人在回路。
 
 ## 1. 三个要先说清的结论
@@ -10,7 +10,9 @@
 2. **「代码仓库 = Harness」说得不准。** Harness 是模型之外、让模型能动手的那套运行时。Anthropic《Demystifying evals for AI agents》（Mikaela Grace、Jeremy Hadfield、Rodrigo Olivares、Jiri De Jonghe，2026-01-09）原话：「An agent harness (or scaffold) is the system that enables a model to act as an agent: it processes inputs, orchestrates tool calls, and returns results」。同一篇把 Claude Code 叫做 “a flexible agent harness”。更早一篇把 Claude Agent SDK 叫做 “a powerful, general-purpose agent harness adept at coding”（[Effective harnesses for long-running agents](https://www.anthropic.com/research/effective-harnesses-for-long-running-agents)，Justin Young，2025-11-26）。所以 **Claude Code、Codex 才是现成的 Harness**；仓库里的 AGENTS.md、文档、检查，是你在 Harness 上加的东西。
 3. **仓库这部分有自己的叫法：Harness engineering。** OpenAI《Harness engineering: leveraging Codex in an agent-first world》（Ryan Lopopolo，2026-02-11，[原文](https://openai.com/index/harness-engineering/)）。原文没有给这个词下字典式定义。它讲的是：人不再亲手写代码，而是设计环境、写清意图、做反馈回路。原话：「Humans steer. Agents execute。」以及 “A short AGENTS.md (roughly 100 lines) is injected into context and serves primarily as a map”。深层知识放结构化的 `docs/`，当作 system of record。和车主小程序「AGENTS.md 限 60 行、细节下沉 `docs/`」是同一类做法。
 
-建议的大白话（待 HAN-1821 定稿）：**模型是大脑；Claude Code 这类工具是现成的 Harness（手脚和工作台）；你在仓库里写的规则、检查、任务记录，是给 Harness 加的那一层，这件事叫 Harness engineering。**
+建议的大白话（HAN-1821 定稿）：**Claude Code、Codex 是现成的 Harness。仓库里的规则和检查，是摔过一次就补上的。**
+
+这件事叫 Harness engineering。页上用哪句，见 `docs/research/talk-03-harness.md` 第 1 节。
 
 ## 2. 概念清单（HAN-1827，2026-11-17 已核）
 
@@ -163,7 +165,7 @@ Lance Martin、Gabe Cemaj、Michael Cohen《Scaling Managed Agents: Decoupling t
 
 ## 4. 对演讲的影响（先不改页面）
 
-- 03「地基」标题「代码仓库，就是 AI 的 Harness」要改，方向见第 1 节，等 HAN-1821 定稿。
-- 攀岩比喻的出处（Tejas Kumar）没搜到原文，只有转引；如果车主说的本来就是 Home Repo，攀岩比喻可以不用。
+- 03「地基」标题「代码仓库，就是 AI 的 Harness」要改，方向见 `docs/research/talk-03-harness.md`（HAN-1821 已定稿）。
+- 攀岩比喻有 Tejas Kumar 2026-09-14 的原文，但页面现在的说法和场次都要换。
 - `docs/talk-qingdao-plan.md` 里「home rope」那条待车主确认后改。
 - 演讲用得上的六条，大白话都在第 2 节的表里。Home Repo 不必上页，只用来避免讲错。
