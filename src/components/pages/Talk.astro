@@ -147,8 +147,9 @@ import { talk } from '../../i18n/talk';
         const steps = [...root.querySelectorAll<HTMLElement>('[data-step]')];
         const panes = [...root.querySelectorAll<HTMLElement>('[data-pane]')];
         const hover = root.hasAttribute('data-hover');
-        // data-vt：前后两格都有 view-transition-name 元素时，用 View Transition 让同名元素变形过去
-        const named = (n: number) => !!root.querySelector(`[data-pane="${n}"] [style*="view-transition-name"]`);
+        // data-vt="2-3 3-4"：列出哪两步之间用 View Transition 变形；切换时把这一对写进 data-vt-pair，
+        // 页面 CSS 只在这一对上给元素起 view-transition-name，同名元素就从上一步变形到下一步
+        const pairs = (root.dataset.vt ?? '').split(/\s+/).filter(Boolean);
         const sel = (i: number) => {
           const was = Number(root.dataset.at ?? -1);
           if (was === i) return;
@@ -162,14 +163,20 @@ import { talk } from '../../i18n/talk';
             panes.forEach((p) => (p.hidden = p.dataset.pane !== String(i)));
             root.dispatchEvent(new CustomEvent('step', { detail: i }));
           };
-          const morph = root.hasAttribute('data-vt') && 'startViewTransition' in document && !reduce && wide.matches && was >= 0 && named(was) && named(i);
+          const pair = `${Math.min(was, i)}-${Math.max(was, i)}`;
+          const morph = pairs.includes(pair) && 'startViewTransition' in document && !reduce && wide.matches;
           if (!morph) {
             delete root.dataset.morph;
+            delete root.dataset.vtPair;
             apply();
             return;
           }
           root.dataset.morph = '';
-          document.startViewTransition(apply).finished.finally(() => delete root.dataset.morph);
+          root.dataset.vtPair = pair;
+          document.startViewTransition(apply).finished.finally(() => {
+            delete root.dataset.morph;
+            delete root.dataset.vtPair;
+          });
         };
         steps.forEach((s, i) => {
           s.addEventListener('click', () => sel(i));
