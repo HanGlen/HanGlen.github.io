@@ -1,7 +1,7 @@
 ---
 /**
- * 演讲 04「怎么维护和迭代」：收反馈、开单 → 接上流水线 → 告诉用户 → 两条时间线。
- * 版式照 03（共用 Talk.astro 里的 .t-steps）：顶上步骤条，左图右文，例子在底部色块。
+ * 演讲 05「怎么维护和迭代」：收反馈、开单 → 接上流水线 → 告诉用户 → 两条时间线。
+ * 版式照 04（共用 Talk.astro 里的 .t-steps）：顶上步骤条，左图右文，例子在底部色块。
  * 全程跟着同一条真实反馈（HAN-1688）走；最后一步把它和一个大需求（装备商店）的时间线并排。
  */
 import { talk } from '../../i18n/talk';
@@ -33,7 +33,7 @@ const lanes = k.tl.lanes.map((lane) => {
 
 <section class="slide t-slide keep" data-slide data-notes={k.notes} aria-labelledby="keep-title">
   <header class="t-head">
-    <p class="kicker">{k.no} · {k.kicker}</p>
+    <p class="no">{k.no}</p>
     <h2 id="keep-title">{k.title}</h2>
     <p class="lead">{k.lead}</p>
   </header>
@@ -92,7 +92,7 @@ const lanes = k.tl.lanes.map((lane) => {
           </div>
         </div>
 
-        <!-- 2 接上流水线：新单 → AI 切片 → 快速修复 / Project；下面画出痛点一那条流水线，写这张单的真实时间 -->
+        <!-- 2 接上流水线：新单 → AI 切片 → 快速修复 / Project；下面画出 04 那条流水线，写这张单的真实时间 -->
         <div class="frame" data-pane="1" hidden>
           <div class="flow">
             <span class="chip card fin" style="--d:0">{k.join.card}</span>
@@ -481,7 +481,7 @@ const lanes = k.tl.lanes.map((lane) => {
     }
   }
 
-  /* 2：痛点一那条流水线，写 HAN-1688 走过的真实时间 */
+  /* 2：04 那条流水线，写 HAN-1688 走过的真实时间 */
   .chainbox {
     margin-top: clamp(18px, 3.4vh, 40px);
     padding: clamp(12px, 1.6vh, 20px) clamp(12px, 1.2vw, 20px);

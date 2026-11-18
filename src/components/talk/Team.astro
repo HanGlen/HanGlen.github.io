@@ -1,0 +1,492 @@
+---
+/**
+ * 演讲 03「一个人 + Agentic Engineering = 一个团队」：一家公司 → 几个人 → 一个人 → 工具 → 我自己。
+ * 版式同 04、05（.t-steps）：← → 一步步亮，左边一张图，右边一个问题 + 一句大白话，例子在底部色块。
+ * 每张图都能悬停、聚焦读数（Talk.astro 的 [data-reads]）。口径不同的数各自成行，不放进同一个比较。
+ * 依据 docs/research/talk-03-team.md（HAN-1864）；我自己的每月 PR 来自 src/data/dnd.json。
+ */
+import data from '../../data/dnd.json';
+import { talk } from '../../i18n/talk';
+import { rich } from '../../lib/rich';
+
+const t = talk.team;
+const L = t.levels;
+const amax = Math.max(...t.anth.bars.map((b) => b.v));
+const tmax = Math.max(...t.tools.rows.map((r) => r.v));
+const months = Object.entries(data.monthlyPRs as Record<string, number>);
+const mmax = Math.max(...months.map(([, v]) => v));
+const mlabel = (m: string) => `${Number(m.slice(5))} 月`;
+---
+
+<section class="slide t-slide team" data-slide data-notes={t.notes} aria-labelledby="team-title">
+  <header class="t-head">
+    <p class="no">{t.no}</p>
+    <h2 id="team-title">{t.title}</h2>
+    <p class="lead">{t.lead}</p>
+  </header>
+
+  <div class="body t-body t-steps" data-stepper style={`--n: ${L.length}`}>
+    <ol class="line" role="tablist" aria-label={t.title}>
+      {
+        L.map((l, i) => (
+          <li>
+            <button type="button" role="tab" data-step aria-selected={i === 0 ? 'true' : 'false'}>
+              <i aria-hidden="true">{i + 1}</i>
+              <span>{l.k}</span>
+              <em>{l.tag}</em>
+            </button>
+          </li>
+        ))
+      }
+    </ol>
+
+    <div class="main">
+      <div class="stage">
+        <!-- 1 一家公司：每天合入次数，5 月 vs 9 月 -->
+        <div class="frame" data-pane="0" data-reads>
+          <p class="unit fin">{t.anth.unit}</p>
+          <ul class="hbars">
+            {
+              t.anth.bars.map((b, i) => (
+                <li class="fin" style={`--d:${i + 1}`} data-read={`${b.k}：每天合入${b.label}`}>
+                  <span class="hk">{b.k}</span>
+                  <span class="track">
+                    <i class={i ? 'hot' : ''} style={`--w:${(b.v / amax) * 100}%`} />
+                  </span>
+                  <b class="serif">{b.label}</b>
+                </li>
+              ))
+            }
+          </ul>
+          <p class="times serif fin" style="--d:3">{t.anth.x}</p>
+          <p class="t-read" aria-live="polite" data-read-out data-hint={t.readK}>{t.readK}</p>
+        </div>
+
+        <!-- 2 几个人：从空仓库开始的五个月 -->
+        <div class="frame" data-pane="1" hidden data-reads>
+          <ol class="tl">
+            {
+              t.oai.map((x, i) => (
+                <li class={`fin${i === 1 ? ' mid' : ''}`} style={`--d:${i + 1}`} data-read={`${x.at}：${x.k}，${x.v}`}>
+                  <em>{x.at}</em>
+                  <b class="serif">{x.v}</b>
+                  <span>{x.k}</span>
+                </li>
+              ))
+            }
+          </ol>
+          <p class="t-read" aria-live="polite" data-read-out data-hint={t.readK}>{t.readK}</p>
+        </div>
+
+        <!-- 3 一个人：每张卡片写自己的口径 -->
+        <div class="frame" data-pane="2" hidden data-reads>
+          <ul class="people">
+            {
+              t.people.map((p, i) => (
+                <li class="fin" style={`--d:${i + 1}`} data-read={`${p.who}：${p.how}`}>
+                  <p class="pw">
+                    <b>{p.who}</b>
+                    <span>{p.role}</span>
+                  </p>
+                  <p class="pb serif">{p.big}</p>
+                  <p class="pk">{p.k}</p>
+                  <p class="ph">{p.how}</p>
+                </li>
+              ))
+            }
+          </ul>
+          <p class="t-read" aria-live="polite" data-read-out data-hint={t.readK}>{t.readK}</p>
+        </div>
+
+        <!-- 4 工具：平均几天一更新，越短越勤 -->
+        <div class="frame" data-pane="3" hidden data-reads>
+          <p class="unit fin">{t.tools.unit} · {t.tools.win}</p>
+          <ul class="hbars days">
+            {
+              t.tools.rows.map((r, i) => (
+                <li class="fin" style={`--d:${i + 1}`} data-read={`${r.k}：三个月 ${r.n}（数的是${r.what}），平均 ${r.v} 天一次`}>
+                  <span class="hk">{r.k}</span>
+                  <span class="track">
+                    <i class={i === 0 ? 'hot' : ''} style={`--w:${(r.v / tmax) * 100}%`} />
+                  </span>
+                  <b class="serif">{r.v.toFixed(1)} 天</b>
+                </li>
+              ))
+            }
+          </ul>
+          <p class="t-read" aria-live="polite" data-read-out data-hint={t.readK}>{t.readK}</p>
+        </div>
+
+        <!-- 5 我自己：每月合入的 PR -->
+        <div class="frame" data-pane="4" hidden data-reads>
+          <p class="unit fin">{t.mine.unit}</p>
+          <ol class="cols">
+            {
+              months.map(([m, v], i) => (
+                <li class="fin" style={`--d:${i + 1}`} data-read={`${mlabel(m)}：合入 ${v} 个 PR${i === months.length - 1 ? `（${t.mine.partial}）` : ''}`}>
+                  <span class="col">
+                    <b class="serif">{v}</b>
+                    <i class={`${v === mmax ? 'hot' : ''}${i === months.length - 1 ? ' part' : ''}`} style={`--h:${(v / mmax) * 88}%`} />
+                  </span>
+                  <em>{mlabel(m)}</em>
+                </li>
+              ))
+            }
+          </ol>
+          <p class="t-read" aria-live="polite" data-read-out data-hint={t.mine.partial}>{t.mine.partial}</p>
+        </div>
+      </div>
+
+      <aside class="side" aria-live="polite">
+        {
+          L.map((l, i) => (
+            <div class="sp" data-pane={String(i)} hidden={i !== 0}>
+              <h3 class="serif">{l.q}</h3>
+              <p class="plain">{l.plain}</p>
+            </div>
+          ))
+        }
+        <p class="t-hint">{t.hint}</p>
+      </aside>
+    </div>
+
+    {
+      L.map((l, i) => (
+        <div class="ex" data-pane={String(i)} hidden={i !== 0}>
+          <b>{t.caseK}</b>
+          <p>{l.case}</p>
+          <details class="src">
+            <summary>{t.srcK}</summary>
+            <p set:html={rich(l.src)} />
+          </details>
+        </div>
+      ))
+    }
+  </div>
+</section>
+
+<style>
+  .stage {
+    min-width: 0;
+  }
+
+  .unit {
+    margin: 0;
+    font-size: clamp(13px, 1vw, 17px);
+    letter-spacing: 0.08em;
+    color: var(--ink-3);
+  }
+
+  /* 横条：名字 | 条 | 数 */
+  .hbars {
+    list-style: none;
+    margin: 0;
+    padding: 0;
+    display: flex;
+    flex-direction: column;
+    gap: clamp(10px, 2vh, 22px);
+  }
+
+  .hbars li {
+    display: grid;
+    grid-template-columns: clamp(110px, 9vw, 170px) minmax(0, 1fr) clamp(120px, 11vw, 200px);
+    align-items: center;
+    gap: 16px;
+    padding: 6px 8px;
+    border-radius: var(--r-sm);
+    transition: background 0.2s;
+  }
+
+  .hbars li[data-on] {
+    background: var(--bg-2);
+  }
+
+  .hk {
+    font-size: clamp(15px, 1.25vw, 22px);
+    color: var(--ink-2);
+  }
+
+  .hbars b {
+    font-size: clamp(20px, 1.9vw, 34px);
+    font-weight: 600;
+    white-space: nowrap;
+  }
+
+  .track {
+    height: clamp(22px, 3.4vh, 40px);
+    border-radius: var(--r-sm);
+    background: var(--heat-0);
+    overflow: hidden;
+  }
+
+  .track i {
+    display: block;
+    height: 100%;
+    width: var(--w);
+    border-radius: var(--r-sm);
+    background: var(--cat-blue);
+    transform-origin: left;
+    animation: grow 0.9s var(--ease) both;
+    animation-delay: calc(0.3s + var(--d, 0) * 0.12s);
+  }
+
+  .track i.hot {
+    background: var(--accent);
+  }
+
+  .days .track {
+    height: clamp(16px, 2.4vh, 28px);
+  }
+
+  @keyframes grow {
+    from {
+      transform: scaleX(0);
+    }
+  }
+
+  .times {
+    margin: 0;
+    align-self: flex-end;
+    font-size: clamp(56px, 7vw, 132px);
+    font-weight: 600;
+    line-height: 1;
+    color: var(--accent);
+  }
+
+  /* 时间线：三个点 */
+  .tl {
+    list-style: none;
+    margin: 0;
+    padding: clamp(18px, 3vh, 36px) 0 0;
+    display: grid;
+    grid-template-columns: repeat(3, minmax(0, 1fr));
+    gap: clamp(12px, 1.6vw, 28px);
+    position: relative;
+  }
+
+  .tl::before {
+    content: '';
+    position: absolute;
+    left: 8px;
+    right: 8px;
+    top: calc(clamp(18px, 3vh, 36px) + 8px);
+    height: 2px;
+    background: var(--line-2);
+  }
+
+  .tl li {
+    position: relative;
+    display: flex;
+    flex-direction: column;
+    gap: 6px;
+    padding: 30px 12px 12px;
+    border-radius: var(--r-sm);
+    transition: background 0.2s;
+  }
+
+  .tl li[data-on] {
+    background: var(--bg-2);
+  }
+
+  .tl li::before {
+    content: '';
+    position: absolute;
+    left: 12px;
+    top: 0;
+    width: 16px;
+    height: 16px;
+    border-radius: 50%;
+    background: var(--bg);
+    border: 2px solid var(--accent);
+  }
+
+  .tl li.mid::before {
+    background: var(--accent);
+  }
+
+  .tl em {
+    font-style: normal;
+    font-family: var(--mono);
+    font-size: clamp(12px, 0.95vw, 16px);
+    color: var(--accent-ink);
+  }
+
+  .tl b {
+    font-size: clamp(24px, 2.4vw, 44px);
+    font-weight: 600;
+    line-height: 1.15;
+  }
+
+  .tl span {
+    font-size: clamp(14px, 1.15vw, 20px);
+    line-height: 1.45;
+    color: var(--ink-2);
+  }
+
+  /* 一个人：三张卡 */
+  .people {
+    list-style: none;
+    margin: 0;
+    padding: 0;
+    display: grid;
+    grid-template-columns: repeat(3, minmax(0, 1fr));
+    gap: clamp(12px, 1.4vw, 24px);
+  }
+
+  .people li {
+    display: flex;
+    flex-direction: column;
+    gap: 6px;
+    padding: clamp(14px, 1.4vw, 24px);
+    border: 1px solid var(--line);
+    border-radius: var(--r);
+    background: var(--card);
+    box-shadow: var(--shadow);
+    transition: transform 0.3s var(--ease), border-color 0.3s;
+  }
+
+  .people li[data-on] {
+    transform: translateY(-4px);
+    border-color: var(--accent);
+  }
+
+  .people p {
+    margin: 0;
+  }
+
+  .pw {
+    display: flex;
+    flex-direction: column;
+    gap: 2px;
+  }
+
+  .pw b {
+    font-size: clamp(15px, 1.2vw, 21px);
+  }
+
+  .pw span {
+    font-size: clamp(12px, 0.9vw, 15px);
+    color: var(--ink-3);
+  }
+
+  .pb {
+    margin-top: 8px !important;
+    font-size: clamp(32px, 3.2vw, 60px);
+    font-weight: 600;
+    line-height: 1.05;
+    color: var(--accent);
+  }
+
+  .pk {
+    font-size: clamp(14px, 1.1vw, 19px);
+    color: var(--ink);
+  }
+
+  .ph {
+    margin-top: auto !important;
+    padding-top: 10px;
+    border-top: 1px solid var(--line);
+    font-size: clamp(12px, 0.9vw, 15px);
+    line-height: 1.5;
+    color: var(--ink-3);
+  }
+
+  /* 我自己：每月柱子 */
+  .cols {
+    list-style: none;
+    margin: 0;
+    padding: 0;
+    height: clamp(220px, 38vh, 420px);
+    display: grid;
+    grid-template-columns: repeat(6, minmax(0, 1fr));
+    gap: clamp(10px, 1.4vw, 26px);
+    align-items: end;
+  }
+
+  .cols li {
+    height: 100%;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 8px;
+    padding: 4px;
+    border-radius: var(--r-sm);
+    transition: background 0.2s;
+  }
+
+  .cols li[data-on] {
+    background: var(--bg-2);
+  }
+
+  .cols b {
+    font-size: clamp(16px, 1.4vw, 26px);
+    font-weight: 600;
+  }
+
+  .col {
+    flex: 1;
+    width: 100%;
+    display: flex;
+    flex-direction: column;
+    justify-content: flex-end;
+    align-items: center;
+    gap: 6px;
+  }
+
+  .col i {
+    display: block;
+    width: 100%;
+    height: var(--h);
+    border-radius: var(--r-sm) var(--r-sm) 2px 2px;
+    background: var(--heat-3);
+    transform-origin: bottom;
+    animation: rise 0.9s var(--ease) both;
+    animation-delay: calc(0.3s + var(--d, 0) * 0.08s);
+  }
+
+  .col i.hot {
+    background: var(--accent);
+  }
+
+  .col i.part {
+    background: repeating-linear-gradient(-45deg, var(--heat-2) 0 6px, var(--heat-1) 6px 12px);
+  }
+
+  .cols em {
+    font-style: normal;
+    font-family: var(--mono);
+    font-size: clamp(12px, 0.95vw, 16px);
+    color: var(--ink-3);
+  }
+
+  @keyframes rise {
+    from {
+      transform: scaleY(0);
+    }
+  }
+
+  @media (max-width: 900px) {
+    .hbars li {
+      grid-template-columns: 1fr;
+      gap: 6px;
+    }
+    .tl,
+    .people {
+      grid-template-columns: 1fr;
+    }
+    .tl::before {
+      display: none;
+    }
+    .cols {
+      height: 220px;
+      gap: 6px;
+    }
+  }
+
+  @media (prefers-reduced-motion: reduce) {
+    .track i,
+    .col i {
+      animation: none;
+    }
+  }
+</style>

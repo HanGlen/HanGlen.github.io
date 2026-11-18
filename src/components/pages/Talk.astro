@@ -7,10 +7,11 @@ import '../../styles/global.css';
 import Cover from '../talk/Cover.astro';
 import Network from '../talk/Network.astro';
 import Gap from '../talk/Gap.astro';
+import Team from '../talk/Team.astro';
 import Make from '../talk/Make.astro';
 import Keep from '../talk/Keep.astro';
-import Ai from '../talk/Ai.astro';
-import Checklist from '../talk/Checklist.astro';
+import Case from '../talk/Case.astro';
+import Summary from '../talk/Summary.astro';
 import { talk } from '../../i18n/talk';
 ---
 
@@ -29,10 +30,11 @@ import { talk } from '../../i18n/talk';
       <Cover />
       <Network />
       <Gap />
+      <Team />
       <Make />
       <Keep />
-      <Ai />
-      <Checklist />
+      <Case />
+      <Summary />
     </main>
 
     <nav class="dots" aria-label="页码" data-dots></nav>
@@ -198,6 +200,31 @@ import { talk } from '../../i18n/talk';
         delete root.dataset.dir;
       });
 
+      // 读数：[data-reads] 里的 [data-read] 悬停、聚焦或点击时，把它的读数写进同一组的 [data-read-out]；
+      // 移开回到 data-hint，点过的那个钉住
+      document.querySelectorAll<HTMLElement>('[data-reads]').forEach((root) => {
+        const out = root.querySelector<HTMLElement>('[data-read-out]');
+        if (!out) return;
+        const items = [...root.querySelectorAll<HTMLElement>('[data-read]')];
+        let pinned: HTMLElement | null = null;
+        const show = (el: HTMLElement | null) => {
+          out.textContent = el ? el.dataset.read! : out.dataset.hint || '';
+          out.classList.toggle('on', !!el);
+          items.forEach((x) => x.toggleAttribute('data-on', x === el));
+        };
+        items.forEach((el) => {
+          if (!el.hasAttribute('tabindex') && !/^(BUTTON|A)$/.test(el.tagName)) el.tabIndex = 0;
+          el.addEventListener('mouseenter', () => show(el));
+          el.addEventListener('mouseleave', () => show(pinned));
+          el.addEventListener('focus', () => show(el));
+          el.addEventListener('blur', () => show(pinned));
+          el.addEventListener('click', () => {
+            pinned = pinned === el ? null : el;
+            show(pinned ?? el);
+          });
+        });
+      });
+
       const first = fromHash();
       mark(first);
       if (!wide.matches && first) slides[first].scrollIntoView({ block: 'start' });
@@ -254,7 +281,7 @@ import { talk } from '../../i18n/talk';
     z-index: 30;
   }
 
-  /* 分步页共用版式（03、04）：顶部步骤条、左图右文、底部例子色块。步数写在 style="--n: 5" */
+  /* 分步页共用版式（03–06）：顶部步骤条、左图右文、底部例子色块。步数写在 style="--n: 5" */
   .t-steps {
     flex: 1;
     min-height: 0;
@@ -574,6 +601,29 @@ import { talk } from '../../i18n/talk';
     margin: 0;
     font-size: 14px;
     color: var(--ink-3);
+  }
+
+  /* 读数行：悬停一个数据点时换成它的读数 */
+  .t-read {
+    margin: 0;
+    min-height: 1.5em;
+    font-size: clamp(14px, 1.1vw, 19px);
+    color: var(--ink-3);
+    transition: color 0.2s;
+  }
+
+  .t-read.on {
+    color: var(--ink);
+  }
+
+  [data-read] {
+    cursor: pointer;
+  }
+
+  [data-read]:focus-visible {
+    outline: 2px solid var(--accent);
+    outline-offset: 3px;
+    border-radius: 4px;
   }
 
   .t-src {
