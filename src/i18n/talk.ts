@@ -274,7 +274,7 @@ export const talk = {
   },
 
   /**
-   * 03 怎么做出来：先备工具、把仓库做成 Harness，再从最小的一张单讲到一个大需求（Project）、一堆需求。
+   * 03 怎么做出来：工具 → 模型能力 → 地基（仓库）→ 一张单 → 一个大需求（Project）→ 一堆需求 → 做出来一件事。
    * 「推荐流程」车主 2026-11-17 定挪到后面讲（配置好以后能做到什么），先不放这页。
    */
   make: {
@@ -288,23 +288,32 @@ export const talk = {
         k: '工具准备',
         tag: 'Tools',
         q: '先看需求，再挑工具',
-        plain: '工具分五类：入门用国产的上手快，顺手了再换进阶的。',
-        case: '我用 Claude Code 写前端、Codex 写后端，代码放 GitHub，任务放 Linear。',
+        plain: '八类工具，国内、国外各挑几个，点名字直接打开官网。',
+        case: '做定制软件先看标红的三类。我用 Claude Code、Codex 写代码，GitHub、Linear 放代码管任务，微信云开发放上线。',
+        src: '2026-11-17 打开各家官网整理（HAN-1844）。挑的标准：不用写代码就能上手、有免费档、国内能开通。',
+      },
+      {
+        k: '模型能力',
+        tag: 'Models',
+        q: '哪家模型最强？',
+        plain: '每个领域领先的不一样，还一直在变；点开榜单自己看。',
+        case: '一张单交给谁，看它擅长什么：界面交给 Claude，后端和美术交给 Codex。',
+        src: '各榜 2026-11-08 至 11-18 打开的页面（HAN-1845）。名次区间互相重叠时，不说谁已经拉开；长文档那页两处第一名对不上，不上表。',
       },
       {
         k: '地基',
         tag: 'Harness',
         q: '工具外面，还要加什么？',
-        plain: 'Claude Code、Codex 是现成的 Harness。仓库里的规则和检查，是沉淀下来的经验。',
-        case: '用中文名判断职业，就加一道检查；换行被整文件翻乱，也加一道检查。',
-        src: 'Anthropic 2025-11：Claude Agent SDK 是通用的 agent harness。OpenAI 2026-02《Harness engineering》：AGENTS.md 当目录，规矩写不清就写成检查。Anthropic 2026-03：新模型出来，拆掉不再承重的部分。',
+        plain: 'Claude Code、Codex 是现成的 Harness，随时能换；仓库里的规矩是你自己的，换工具不丢。',
+        case: '我同时付费用 6 个 AI。Claude 账户被封过一次，换个新账户马上接上：规矩、任务、记录都在仓库里。',
+        src: 'Anthropic 2025-11：Claude Agent SDK 是通用的 agent harness。OpenAI 2026-02《Harness engineering》：AGENTS.md 当目录，规矩写不清就写成检查。仓库多了，再建一个 [Home Repo](https://www.youtube.com/watch?v=hWe-j78vNpc) 放共用的规矩（Matt Pocock，2026-11-12）。',
       },
       {
         k: '一张单',
         tag: 'Spec',
         q: '最简单的一个改动，怎么做？',
         plain: '写清一张单，AI 开发，另一个 AI 评审，检查全过才合并。',
-        case: '10 月 29 日一条玩家反馈：把「灵感」改成「激励」，2.5 小时合入。',
+        case: '一位玩家反馈：页面上「灵感」写错了，应该是「激励」。10 月 29 日开单，2.5 小时合入。',
         src: 'Anthropic 2026-03：把干活的和评判的 agent 分开。',
       },
       {
@@ -322,54 +331,72 @@ export const talk = {
         plain: '分诊 AI 把它们拆成一个个 Project，里面全是最小的单；定时任务一直跑就行。',
         case: '5 个月 1,633 个 PR，最近 30 天平均每天 26 个。',
       },
+      {
+        k: '做出来一件事',
+        tag: 'Any task',
+        q: '这套只能做软件吗？',
+        plain: '任何一件难事，一层层拆开，拆到能直接动手，就做得出来。',
+        case: '这场演讲就是 Linear 里的一个 Project：调研单交给 Cursor，改页面的单交给 Claude。',
+        src: '例如 HAN-1819（调研：02 页换成中国数据，Cursor）→ HAN-1822（按调研改页，Claude）。',
+      },
     ],
-    toolsHead: ['类型', '入门', '进阶'],
+    /** 工具：八类，国内、国外各列推荐的几个，名字链到官网（docs/research/talk-03-tools.md「上页只放这些」） */
+    toolsHead: ['类', '国内', '国外'],
     tools: [
-      { k: '写代码的 AI', v: ['WorkBuddy', 'Trae'], pro: ['Claude Code', 'Codex'] },
-      { k: '放代码', v: ['GitHub'], pro: ['GitHub'], same: '直接用 GitHub' },
-      { k: '管任务', v: ['GitHub Issues'], pro: ['Linear'] },
-      { k: '工作流', v: ['飞书自动化'], pro: ['GitHub Actions'] },
-      { k: '放上线', v: ['微信云开发'], pro: ['微信云开发'], same: '做小程序直接用' },
+      { k: '聊天助手', cn: [['豆包', 'https://www.doubao.com/'], ['千问', 'https://www.qianwen.com/'], ['Kimi', 'https://www.kimi.com/'], ['DeepSeek', 'https://www.deepseek.com/'], ['腾讯元宝', 'https://yuanbao.tencent.com/']], en: [['Claude', 'https://claude.ai/'], ['Gemini', 'https://gemini.google.com/'], ['ChatGPT', 'https://chatgpt.com/']] },
+      { k: '写代码', hot: true, cn: [['Trae', 'https://www.trae.cn/'], ['WorkBuddy', 'https://www.workbuddy.cn/'], ['通义灵码', 'https://lingma.aliyun.com/'], ['CodeBuddy', 'https://www.codebuddy.cn/']], en: [['Claude Code', 'https://claude.com/product/claude-code'], ['Codex', 'https://openai.com/codex/'], ['GitHub Copilot', 'https://github.com/features/copilot'], ['Cursor', 'https://cursor.com/']] },
+      { k: '做图和设计', cn: [['即梦', 'https://jimeng.jianying.com/'], ['可灵', 'https://klingai.com/'], ['创客贴', 'https://www.chuangkit.com/'], ['星流', 'https://www.xingliu.art/']], en: [['Figma', 'https://www.figma.com/'], ['Ideogram', 'https://ideogram.ai/'], ['Recraft', 'https://www.recraft.ai/']] },
+      { k: '视频和配音', cn: [['即梦', 'https://jimeng.jianying.com/'], ['可灵', 'https://klingai.com/'], ['海螺', 'https://hailuoai.com/'], ['剪映', 'https://www.jianying.com/'], ['Vidu', 'https://www.vidu.cn/']], en: [['Runway', 'https://runway.com/'], ['HeyGen', 'https://www.heygen.com/'], ['CapCut', 'https://www.capcut.com/'], ['ElevenLabs', 'https://elevenlabs.io/']] },
+      { k: '办公和文档', cn: [['WPS AI', 'https://ai.wps.cn/'], ['飞书', 'https://www.feishu.cn/'], ['腾讯文档', 'https://docs.qq.com/'], ['通义听悟', 'https://tingwu.aliyun.com/'], ['ima', 'https://ima.qq.com/']], en: [['Notion', 'https://www.notion.com/'], ['Claude', 'https://claude.ai/'], ['Gemini', 'https://gemini.google.com/']] },
+      { k: '自动化', cn: [['扣子', 'https://www.coze.cn/'], ['飞书多维表格', 'https://base.feishu.cn/'], ['宜搭', 'https://www.aliwork.com/']], en: [['Zapier', 'https://zapier.com/'], ['n8n', 'https://n8n.io/'], ['Dify', 'https://dify.ai/']] },
+      { k: '放代码、管任务', hot: true, cn: [['Gitee', 'https://gitee.com/'], ['CODING', 'https://coding.net/'], ['TAPD', 'https://www.tapd.cn/'], ['飞书项目', 'https://project.feishu.cn/']], en: [['GitHub', 'https://github.com/'], ['Linear', 'https://linear.app/']] },
+      { k: '放上线', hot: true, cn: [['微信云开发', 'https://cloud.weixin.qq.com/cloudbase'], ['腾讯云', 'https://cloud.tencent.com/'], ['火山引擎', 'https://www.volcengine.com/']], en: [['Vercel', 'https://vercel.com/'], ['Zeabur', 'https://zeabur.com/']] },
     ],
-    models: {
-      k: '挑模型看这几个榜',
-      links: [
-        { k: 'SWE-bench', href: 'https://www.swebench.com' },
-        { k: 'LMArena', href: 'https://lmarena.ai/leaderboard/webdev' },
-        { k: 'Artificial Analysis', href: 'https://artificialanalysis.ai' },
-        { k: 'OpenRouter', href: 'https://openrouter.ai/rankings' },
-      ],
-    },
+    /** 模型能力：每个领域写领先的那家，悬停看前三，点击打开榜单（docs/research/talk-03-models.md） */
+    modelsHead: ['领域', '现在领先', '榜单'],
+    models: [
+      { k: '做网页、界面', lead: 'Anthropic 包揽前三', top: 'Claude Fable 5.2 · Claude Opus 5.5 · Claude Sonnet 5.5', board: 'LMArena WebDev', at: '11-13', href: 'https://arena.ai/leaderboard/code/webdev' },
+      { k: '写代码', lead: 'Copilot 第一，Claude 并列第二', top: 'Copilot Fusion 71.2% · Claude Opus 5.5 65.8% · Claude Fable 5.2 65.8%', board: 'Terminal-Bench', at: '11-18', href: 'https://www.tbench.ai/' },
+      { k: '生图、海报', lead: 'OpenAI 包揽前三', top: 'GPT-Image-2.5 Sunburst · GPT-Image-2.6 Sunburst · GPT-Image-2（商业设计榜）', board: 'LMArena 文生图', at: '11-16', href: 'https://arena.ai/leaderboard/image/text-to-image/commercial-design' },
+      { k: '视频', lead: 'Google 包揽前三', top: 'Gemini Omni 1.2 Flash · 1.1 Flash · gemini-omni-flash；国产最高是即梦 Seedance，第 6', board: 'LMArena 文生视频', at: '11-08', href: 'https://arena.ai/leaderboard/video/text-to-video' },
+      { k: '综合', lead: 'Claude 第一，GPT、Gemini 随后', top: 'Claude Fable 5.2 65 · GPT-6.2 Astra 62 · Gemini 4 Carbon 60', board: 'Artificial Analysis', at: '11-18', href: 'https://artificialanalysis.ai/leaderboards/models' },
+      { k: '性价比', lead: 'OpenAI 包揽前三', top: '指数 50 分以上、单次更便宜：GPT-6.1 Terra · GPT-6.2 Sol · GPT-6.2 Astra', board: 'Artificial Analysis', at: '11-18', href: 'https://artificialanalysis.ai/leaderboards/models' },
+      { k: '国产', lead: 'Kimi、千问、腾讯混元', top: 'Kimi K3.1 Pro 46 · Qwen4 Max 43 · 腾讯 Hy4 35', board: 'Artificial Analysis', at: '11-18', href: 'https://artificialanalysis.ai/leaderboards/models' },
+    ],
+    modelsHint: '悬停或点一行，看前三名',
     harness: {
       model: '模型',
       modelV: '负责想',
       mid: '现成 Harness',
-      midV: 'Claude Code、Codex',
       midParts: [
         { k: '工具', tip: '读写文件、跑命令' },
         { k: '循环', tip: '一步步做，直到做完' },
         { k: '权限', tip: '哪些能直接做，哪些先问人' },
         { k: '上下文', tip: '记住前面做过什么' },
       ],
-      ring: '你加上的规矩',
-      ringV: '沉淀下来的经验',
+      ring: '代码仓库',
+      ringV: '你加上的规矩，换工具不丢',
       parts: [
-        { k: '规则文档', tip: 'AGENTS.md 只当目录，细节放 docs/' },
-        { k: '自动检查', tip: '用中文名判断职业，就加一道检查（PR #672）' },
-        { k: '技能说明', tip: '怎么测界面、怎么发推文，用到才读' },
-        { k: '任务记录', tip: 'Linear 单和 PR 正文，下一轮读得懂' },
+        { k: '规则文档', tip: '像员工手册，谁来都先读它。AGENTS.md 只当目录，细节放 docs/' },
+        { k: '自动检查', tip: '像出厂质检。用中文名判断职业，就加一道检查（PR #672）' },
+        { k: '技能说明', tip: '像操作手册。怎么测界面、怎么发推文，用到才读' },
+        { k: '任务记录', tip: '像交接本。Linear 单和 PR 正文，下一轮读得懂' },
       ],
-      hint: '悬停或点一个词，看它指什么',
+      /** 车主同时付费在用的六个 AI（2026-11-17） */
+      swap: ['Claude', 'Codex', 'Cursor', 'Trae', 'Gemini', 'Grok'],
+      swapK: '我在用的 AI',
+      unplug: '拔掉 {x}：仓库还在，其余照跑',
+      hint: '悬停一个词看它指什么；点左边一个 AI 把它拔掉',
     },
     ticket: [
-      { k: '需求单', en: 'Spec', ex: '「灵感」改成「激励」' },
-      { k: 'AI 开发', en: 'Coding Agent', ex: 'Claude 改代码' },
+      { k: '需求单', en: 'Spec', ex: '玩家：「灵感」写错了' },
+      { k: 'AI 开发', en: 'Coding Agent', ex: 'Claude 改成「激励」' },
       { k: '申请合入', en: 'Pull Request', ex: '提交一个 PR' },
       { k: 'AI 代码评审', en: 'Code Review', ex: 'Codex 审' },
       { k: '门禁检查', en: 'CI', ex: '15 分钟跑完' },
       { k: '合并', en: 'Merge', ex: '11:21 合入' },
     ],
-    retry: '代码评审、门禁检查，任一不过都打回重改',
+    retry: '评审或检查不过，打回重改',
     need: {
       req: '一个大需求',
       project: 'Project',
@@ -395,10 +422,20 @@ export const talk = {
       loopV: '一直跑',
       done: '合入',
     },
+    craft: {
+      from: '一堆需求',
+      fromV: '拆成 Project，再拆成单',
+      rows: [
+        { k: '一场演讲', steps: ['Project「青岛演讲」', '调研单 · Cursor', '改页单 · Claude', '合入上线'], plain: '20 分钟的演讲，也是一张张单做出来的。' },
+        { k: '一篇推文', steps: ['挑这期更新', '写稿', '配图', 'AI 审稿', '进草稿箱'], plain: '写文章也一样：挑素材、写、配图、找人审，最后我点发布。' },
+        { k: '一个 AI 功能', steps: ['理解问题', '查原文', '回答', '逐句核对'], plain: '回答一个问题：先弄懂问什么，翻原文，答完逐句再对一遍。下一页细讲。' },
+      ],
+      hint: '悬停或点一行',
+    },
     caseK: '例子',
     srcK: '依据',
     notes:
-      '6 分钟。← → 一步步讲。工具：先看需求再挑，分五类，入门用 WorkBuddy、Trae 这些国产的，顺手了换 Claude Code、Codex；代码直接放 GitHub；任务入门用 GitHub Issues，进阶用 Linear；工作流入门用飞书自动化，进阶用 GitHub Actions 跑检查和部署；小程序直接放微信云开发。补一句：用户反馈先落在飞书表里，由写代码的 AI 定时读走、开成任务单。地基：从里往外讲三圈。模型负责想；Claude Code、Codex 是现成的 Harness，自带工具、循环、权限和上下文，负责动手；最外一圈是你自己加的规矩，也就是沉淀下来的经验：AI 犯过的一类错写成自动检查，例如用中文名判断职业，就加一道检查，下一轮就不会再犯。规矩都在仓库里，AI 哪家好用换哪家。一张单：先抛问题「最简单的一个改动怎么做」，上面一行是说法，下面一行是同一张单的真实记录；评审和检查任一不过都打回。传统软件团队也是这套流程，只是每一步换成了 AI。大需求：这张单缩进定时任务里，一个大需求就是一个 Project，AI 先分析、切成小单，一个定时任务每轮领一张；补一句不同 AI 擅长不同的单，Claude 做前端，Codex 做后端和美术。一堆需求：上一步那一整套缩成一个 Project；一堆需求先框起来交给分诊 AI，拆成一个个 Project，Project 里全是最小的单，定时任务一直跑就行。',
+      '7 分钟，每步一分钟左右。← → 一步步讲。工具：八类工具，国内国外各挑几个，名字点了就是官网；做定制软件先看写代码、放代码管任务、放上线这三类，我用 Claude Code、Codex、GitHub、Linear、微信云开发。模型能力：不背名次，只看规律：做界面现在是 Anthropic，生图是 OpenAI，视频是 Google，每个月都在变，表上都有日期，点开就是榜单。顺带一句 AI 的短板：没把握时也会给一个很肯定的答案，所以后面要有检查，05 页还会讲。地基：中间是模型，负责想；中圈是现成的 Harness，Claude Code、Codex 这些，负责动手；最外圈是代码仓库，规则文档、自动检查、技能说明、任务记录都在里面。左边是我同时在用的六个 AI，点一个拔掉，其余照跑。我的 Claude 账户被封过一次，换个新账户马上接上，因为东西都在仓库里，不在工具里。仓库多了还可以再建一个 Home Repo 放共用规矩，一句带过。一张单：一位玩家说「灵感」写错了，上面一行是说法，下面一行是同一张单的真实记录；评审或检查不过就打回。传统软件团队也是这套流程，只是每一步换成了 AI。大需求：这张单缩进定时任务里，一个大需求就是一个 Project，AI 先切成小单，定时任务每轮领一张；不同 AI 擅长不同的单，Claude 做前端，Codex 做后端和美术。一堆需求：上一步那一整套缩成一个 Project；一堆需求交给分诊 AI，拆成一个个 Project，定时任务一直跑。做出来一件事：这套不只做软件。任何难事一层层拆开，拆到能直接动手就做得出来。三个例子：这场演讲本身是一个 Project，调研交给 Cursor、改页面交给 Claude；一篇公众号推文，挑更新、写稿、配图、AI 审稿、进草稿箱，最后我点发布；规则问答，理解、查原文、回答、逐句核对，下一页细讲。',
   },
 
   /**

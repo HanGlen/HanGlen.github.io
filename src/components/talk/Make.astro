@@ -1,15 +1,19 @@
 ---
 /**
- * 演讲 03「怎么做出来」：工具准备 → 地基 Harness → 一张单 → 一个大需求（Project + 定时任务）→ 一堆需求（分诊）。
+ * 演讲 03「怎么做出来」：工具准备 → 模型能力 → 地基 Harness → 一张单 → 一个大需求（Project + 定时任务）
+ * → 一堆需求（分诊）→ 做出来一件事。
  * 顶上是步骤 tab，← → 下一步；左边一张图，右边只放两层：一个问题、一句备注。
  * 每步的例子统一放在底部一条独立色块里，依据在色块右边点开才看（渐进披露）。
- * 3 → 4、4 → 5 用 View Transition 串起来（data-vt 列出哪两步之间变形，切换时写进 data-vt-pair）：
- * 3 → 4 整条「一张单」流水线缩进定时任务里；4 → 5 整条「一个大需求」缩成一堆需求里的 Project A。
+ * 4 → 5、5 → 6、6 → 7 用 View Transition 串起来（data-vt 列出哪两步之间变形，切换时写进 data-vt-pair）：
+ * 「一张单」缩进定时任务里；「一个大需求」缩成一堆需求里的 Project A；「一堆需求」缩成最后一步的起点。
  */
 import { talk } from '../../i18n/talk';
+import { rich } from '../../lib/rich';
 
 const m = talk.make;
 const L = m.levels;
+// 工具表每格先露 3 个，多的点类名展开
+const SHOW = 3;
 ---
 
 <section class="slide t-slide make" data-slide data-notes={m.notes} aria-labelledby="make-title">
@@ -19,7 +23,7 @@ const L = m.levels;
     <p class="lead">{m.lead}</p>
   </header>
 
-  <div class="body t-body t-steps" data-stepper data-vt="2-3 3-4">
+  <div class="body t-body t-steps" data-stepper data-vt="3-4 4-5 5-6" style={`--n: ${L.length}`}>
     <ol class="line" role="tablist" aria-label={m.title}>
       {
         L.map((l, i) => (
@@ -36,7 +40,7 @@ const L = m.levels;
 
     <div class="main">
       <div class="stage">
-        <!-- 1 工具准备：类型 × 入门 / 进阶 -->
+        <!-- 1 工具准备：八类，国内 / 国外，名字链到官网 -->
         <div class="frame" data-pane="0">
           <table class="tools">
             <thead>
@@ -47,50 +51,77 @@ const L = m.levels;
             <tbody>
               {
                 m.tools.map((t, i) => (
-                  <tr class="fin" style={`--d:${i + 1}`}>
+                  <tr class={`fin${t.hot ? ' hot' : ''}`} style={`--d:${i + 1}`}>
                     <th scope="row">
-                      {t.k}
-                      {t.opt && <em>{t.opt}</em>}
+                      {t.cn.length > SHOW || t.en.length > SHOW ? (
+                        <button type="button" class="more" aria-expanded="false" data-more>
+                          {t.k}
+                        </button>
+                      ) : (
+                        t.k
+                      )}
                     </th>
-                    {t.same ? (
-                      <td colspan="2" class="same">
-                        <b class="serif">{t.v[0]}</b>
-                        <span>{t.same}</span>
+                    {[t.cn, t.en].map((xs) => (
+                      <td>
+                        {xs.map(([name, href], j) => (
+                          <a href={href} target="_blank" rel="noopener" class={j >= SHOW ? 'extra' : undefined}>
+                            {name}
+                          </a>
+                        ))}
+                        {xs.length > SHOW && <span class="plus" aria-hidden="true">+{xs.length - SHOW}</span>}
                       </td>
-                    ) : (
-                      <>
-                        <td>
-                          {t.v.map((v) => (
-                            <b class="serif">{v}</b>
-                          ))}
-                        </td>
-                        <td class="pro">
-                          {t.pro.map((v) => (
-                            <b class="serif">{v}</b>
-                          ))}
-                        </td>
-                      </>
-                    )}
+                    ))}
                   </tr>
                 ))
               }
             </tbody>
           </table>
-          <p class="links fin" style="--d:6">
-            <b>{m.models.k}</b>
-            {
-              m.models.links.map((x) => (
-                <a href={x.href} target="_blank" rel="noopener">
-                  {x.k} ↗
-                </a>
-              ))
-            }
-          </p>
         </div>
 
-        <!-- 2 地基 Harness -->
+        <!-- 2 模型能力：每个领域写领先的那家；悬停看前三，点榜单打开原页 -->
         <div class="frame" data-pane="1" hidden>
-          <div class="harness" data-harness>
+          <div class="models" data-rows>
+            <table class="board">
+              <thead>
+                <tr class="fin">
+                  {m.modelsHead.map((h) => <th scope="col">{h}</th>)}
+                </tr>
+              </thead>
+              <tbody>
+                {
+                  m.models.map((x, i) => (
+                    <tr class="fin" style={`--d:${i + 1}`} tabindex="0" data-row={`${x.k}：${x.top}`}>
+                      <th scope="row">{x.k}</th>
+                      <td class="lead serif">{x.lead}</td>
+                      <td class="bd">
+                        <a href={x.href} target="_blank" rel="noopener">
+                          {x.board} ↗
+                        </a>
+                        <span>{x.at}</span>
+                      </td>
+                    </tr>
+                  ))
+                }
+              </tbody>
+            </table>
+            <p class="tip" aria-live="polite" data-row-out data-hint={m.modelsHint}>{m.modelsHint}</p>
+          </div>
+        </div>
+
+        <!-- 3 地基：中间模型，中圈现成 Harness（左边六个 AI 都能插进来），外圈代码仓库 -->
+        <div class="frame" data-pane="2" hidden>
+          <div class="harness" data-harness data-unplug={m.harness.unplug}>
+            <div class="rig">
+            <div class="swap fin" style="--d:3">
+              <p>{m.harness.swapK}</p>
+              <ul>
+                {m.harness.swap.map((x) => (
+                  <li>
+                    <button type="button" class="plug" data-plug={x}>{x}</button>
+                  </li>
+                ))}
+              </ul>
+            </div>
             <div class="ring fin" style="--d:0">
               <p class="rk"><b class="serif">{m.harness.ring}</b>{m.harness.ringV}</p>
               <ul class="parts">
@@ -101,7 +132,7 @@ const L = m.levels;
                 ))}
               </ul>
               <div class="mid fin" style="--d:1">
-                <p class="mk"><b class="serif">{m.harness.mid}</b>{m.harness.midV}</p>
+                <p class="mk"><b class="serif">{m.harness.mid}</b></p>
                 <ul class="mparts">
                   {m.harness.midParts.map((p, i) => (
                     <li class={`m${i}`}>
@@ -115,12 +146,13 @@ const L = m.levels;
                 </div>
               </div>
             </div>
+            </div>
             <p class="tip" aria-live="polite" data-tip-out data-hint={m.harness.hint}>{m.harness.hint}</p>
           </div>
         </div>
 
-        <!-- 3 一张单：上面专业说法，下面同一个过程的真实例子 -->
-        <div class="frame" data-pane="2" hidden>
+        <!-- 4 一张单：上面专业说法，下面同一个过程的真实例子 -->
+        <div class="frame" data-pane="3" hidden>
           <ol class="pipe vt-ticket">
             {
               m.ticket.map((t, i) => (
@@ -132,14 +164,14 @@ const L = m.levels;
               ))
             }
           </ol>
-          <div class="retry fin" style="--d:6" aria-label={m.retry}>
-            <i class="tick" aria-hidden="true" />
-            <span>↻ {m.retry}</span>
+          <div class="retry fin" style="--d:6">
+            <div class="loop" aria-hidden="true"><i class="tick" /></div>
+            <p>↻ {m.retry}</p>
           </div>
         </div>
 
-        <!-- 4 一个大需求：横着一条线；上一步那张单缩进「定时任务」里（View Transition） -->
-        <div class="frame" data-pane="3" hidden>
+        <!-- 5 一个大需求：横着一条线；上一步那张单缩进「定时任务」里（View Transition） -->
+        <div class="frame" data-pane="4" hidden>
           <div class="flow vt-need">
             <div class="req">
               <em>{m.need.project}</em>
@@ -181,9 +213,9 @@ const L = m.levels;
           </p>
         </div>
 
-        <!-- 5 一堆需求：先框成一堆 → 分诊 → 一个个 Project（里面全是最小的单）→ 定时任务一直跑 -->
-        <div class="frame" data-pane="4" hidden>
-          <div class="flow">
+        <!-- 6 一堆需求：先框成一堆 → 分诊 → 一个个 Project（里面全是最小的单）→ 定时任务一直跑 -->
+        <div class="frame" data-pane="5" hidden>
+          <div class="flow vt-pile">
             <div class="pile">
               <em>{m.triage.pile}</em>
               <ul>
@@ -219,6 +251,33 @@ const L = m.levels;
             <span class="chip done fin" style="--d:10">{m.triage.done}</span>
           </div>
         </div>
+
+        <!-- 7 做出来一件事：上一步那一堆缩成起点；三个例子各是一条拆开的链 -->
+        <div class="frame" data-pane="6" hidden>
+          <div class="craft" data-craft>
+            <div class="from vt-pile">
+              <b>{m.craft.from}</b>
+              <span>{m.craft.fromV}</span>
+            </div>
+            <ul class="rows">
+              {
+                m.craft.rows.map((r, i) => (
+                  <li class="fin" style={`--d:${1 + i}`}>
+                    <button type="button" data-plain={r.plain} aria-pressed={i === 0 ? 'true' : 'false'}>
+                      <b class="serif">{r.k}</b>
+                      <ol>
+                        {r.steps.map((x) => (
+                          <li>{x}</li>
+                        ))}
+                      </ol>
+                    </button>
+                  </li>
+                ))
+              }
+            </ul>
+            <p class="say fin" style="--d:5" aria-live="polite" data-craft-out>{m.craft.rows[0].plain}</p>
+          </div>
+        </div>
       </div>
 
       <aside class="side" aria-live="polite">
@@ -243,7 +302,7 @@ const L = m.levels;
           {l.src && (
             <details class="src">
               <summary>{m.srcK}</summary>
-              <p>{l.src}</p>
+              <p set:html={rich(l.src)} />
             </details>
           )}
         </div>
@@ -284,90 +343,173 @@ const L = m.levels;
     font-size: clamp(14px, 1.2vw, 20px);
   }
 
-  /* 工具准备：类型 × 入门 / 进阶 */
-  .tools {
+  /* 工具准备：八类 × 国内 / 国外，名字是官网链接 */
+  .tools,
+  .board {
     width: 100%;
     border-collapse: collapse;
   }
 
   .tools th,
-  .tools td {
-    padding: clamp(10px, 1.6vh, 18px) clamp(10px, 1.2vw, 20px);
+  .tools td,
+  .board th,
+  .board td {
+    padding: clamp(4px, 0.8vh, 12px) clamp(8px, 0.9vw, 16px);
     border-bottom: 1px solid var(--line);
     text-align: left;
     vertical-align: baseline;
   }
 
-  .tools thead th {
+  .tools thead th,
+  .board thead th {
     padding-top: 0;
-    font-size: clamp(12px, 0.95vw, 15px);
+    font-size: clamp(12px, 0.9vw, 15px);
     font-weight: 500;
     letter-spacing: 0.08em;
     color: var(--ink-3);
     border-bottom: 1.5px solid var(--line-2);
   }
 
-  .tools thead th:last-child {
-    color: var(--accent-ink);
-  }
-
-  .tools tbody th {
-    width: 26%;
-    font-size: clamp(15px, 1.25vw, 22px);
+  .tools tbody th,
+  .board tbody th {
+    width: 1%;
+    font-size: clamp(14px, 1.1vw, 19px);
     font-weight: 500;
     color: var(--ink-2);
     white-space: nowrap;
   }
 
-  .tools tbody th em {
-    margin-left: 8px;
-    padding: 1px 8px;
-    border: 1px dashed var(--ink-3);
-    border-radius: var(--r-pill);
-    font-style: normal;
-    font-size: 0.7em;
-    color: var(--ink-3);
-  }
-
-  .tools td b {
+  .tools td a {
     display: inline-block;
-    margin-right: clamp(12px, 1.2vw, 22px);
-    font-size: clamp(20px, 2vw, 36px);
-    font-weight: 600;
-    line-height: 1.2;
+    margin-right: clamp(8px, 0.9vw, 16px);
+    font-size: clamp(14px, 1.15vw, 20px);
+    line-height: 1.35;
+    color: var(--ink);
+    text-decoration: none;
+    border-bottom: 1px solid transparent;
+    transition: color 0.2s, border-color 0.2s;
   }
 
-  .tools td.pro b {
+  .tools td a:hover,
+  .tools td a:focus-visible {
+    outline: none;
     color: var(--accent-ink);
+    border-bottom-color: var(--accent);
   }
 
-  .tools td.same span {
-    font-size: clamp(13px, 1.05vw, 17px);
+  .tools tbody tr {
+    transition: background 0.2s;
+  }
+
+  .tools tbody tr:hover {
+    background: var(--bg-2);
+  }
+
+  .tools td {
+    white-space: nowrap;
+  }
+
+  .tools td a.extra {
+    display: none;
+  }
+
+  .tools tr.open td {
+    white-space: normal;
+  }
+
+  .tools tr.open td a.extra {
+    display: inline-block;
+  }
+
+  .tools tr.open .plus {
+    display: none;
+  }
+
+  .plus {
+    font-family: var(--mono);
+    font-size: clamp(11px, 0.85vw, 14px);
     color: var(--ink-3);
   }
 
-  .links {
-    margin: 0;
+  .tools .more {
+    padding: 0;
+    font: inherit;
+    color: inherit;
+    background: none;
+    border: 0;
+    border-bottom: 1px dashed var(--ink-3);
+    cursor: pointer;
+  }
+
+  .tools .more::after {
+    content: ' ▸';
+    font-size: 0.75em;
+    color: var(--ink-3);
+  }
+
+  .tools .more[aria-expanded='true']::after {
+    content: ' ▾';
+  }
+
+  .tools .more:focus-visible {
+    outline: 2px solid var(--accent);
+    outline-offset: 2px;
+  }
+
+  /* 做定制软件先看的三类：左边一条陶土红 */
+  .tools tr.hot th {
+    color: var(--accent-ink);
+    font-weight: 600;
+    box-shadow: inset 3px 0 0 var(--accent);
+  }
+
+  /* 模型能力：领域 × 领先的那家 × 榜单 */
+  .models {
     display: flex;
-    flex-wrap: wrap;
-    align-items: baseline;
-    gap: 4px 14px;
-    font-size: 14px;
+    flex-direction: column;
+    gap: clamp(8px, 1.4vh, 16px);
   }
 
-  .links b {
-    font-weight: 500;
+  .board tbody tr {
+    cursor: default;
+    transition: background 0.2s;
+  }
+
+  .board tbody tr:hover,
+  .board tbody tr:focus-visible,
+  .board tbody tr[aria-selected='true'] {
+    outline: none;
+    background: var(--accent-soft);
+  }
+
+  .board td.lead {
+    font-size: clamp(17px, 1.6vw, 28px);
+    font-weight: 600;
+    line-height: 1.25;
+  }
+
+  .board td.bd {
+    white-space: nowrap;
+    font-size: clamp(12px, 0.95vw, 16px);
     color: var(--ink-3);
   }
 
-  .links a {
+  .board td.bd a {
+    margin-right: 8px;
     color: var(--ink-2);
     text-decoration: none;
     border-bottom: 1px solid var(--line-2);
   }
 
-  .links a:hover {
+  .board td.bd a:hover,
+  .board td.bd a:focus-visible {
+    outline: none;
     color: var(--accent-ink);
+    border-bottom-color: var(--accent);
+  }
+
+  .board td.bd span {
+    font-family: var(--mono);
   }
 
   /* 地基：三圈。中间模型，中圈现成 Harness，外圈你加上的规矩 */
@@ -378,9 +520,81 @@ const L = m.levels;
     gap: clamp(8px, 1.4vh, 16px);
   }
 
+  /* 左边六个 AI 都插进中圈；点一个拔掉，其余照跑 */
+  .rig {
+    width: 100%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: clamp(14px, 2vw, 36px);
+  }
+
+  .swap p {
+    margin: 0 0 8px;
+    font-size: clamp(11px, 0.85vw, 14px);
+    letter-spacing: 0.06em;
+    color: var(--ink-3);
+  }
+
+  .swap ul {
+    list-style: none;
+    margin: 0;
+    padding: 0 clamp(14px, 1.6vw, 28px) 0 0;
+    display: flex;
+    flex-direction: column;
+    gap: 6px;
+    border-right: 2px solid var(--ink-3);
+  }
+
+  .swap li {
+    position: relative;
+  }
+
+  /* 每个 AI 一根线连到右边的总线 */
+  .swap li::after {
+    content: '';
+    position: absolute;
+    left: 100%;
+    right: calc(-1 * clamp(14px, 1.6vw, 28px));
+    top: 50%;
+    border-top: 2px solid var(--ink-3);
+    transition: opacity 0.25s;
+  }
+
+  .harness .plug {
+    width: 100%;
+    padding: 0.25em 0.8em;
+    border-radius: var(--r-sm);
+    border: 1.5px solid var(--line-2);
+    background: var(--card);
+    color: var(--ink);
+    font-size: clamp(12px, 1vw, 17px);
+    text-align: left;
+  }
+
+  .harness .plug:hover {
+    transform: translateX(-2px);
+    background: var(--bg-2);
+    border-color: var(--ink-3);
+    color: var(--ink);
+  }
+
+  .harness .plug[aria-pressed='true'] {
+    transform: translateX(-10px);
+    background: transparent;
+    border-style: dashed;
+    color: var(--ink-3);
+    text-decoration: line-through;
+  }
+
+  .swap li:has(.plug[aria-pressed='true'])::after {
+    opacity: 0;
+  }
+
   .ring {
     position: relative;
-    width: min(100%, 66vh);
+    flex: 0 1 auto;
+    width: min(100%, 60vh);
     aspect-ratio: 1.45;
     border-radius: 50%;
     border: 3px dashed var(--accent);
@@ -415,7 +629,7 @@ const L = m.levels;
 
   .mid {
     position: relative;
-    width: 52%;
+    width: 48%;
     aspect-ratio: 1.45;
     margin-top: 10%;
     border-radius: 50%;
@@ -488,10 +702,10 @@ const L = m.levels;
     outline-offset: 2px;
   }
 
-  .p0 { left: 13%; top: 38%; }
-  .p1 { left: 87%; top: 38%; }
-  .p2 { left: 13%; top: 70%; }
-  .p3 { left: 87%; top: 70%; }
+  .p0 { left: 15%; top: 36%; }
+  .p1 { left: 85%; top: 36%; }
+  .p2 { left: 15%; top: 66%; }
+  .p3 { left: 85%; top: 66%; }
 
   .m0 { left: 14%; top: 42%; }
   .m1 { left: 86%; top: 42%; }
@@ -610,45 +824,51 @@ const L = m.levels;
     opacity: 0.85;
   }
 
-  /* 打回：评审（第 4 格）和门禁（第 5 格）各伸下来一根，连回 AI 开发（第 2 格） */
+  /* 打回：一根虚线从评审（第 4 格）、门禁（第 5 格）底下绕回 AI 开发（第 2 格），说明写在线下面 */
   .retry {
+    display: grid;
+    grid-template-columns: repeat(6, minmax(0, 1fr));
+    gap: 0 10px;
+    margin-top: -4px;
+  }
+
+  .retry .loop {
+    grid-column: 2 / 6;
     position: relative;
-    height: 30px;
-    margin: -6px calc(100% / 12 * 3 - 5px) 8px calc(100% / 12 * 3 - 5px);
+    height: 26px;
+    margin: 0 calc(100% / 8);
     border: 2px dashed var(--accent);
     border-top: 0;
-    border-radius: 0 0 var(--r) var(--r);
+    border-radius: 0 0 var(--r-sm) var(--r-sm);
   }
 
-  .retry::before {
-    content: '▲';
+  /* 箭头朝上，指回 AI 开发 */
+  .retry .loop::before {
+    content: '';
     position: absolute;
     left: -7px;
-    top: -10px;
-    font-size: 10px;
-    color: var(--accent);
+    top: -6px;
+    border: 6px solid transparent;
+    border-bottom: 8px solid var(--accent);
+    border-top: 0;
   }
 
+  /* 评审那一格也伸下来一根 */
   .retry .tick {
     position: absolute;
     left: calc(200% / 3);
     top: 0;
     bottom: 0;
-    border-left: 2px solid var(--accent);
-    opacity: 0.6;
+    border-left: 2px dashed var(--accent);
   }
 
-  .retry span {
-    position: absolute;
-    left: 33%;
-    bottom: -0.8em;
-    transform: translateX(-50%);
-    padding: 0 10px;
-    background: var(--bg);
+  .retry p {
+    grid-column: 2 / 6;
+    margin: 8px 0 0;
+    text-align: center;
     color: var(--accent-ink);
     font-size: clamp(13px, 1.1vw, 18px);
     font-weight: 600;
-    white-space: nowrap;
   }
 
   /* 一个大需求 / 一堆需求：横着一条线 */
@@ -906,17 +1126,123 @@ const L = m.levels;
     font-size: clamp(16px, 1.4vw, 24px);
   }
 
+  /* 做出来一件事：起点是上一步那一堆，下面三条拆开的链 */
+  .craft {
+    display: flex;
+    flex-direction: column;
+    gap: clamp(10px, 1.8vh, 20px);
+  }
+
+  .from {
+    align-self: flex-start;
+    display: flex;
+    align-items: baseline;
+    gap: 10px;
+    padding: 0.5em 1em;
+    border: 2px dashed var(--ink);
+    border-radius: var(--r);
+    background: var(--card);
+  }
+
+  .from b {
+    font-size: clamp(15px, 1.3vw, 22px);
+  }
+
+  .from span {
+    font-size: clamp(12px, 0.95vw, 16px);
+    color: var(--ink-3);
+  }
+
+  .rows {
+    list-style: none;
+    margin: 0;
+    padding: 0;
+    display: flex;
+    flex-direction: column;
+    gap: 8px;
+  }
+
+  .rows button {
+    width: 100%;
+    display: grid;
+    grid-template-columns: clamp(110px, 10vw, 180px) 1fr;
+    align-items: center;
+    gap: 12px;
+    padding: clamp(10px, 1.4vh, 16px) clamp(12px, 1.2vw, 20px);
+    font: inherit;
+    text-align: left;
+    color: var(--ink);
+    background: var(--card);
+    border: 1.5px solid var(--line-2);
+    border-radius: var(--r);
+    cursor: pointer;
+    transition: border-color 0.25s, background 0.25s, transform 0.25s var(--ease);
+  }
+
+  .rows button[aria-pressed='true'] {
+    border-color: var(--accent);
+    background: var(--accent-soft);
+  }
+
+  .rows button:focus-visible {
+    outline: 2px solid var(--accent);
+    outline-offset: 2px;
+  }
+
+  .rows b {
+    font-size: clamp(17px, 1.5vw, 26px);
+    font-weight: 600;
+  }
+
+  .rows ol {
+    list-style: none;
+    margin: 0;
+    padding: 0;
+    display: flex;
+    flex-wrap: wrap;
+    align-items: center;
+    gap: 6px 20px;
+  }
+
+  .rows ol li {
+    position: relative;
+    padding: 0.2em 0.65em;
+    border-radius: var(--r-sm);
+    background: var(--bg-2);
+    font-size: clamp(12px, 1vw, 17px);
+    white-space: nowrap;
+  }
+
+  .rows ol li + li::before {
+    content: '→';
+    position: absolute;
+    left: -16px;
+    color: var(--ink-3);
+  }
+
+  .say {
+    margin: 0;
+    min-height: 1.5em;
+    font-size: clamp(16px, 1.45vw, 26px);
+    color: var(--accent-ink);
+  }
+
   /* View Transition：只在相邻两步之间命名，同名元素从上一步变形过来 */
-  [data-vt-pair='2-3'] .vt-ticket {
+  [data-vt-pair='3-4'] .vt-ticket {
     view-transition-name: mk-ticket;
   }
 
-  [data-vt-pair='3-4'] .vt-need {
+  [data-vt-pair='4-5'] .vt-need {
     view-transition-name: mk-need;
   }
 
+  [data-vt-pair='5-6'] .vt-pile {
+    view-transition-name: mk-pile;
+  }
+
   ::view-transition-group(mk-ticket),
-  ::view-transition-group(mk-need) {
+  ::view-transition-group(mk-need),
+  ::view-transition-group(mk-pile) {
     animation-duration: 0.7s;
     animation-timing-function: var(--ease);
   }
@@ -929,7 +1255,9 @@ const L = m.levels;
 
   /* 整条流水线缩成一个 Project：保持比例，不压扁 */
   ::view-transition-old(mk-need),
-  ::view-transition-new(mk-need) {
+  ::view-transition-new(mk-need),
+  ::view-transition-old(mk-pile),
+  ::view-transition-new(mk-pile) {
     width: 100%;
     height: 100%;
     object-fit: contain;
@@ -939,28 +1267,39 @@ const L = m.levels;
     .pipe {
       grid-template-columns: 1fr 1fr;
     }
-    .tools td b {
-      font-size: 17px;
-    }
-    .tools tbody th {
+    .tools td,
+    .board td.bd {
       white-space: normal;
     }
+    .tools tbody th,
+    .board tbody th {
+      font-size: 13px;
+    }
+    .tools td a {
+      font-size: 14px;
+    }
     .pipe li + li::before,
-    .retry::before,
-    .retry .tick {
+    .retry .loop {
       display: none;
     }
     /* 手机上不画回路线，只留打回说明 */
     .retry {
-      height: auto;
-      margin: 0;
+      display: block;
+    }
+    .rig {
+      flex-direction: column;
+    }
+    .swap ul {
+      flex-direction: row;
+      flex-wrap: wrap;
+      padding: 0;
       border: 0;
     }
-    .retry span {
-      position: static;
-      transform: none;
-      padding: 0;
-      white-space: normal;
+    .swap li::after {
+      display: none;
+    }
+    .rows button {
+      grid-template-columns: 1fr;
     }
     .flow {
       flex-direction: column;
@@ -1028,6 +1367,63 @@ const L = m.levels;
         pinned = pinned === b ? null : b;
         show(pinned ?? b);
       });
+    });
+
+    // 左边的 AI：点一下拔掉（再点插回），下面一行说「仓库还在，其余照跑」
+    root.querySelectorAll<HTMLButtonElement>('button[data-plug]').forEach((b) => {
+      b.setAttribute('aria-pressed', 'false');
+      b.addEventListener('click', () => {
+        const off = b.getAttribute('aria-pressed') !== 'true';
+        b.setAttribute('aria-pressed', String(off));
+        out.textContent = off ? root.dataset.unplug!.replace('{x}', b.dataset.plug!) : out.dataset.hint!;
+        out.classList.toggle('on', off);
+      });
+    });
+  });
+
+  // 工具表：点类名展开这一类的完整清单
+  document.querySelectorAll<HTMLButtonElement>('.tools [data-more]').forEach((b) => {
+    b.addEventListener('click', () => {
+      const open = b.getAttribute('aria-expanded') !== 'true';
+      b.setAttribute('aria-expanded', String(open));
+      b.closest('tr')!.classList.toggle('open', open);
+    });
+  });
+
+  // 模型能力：悬停、聚焦或点一行，下面一行写前三名
+  document.querySelectorAll<HTMLElement>('[data-rows]').forEach((root) => {
+    const out = root.querySelector<HTMLElement>('[data-row-out]')!;
+    const rows = [...root.querySelectorAll<HTMLElement>('tr[data-row]')];
+    let pinned: HTMLElement | null = null;
+    const show = (r: HTMLElement | null) => {
+      out.textContent = r ? r.dataset.row! : out.dataset.hint!;
+      out.classList.toggle('on', !!r);
+      rows.forEach((x) => x.setAttribute('aria-selected', String(x === r)));
+    };
+    rows.forEach((r) => {
+      r.addEventListener('mouseenter', () => show(r));
+      r.addEventListener('mouseleave', () => show(pinned));
+      r.addEventListener('focus', () => show(r));
+      r.addEventListener('blur', () => show(pinned));
+      r.addEventListener('click', () => {
+        pinned = pinned === r ? null : r;
+        show(pinned ?? r);
+      });
+    });
+  });
+
+  // 做出来一件事：悬停、聚焦或点一行，下面一行换成这个例子的大白话
+  document.querySelectorAll<HTMLElement>('[data-craft]').forEach((root) => {
+    const out = root.querySelector<HTMLElement>('[data-craft-out]')!;
+    const btns = [...root.querySelectorAll<HTMLButtonElement>('button[data-plain]')];
+    const pick = (b: HTMLButtonElement) => {
+      out.textContent = b.dataset.plain!;
+      btns.forEach((x) => x.setAttribute('aria-pressed', String(x === b)));
+    };
+    btns.forEach((b) => {
+      b.addEventListener('mouseenter', () => pick(b));
+      b.addEventListener('focus', () => pick(b));
+      b.addEventListener('click', () => pick(b));
     });
   });
 </script>
