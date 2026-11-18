@@ -19,21 +19,31 @@ for (const [d, n] of Object.entries(daily)) {
 }
 const counts = [feat, fix, Math.max(0, total - feat - fix)];
 let ci = 0;
-const lines = c.title.split('\n');
-/** 最后一行里不标强调色的字：连接词和标点，其余（定制软件、AI 能力）标陶土红 */
-const plain = '与和？? ';
+/** 标题里 *…* 包住的字标陶土红，\n 换行 */
+const lines = c.title.split('\n').map((l) => {
+  let hot = false;
+  const out: { ch: string; hot: boolean }[] = [];
+  for (const ch of l) {
+    if (ch === '*') hot = !hot;
+    else out.push({ ch, hot });
+  }
+  return out;
+});
+const label = c.title.replace(/[\n*]/g, '');
+/** 标题之后的元素按这个序号错峰（标题字多，不按字数排，免得等太久） */
+const base = 14;
 ---
 
 <section class="slide cover" data-slide data-notes={c.notes} aria-label="封面">
   <canvas class="cv" aria-hidden="true" data-cover-canvas data-counts={JSON.stringify(counts)}></canvas>
   <div class="inner">
     <p class="eyebrow rise" style="--i:0">{c.eyebrow}</p>
-    <h1 aria-label={c.title.replace('\n', '')}>
+    <h1 aria-label={label}>
       {
-        lines.map((l, li) => (
+        lines.map((l) => (
           <span class="ln" aria-hidden="true">
-            {[...l].map((ch) => (
-              <span class={li === lines.length - 1 && !plain.includes(ch) ? 'ch hot' : 'ch'} style={`--i:${ci++}`}>
+            {l.map(({ ch, hot }) => (
+              <span class={hot ? 'ch hot' : 'ch'} style={`--i:${ci++}`}>
                 {ch === ' ' ? '\u00a0' : ch}
               </span>
             ))}
@@ -42,11 +52,11 @@ const plain = '与和？? ';
       }
     </h1>
     <div class="pains">
-      <p class="sub rise" style={`--i:${ci + 1}`}>{c.sub}</p>
+      <p class="sub rise" style={`--i:${base + 1}`}>{c.sub}</p>
       <ol>
         {
           c.pains.map((p, i) => (
-            <li class="rise" style={`--i:${ci + 2 + i}`}>
+            <li class="rise" style={`--i:${base + 2 + i}`}>
               <i>{String(i + 1).padStart(2, '0')}</i>
               {p}
             </li>
@@ -54,9 +64,9 @@ const plain = '与和？? ';
         }
       </ol>
     </div>
-    <p class="who rise" style={`--i:${ci + 6}`}><b class="serif">{c.name}</b><span>{c.role}</span></p>
+    <p class="who rise" style={`--i:${base + 6}`}><b class="serif">{c.name}</b><span>{c.role}</span></p>
   </div>
-  <p class="field rise" style={`--i:${ci + 9}`}>
+  <p class="field rise" style={`--i:${base + 9}`}>
     <i aria-hidden="true"></i>{c.field}<span>{c.fieldNote.replace('{n}', total.toLocaleString('en-US'))}</span>
   </p>
   <p class="next" aria-hidden="true">{c.next}<i></i></p>
@@ -102,7 +112,7 @@ const plain = '与和？? ';
     margin: 0;
     font-family: var(--serif);
     font-weight: 600;
-    font-size: clamp(32px, 6.2vw, 120px);
+    font-size: clamp(30px, 4.6vw, 92px);
     line-height: 1.08;
     letter-spacing: -0.01em;
   }
@@ -122,7 +132,7 @@ const plain = '与和？? ';
     opacity: 0;
     transform: translateY(0.4em);
     animation: up 0.8s cubic-bezier(0.2, 0.7, 0.2, 1) forwards;
-    animation-delay: calc(0.15s + var(--i) * 0.04s);
+    animation-delay: calc(0.15s + var(--i) * 0.03s);
   }
 
   .ch.hot {

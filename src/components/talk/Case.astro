@@ -1,0 +1,642 @@
+---
+/**
+ * 演讲 06「大案例：洛山达 DND 助手」。版式同 04、05（.t-steps），步骤条上面分两组：
+ * 整个产品（数字化 + AI → 体量 → 玩家评分）、一个需求跑完全流程（规则问答从需求到上线 → 上线后怎么答）。
+ * 每张图悬停、聚焦读数。依据 docs/research/talk-06-case.md（HAN-1866）。
+ */
+import { talk } from '../../i18n/talk';
+import { rich } from '../../lib/rich';
+
+const c = talk.case;
+const L = c.levels;
+const smax = Math.max(...c.size.bars.map((b) => b.v), c.size.bars.filter((b) => b.me).reduce((a, b) => a + b.v, 0));
+const me = c.size.bars.filter((b) => b.me);
+const other = c.size.bars.filter((b) => !b.me);
+const starMax = Math.max(...c.survey.stars.map((s) => s.n));
+const total = c.survey.stars.reduce((a, s) => a + s.n, 0);
+const groupLen = c.groups.map((_, gi) => L.filter((l) => l.g === gi).length);
+---
+
+<section class="slide t-slide case" data-slide data-notes={c.notes} aria-labelledby="case-title">
+  <header class="t-head">
+    <p class="no">{c.no}</p>
+    <h2 id="case-title">{c.title}</h2>
+    <p class="lead">{c.lead}</p>
+  </header>
+
+  <div class="body t-body t-steps" data-stepper style={`--n: ${L.length}`}>
+    <p class="groups" aria-hidden="true" style={`grid-template-columns: ${groupLen.map((n) => `${n}fr`).join(' ')}`}>
+      {c.groups.map((g) => <span>{g}</span>)}
+    </p>
+    <ol class="line" role="tablist" aria-label={c.title}>
+      {
+        L.map((l, i) => (
+          <li>
+            <button type="button" role="tab" data-step aria-selected={i === 0 ? 'true' : 'false'}>
+              <i aria-hidden="true">{i + 1}</i>
+              <span>{l.k}</span>
+            </button>
+          </li>
+        ))
+      }
+    </ol>
+
+    <div class="main">
+      <div class="stage">
+        <!-- 1 数字化 + AI：两组功能 -->
+        <div class="frame" data-pane="0">
+          <div class="kinds">
+            {
+              c.kinds.map((k, ki) => (
+                <div class={`kind k-${k.kind} fin`} style={`--d:${ki + 1}`}>
+                  <p class="kk serif">{k.k}</p>
+                  <ul>
+                    {k.items.map((x) => (
+                      <li>{x}</li>
+                    ))}
+                  </ul>
+                </div>
+              ))
+            }
+          </div>
+        </div>
+
+        <!-- 2 体量：洛山达手写（小程序 + 云函数）vs SQLite 代码 -->
+        <div class="frame" data-pane="1" hidden data-reads>
+          <p class="unit fin">{c.size.unit} · {c.size.foot}</p>
+          <ul class="stack">
+            <li class="fin" style="--d:1">
+              <span class="hk">{c.size.sum.k}</span>
+              <span class="track">
+                {
+                  me.map((b, i) => (
+                    <i class={i ? 'b2' : 'b1'} style={`--w:${(b.v / smax) * 100}%`} data-read={`${b.k}：${b.v} 万行`} />
+                  ))
+                }
+              </span>
+              <b class="serif">{c.size.sum.v}</b>
+            </li>
+            {
+              other.map((b) => (
+                <li class="fin" style="--d:2">
+                  <span class="hk">{b.k}</span>
+                  <span class="track">
+                    <i class="b3" style={`--w:${(b.v / smax) * 100}%`} data-read={`${b.k}：${b.v} 万行（不含注释和空行）`} />
+                  </span>
+                  <b class="serif">{b.v} 万</b>
+                </li>
+              ))
+            }
+          </ul>
+          <p class="legend fin" style="--d:3">
+            {me.map((b, i) => <span><i class={i ? 'b2' : 'b1'} />{b.k}</span>)}
+          </p>
+          <p class="t-read" aria-live="polite" data-read-out data-hint="悬停一段看读数">悬停一段看读数</p>
+        </div>
+
+        <!-- 3 玩家评分：大数 + 每档人数 + 几句原话 -->
+        <div class="frame" data-pane="2" hidden data-reads>
+          <div class="survey">
+            <p class="score fin">
+              <b class="serif">{c.survey.big}</b>
+              <span>{c.survey.of}</span>
+              <em>{c.survey.n}</em>
+            </p>
+            <ul class="stars fin" style="--d:1">
+              {
+                c.survey.stars.map((s) => (
+                  <li data-read={`${s.s} 星：${s.n} 人（${Math.round((s.n / total) * 100)}%）`}>
+                    <span>{s.s} 星</span>
+                    <span class="track">
+                      <i style={`--w:${(s.n / starMax) * 100}%`} />
+                    </span>
+                    <b>{s.n}</b>
+                  </li>
+                ))
+              }
+            </ul>
+          </div>
+          <ul class="quotes">
+            {
+              c.survey.quotes.map((q, i) => (
+                <li class="fin" style={`--d:${i + 2}`}>
+                  「{q}」
+                </li>
+              ))
+            }
+          </ul>
+          <p class="t-read" aria-live="polite" data-read-out data-hint="悬停一档看人数">悬停一档看人数</p>
+        </div>
+
+        <!-- 4 规则问答：从需求到打开入口 -->
+        <div class="frame" data-pane="3" hidden data-reads>
+          <ol class="flow">
+            {
+              c.flow.map((f, i) => (
+                <li class={`fin${'end' in f && f.end ? ' end' : ''}`} style={`--d:${i + 1}`} data-read={`${f.at} ${f.k}：${f.v}（${f.who}）`}>
+                  <em>{f.at}</em>
+                  <b>{f.k}</b>
+                  <span class="who">{f.who}</span>
+                </li>
+              ))
+            }
+          </ol>
+          <p class="t-read" aria-live="polite" data-read-out data-hint="悬停一步看做了什么">悬停一步看做了什么</p>
+        </div>
+
+        <!-- 5 上线后怎么答：四步 + 真实截图 -->
+        <div class="frame" data-pane="4" hidden>
+          <div class="answer">
+            <ol class="qa">
+              {
+                c.steps.map((s, i) => (
+                  <li class="fin" style={`--d:${i + 1}`}>
+                    <i>{i + 1}</i>
+                    <b class="serif">{s.k}</b>
+                    <em>{s.en}</em>
+                  </li>
+                ))
+              }
+            </ol>
+            <figure class="shot fin" style="--d:5">
+              <img src={c.img.src} alt={c.img.alt} width="750" height="1416" loading="lazy" decoding="async" />
+              <figcaption>{c.img.cap}</figcaption>
+            </figure>
+          </div>
+        </div>
+      </div>
+
+      <aside class="side" aria-live="polite">
+        {
+          L.map((l, i) => (
+            <div class="sp" data-pane={String(i)} hidden={i !== 0}>
+              <h3 class="serif">{l.q}</h3>
+              <p class="plain">{l.plain}</p>
+            </div>
+          ))
+        }
+        <p class="t-hint">{c.hint}</p>
+      </aside>
+    </div>
+
+    {
+      L.map((l, i) => (
+        <div class="ex" data-pane={String(i)} hidden={i !== 0}>
+          <b>{c.caseK}</b>
+          <p>{l.case}</p>
+          <details class="src">
+            <summary>{c.srcK}</summary>
+            <p set:html={rich(l.src)} />
+          </details>
+        </div>
+      ))
+    }
+  </div>
+</section>
+
+<style>
+  .stage {
+    min-width: 0;
+  }
+
+  /* 步骤条上面的分组 */
+  .groups {
+    margin: 0 0 -6px;
+    display: grid;
+    gap: 12px;
+    font-size: clamp(12px, 0.9vw, 15px);
+    letter-spacing: 0.08em;
+    color: var(--ink-3);
+  }
+
+  .groups span {
+    padding-bottom: 4px;
+    border-bottom: 2px solid var(--line-2);
+  }
+
+  .groups span + span {
+    border-color: var(--accent);
+    color: var(--accent-ink);
+  }
+
+  .k-dig {
+    --c: var(--cat-blue);
+    --c-soft: var(--blue-soft);
+  }
+
+  .k-ai {
+    --c: var(--accent);
+    --c-soft: var(--accent-soft);
+  }
+
+  /* 1 两组功能 */
+  .kinds {
+    display: grid;
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+    gap: clamp(14px, 1.6vw, 28px);
+  }
+
+  .kind {
+    padding: clamp(16px, 1.6vw, 28px);
+    border-radius: var(--r);
+    border: 1px solid var(--line);
+    border-top: 4px solid var(--c);
+    background: var(--card);
+    box-shadow: var(--shadow);
+  }
+
+  .kk {
+    margin: 0 0 14px;
+    font-size: clamp(24px, 2.2vw, 40px);
+    font-weight: 600;
+    color: var(--c);
+  }
+
+  .kind ul {
+    list-style: none;
+    margin: 0;
+    padding: 0;
+    display: flex;
+    flex-wrap: wrap;
+    gap: 10px;
+  }
+
+  .kind li {
+    padding: 0.35em 0.9em;
+    border-radius: var(--r-pill);
+    background: var(--c-soft);
+    font-size: clamp(15px, 1.25vw, 22px);
+    transition: transform 0.2s var(--ease);
+  }
+
+  .kind li:hover {
+    transform: translateY(-2px);
+  }
+
+  /* 2 体量 */
+  .unit {
+    margin: 0;
+    font-size: clamp(13px, 1vw, 17px);
+    letter-spacing: 0.08em;
+    color: var(--ink-3);
+  }
+
+  .stack {
+    list-style: none;
+    margin: 0;
+    padding: 0;
+    display: flex;
+    flex-direction: column;
+    gap: clamp(12px, 2.4vh, 26px);
+  }
+
+  .stack li {
+    display: grid;
+    grid-template-columns: clamp(110px, 9vw, 170px) minmax(0, 1fr) clamp(90px, 8vw, 150px);
+    align-items: center;
+    gap: 16px;
+  }
+
+  .hk {
+    font-size: clamp(15px, 1.25vw, 22px);
+    color: var(--ink-2);
+  }
+
+  .stack b {
+    font-size: clamp(22px, 2.1vw, 38px);
+    font-weight: 600;
+  }
+
+  .track {
+    display: flex;
+    gap: 2px;
+    height: clamp(26px, 4vh, 46px);
+    border-radius: var(--r-sm);
+    background: var(--heat-0);
+    overflow: hidden;
+  }
+
+  .track i {
+    display: block;
+    height: 100%;
+    width: var(--w);
+    transform-origin: left;
+    animation: grow 0.9s var(--ease) both;
+    animation-delay: calc(0.3s + var(--d, 0) * 0.12s);
+    transition: filter 0.2s;
+  }
+
+  .track i[data-on] {
+    filter: brightness(1.12) saturate(1.2);
+    outline: 2px solid var(--ink);
+    outline-offset: -2px;
+  }
+
+  .b1 {
+    background: var(--accent);
+  }
+
+  .b2 {
+    background: var(--heat-3);
+  }
+
+  .b3 {
+    background: var(--ink-3);
+  }
+
+  @keyframes grow {
+    from {
+      transform: scaleX(0);
+    }
+  }
+
+  .legend {
+    margin: 0;
+    display: flex;
+    gap: 18px;
+    font-size: clamp(12px, 0.95vw, 16px);
+    color: var(--ink-2);
+  }
+
+  .legend span {
+    display: inline-flex;
+    align-items: center;
+    gap: 6px;
+  }
+
+  .legend i {
+    width: 12px;
+    height: 12px;
+    border-radius: 3px;
+  }
+
+  /* 3 问卷 */
+  .survey {
+    display: grid;
+    grid-template-columns: auto minmax(0, 1fr);
+    gap: clamp(20px, 3vw, 56px);
+    align-items: center;
+  }
+
+  .score {
+    margin: 0;
+    display: grid;
+    grid-template-columns: auto auto;
+    align-items: baseline;
+    column-gap: 6px;
+  }
+
+  .score b {
+    font-size: clamp(72px, 8vw, 150px);
+    font-weight: 600;
+    line-height: 0.95;
+    color: var(--accent);
+  }
+
+  .score span {
+    font-size: clamp(22px, 2vw, 36px);
+    color: var(--ink-3);
+  }
+
+  .score em {
+    grid-column: 1 / -1;
+    font-style: normal;
+    font-size: clamp(14px, 1.1vw, 19px);
+    color: var(--ink-2);
+  }
+
+  .stars {
+    list-style: none;
+    margin: 0;
+    padding: 0;
+    display: flex;
+    flex-direction: column;
+    gap: 6px;
+  }
+
+  .stars li {
+    display: grid;
+    grid-template-columns: 3.2em minmax(0, 1fr) 2em;
+    align-items: center;
+    gap: 10px;
+    padding: 2px 6px;
+    border-radius: var(--r-sm);
+    font-size: clamp(13px, 1vw, 17px);
+    color: var(--ink-2);
+  }
+
+  .stars li[data-on] {
+    background: var(--bg-2);
+  }
+
+  .stars .track {
+    height: clamp(12px, 1.8vh, 20px);
+  }
+
+  .stars .track i {
+    background: var(--accent);
+    border-radius: var(--r-sm);
+  }
+
+  .quotes {
+    list-style: none;
+    margin: clamp(14px, 2.4vh, 28px) 0 0;
+    padding: 0;
+    display: flex;
+    flex-direction: column;
+    gap: 8px;
+  }
+
+  .quotes li {
+    font-family: var(--serif);
+    font-size: clamp(16px, 1.35vw, 24px);
+    line-height: 1.45;
+    color: var(--ink);
+  }
+
+  .quotes li:last-child {
+    color: var(--ink-2);
+  }
+
+  /* 4 规则问答时间线 */
+  .flow {
+    list-style: none;
+    margin: 0;
+    padding: 22px 0 0;
+    display: grid;
+    grid-template-columns: repeat(7, minmax(0, 1fr));
+    gap: 8px;
+    position: relative;
+  }
+
+  .flow::before {
+    content: '';
+    position: absolute;
+    left: 6px;
+    right: 6px;
+    top: 28px;
+    height: 2px;
+    background: var(--line-2);
+  }
+
+  .flow li {
+    position: relative;
+    display: flex;
+    flex-direction: column;
+    gap: 4px;
+    padding: 22px 6px 8px;
+    border-radius: var(--r-sm);
+    transition: background 0.2s;
+  }
+
+  .flow li[data-on] {
+    background: var(--bg-2);
+  }
+
+  .flow li::before {
+    content: '';
+    position: absolute;
+    left: 6px;
+    top: 0;
+    width: 14px;
+    height: 14px;
+    border-radius: 50%;
+    background: var(--bg);
+    border: 2px solid var(--accent);
+  }
+
+  .flow li.end::before {
+    background: var(--accent);
+    box-shadow: 0 0 0 5px var(--accent-glow);
+  }
+
+  .flow em {
+    font-style: normal;
+    font-family: var(--mono);
+    font-size: clamp(11px, 0.9vw, 15px);
+    color: var(--accent-ink);
+  }
+
+  .flow b {
+    font-size: clamp(15px, 1.25vw, 22px);
+    font-weight: 600;
+    line-height: 1.3;
+  }
+
+  .flow .who {
+    font-size: clamp(12px, 0.9vw, 15px);
+    color: var(--ink-3);
+  }
+
+  .t-read {
+    min-height: 2.9em;
+    line-height: 1.45;
+  }
+
+  /* 5 上线后怎么答 */
+  .answer {
+    display: grid;
+    grid-template-columns: minmax(0, 1fr) auto;
+    gap: clamp(20px, 3vw, 56px);
+    align-items: center;
+  }
+
+  .qa {
+    list-style: none;
+    margin: 0;
+    padding: 0;
+    display: flex;
+    flex-direction: column;
+    gap: clamp(8px, 1.6vh, 16px);
+  }
+
+  .qa li {
+    display: grid;
+    grid-template-columns: 34px auto 1fr;
+    align-items: baseline;
+    gap: 12px;
+    padding: clamp(10px, 1.6vh, 16px) 16px;
+    border: 1px solid var(--line);
+    border-radius: var(--r);
+    background: var(--card);
+  }
+
+  .qa li:last-child {
+    border-color: var(--ok);
+    background: var(--ok-soft);
+  }
+
+  .qa i {
+    font-style: normal;
+    font-family: var(--mono);
+    color: var(--accent-ink);
+  }
+
+  .qa b {
+    font-size: clamp(20px, 1.9vw, 34px);
+    font-weight: 600;
+  }
+
+  .qa em {
+    font-style: normal;
+    font-family: var(--mono);
+    font-size: clamp(11px, 0.85vw, 14px);
+    color: var(--ink-3);
+  }
+
+  .shot {
+    margin: 0;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 8px;
+  }
+
+  .shot img {
+    display: block;
+    height: min(46vh, 520px);
+    width: auto;
+    filter: drop-shadow(var(--shadow-drop));
+  }
+
+  .shot figcaption {
+    max-width: 16em;
+    font-size: clamp(12px, 0.9vw, 14px);
+    line-height: 1.4;
+    color: var(--ink-3);
+    text-align: center;
+  }
+
+  @media (max-width: 900px) {
+    .groups {
+      display: none;
+    }
+    .kinds,
+    .survey,
+    .answer {
+      grid-template-columns: 1fr;
+    }
+    .stack li {
+      grid-template-columns: 1fr auto;
+    }
+    .stack .hk {
+      grid-column: 1 / -1;
+    }
+    .flow {
+      grid-template-columns: 1fr;
+    }
+    .flow::before {
+      display: none;
+    }
+    .shot img {
+      height: auto;
+      width: min(70vw, 300px);
+    }
+  }
+
+  @media (prefers-reduced-motion: reduce) {
+    .track i {
+      animation: none;
+    }
+  }
+</style>

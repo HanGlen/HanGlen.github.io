@@ -1,0 +1,152 @@
+---
+/**
+ * 演讲 07 总结：回到主线，三个问题各一句答案。← → 或悬停一句句讲，讲过的保持亮着。
+ * 二维码车主 2026-11-18 说先不做（HAN-1872 已关），只留网站地址。
+ */
+import { talk } from '../../i18n/talk';
+
+const s = talk.sum;
+---
+
+<section class="slide t-slide sum" data-slide data-notes={s.notes} aria-labelledby="sum-title">
+  <header class="t-head">
+    <p class="no">{s.no}</p>
+    <h2 id="sum-title">{s.title}</h2>
+    <p class="lead">{s.lead}</p>
+  </header>
+
+  <div class="body t-body" data-stepper data-hover>
+    <ol role="tablist" aria-label={s.title}>
+      {
+        s.items.map((it, i) => (
+          <li>
+            <button type="button" role="tab" data-step aria-selected={i === 0 ? 'true' : 'false'}>
+              <i>{String(i + 1).padStart(2, '0')}</i>
+              <b class="serif">{it.q}</b>
+              <span>{it.a}</span>
+              <em>{it.ref}</em>
+            </button>
+          </li>
+        ))
+      }
+    </ol>
+    <p class="bye">
+      <b class="serif">{s.end}</b>
+      <span>{s.site}</span>
+    </p>
+    <p class="t-hint">{s.hint}</p>
+  </div>
+</section>
+
+<style>
+  .body {
+    flex: 1;
+    min-height: 0;
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    gap: clamp(20px, 4vh, 48px);
+  }
+
+  ol {
+    list-style: none;
+    margin: 0;
+    padding: 0;
+    display: grid;
+    grid-template-columns: repeat(3, minmax(0, 1fr));
+    gap: clamp(14px, 1.8vw, 36px);
+  }
+
+  button {
+    width: 100%;
+    height: 100%;
+    display: flex;
+    flex-direction: column;
+    align-items: flex-start;
+    gap: 12px;
+    padding: clamp(18px, 2vw, 36px);
+    font: inherit;
+    text-align: left;
+    color: var(--ink-3);
+    background: var(--card);
+    border: 1px solid var(--line);
+    border-top: 4px solid var(--line-2);
+    border-radius: var(--r);
+    box-shadow: var(--shadow);
+    cursor: pointer;
+    opacity: 0.45;
+    transition: opacity 0.4s var(--ease), transform 0.4s var(--ease), border-color 0.3s;
+  }
+
+  button.seen {
+    opacity: 1;
+    color: var(--ink-2);
+  }
+
+  button[aria-selected='true'] {
+    border-top-color: var(--accent);
+    transform: translateY(-4px);
+    color: var(--ink);
+  }
+
+  button i {
+    font-style: normal;
+    font-family: var(--mono);
+    font-size: clamp(13px, 1vw, 17px);
+    color: var(--accent-ink);
+  }
+
+  button b {
+    font-size: clamp(24px, 2.3vw, 42px);
+    font-weight: 600;
+    line-height: 1.2;
+    color: var(--ink);
+  }
+
+  button span {
+    font-size: clamp(16px, 1.35vw, 24px);
+    line-height: 1.5;
+  }
+
+  button em {
+    margin-top: auto;
+    font-style: normal;
+    font-family: var(--mono);
+    font-size: clamp(12px, 0.9vw, 15px);
+    color: var(--ink-3);
+  }
+
+  .bye {
+    margin: 0;
+    display: flex;
+    align-items: baseline;
+    gap: 20px;
+  }
+
+  .bye b {
+    font-size: clamp(36px, 4vw, 76px);
+    font-weight: 600;
+    color: var(--accent);
+  }
+
+  .bye span {
+    font-family: var(--mono);
+    font-size: clamp(14px, 1.2vw, 20px);
+    color: var(--ink-2);
+  }
+
+  @media (max-width: 900px) {
+    ol {
+      grid-template-columns: 1fr;
+    }
+    button {
+      opacity: 1;
+    }
+  }
+
+  @media (prefers-reduced-motion: reduce) {
+    button {
+      transition: none;
+    }
+  }
+</style>

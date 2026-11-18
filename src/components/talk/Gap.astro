@@ -1,16 +1,22 @@
 ---
 /**
- * 演讲 02「AI 和数字化，用到多深了」：四块色块图（每格 1%）。
- * 每块一个主题、三个数：数从大到小，颜色从浅到深，后一个数落在前一个里面（越深 = 用得越深）。
- * 蓝 = 数字化，陶土红 = AI。← → 或悬停一个数：这块图只亮这个数占的格；还没讲到的块先淡着。
- * 页底小字是编号对应的来源。
+ * 演讲 02「需求在增长」：四条增长线（个人用 AI、企业数字化、软件需求、AI 需求）。
+ * 每条一个大数 + 同一口径的折线（纵轴各自从 0 起，坡度如实），下面一行来源，点开看可信度和原文。
+ * ← → 一条条讲（还没讲到的先淡着，最后一条讲完出结论）；悬停或聚焦一个点看读数。
+ * 依据 docs/research/talk-02-growth.md（HAN-1863）。蓝 = 数字化，陶土红 = AI。
  */
 import { talk } from '../../i18n/talk';
 
 const g = talk.gap;
-const circled = (n: number) => String.fromCharCode(0x2460 + n - 1);
-/** 第 i 格属于第几层：有几个数大于 i，就是第几层（0 = 没填） */
-const level = (items: { v: number }[], i: number) => items.filter((it) => it.v > i).length;
+const W = 300;
+const H = 150;
+const PAD = { l: 8, r: 8, t: 14, b: 8 };
+/** 横轴统一 2023 年初到 2026 年中，四张图对得上时间 */
+const X0 = 2023.3;
+const X1 = 2026.6;
+const px = (x: number) => PAD.l + ((x - X0) / (X1 - X0)) * (W - PAD.l - PAD.r);
+const py = (v: number, max: number) => H - PAD.b - (v / max) * (H - PAD.t - PAD.b);
+const years = [2024, 2025, 2026];
 ---
 
 <section class="slide t-slide gap" data-slide data-notes={g.notes} aria-labelledby="gap-title">
@@ -20,85 +26,75 @@ const level = (items: { v: number }[], i: number) => items.filter((it) => it.v >
     <p class="lead">{g.lead}</p>
   </header>
 
-  <div class="body t-body" data-stepper data-hover data-gap>
-    <div class="blocks">
+  <div class="body t-body" data-stepper data-gap>
+    <div class="lines">
       {
-        g.blocks.map((b, bi) => (
-          <section class={`block k-${b.kind}`} data-block={bi}>
-            <header class="bh">
-              <h3 class="serif">{b.k}</h3>
-            </header>
-            <div class="waffle" data-waffle={bi} aria-hidden="true">
-              {Array.from({ length: 100 }, (_, i) => (
-                <i class={`lv${level(b.items, i)}`} style={`--i:${i}`} />
+        g.lines.map((l, li) => (
+          <section class={`card k-${l.kind}`} data-card={li} data-reads>
+            <button type="button" class="ch" data-step role="tab" aria-selected={li === 0 ? 'true' : 'false'}>
+              <h3 class="serif">{l.k}</h3>
+              <b class="big serif">{l.big}</b>
+              <span class="bk">{l.bigK}</span>
+            </button>
+            <svg viewBox={`0 0 ${W} ${H}`} class="chart" role="img" aria-label={`${l.k}：${l.pts.map((p) => `${p.t} ${p.label}`).join('，')}`}>
+              <line x1={PAD.l} x2={W - PAD.r} y1={H - PAD.b} y2={H - PAD.b} class="axis" />
+              {years.map((y) => (
+                <g>
+                  <line x1={px(y)} x2={px(y)} y1={PAD.t} y2={H - PAD.b} class="grid" />
+                  <text x={px(y) + 3} y={PAD.t - 3} class="yr">
+                    {y}
+                  </text>
+                </g>
               ))}
-            </div>
-            <ol class="items" role="tablist" aria-label={b.k}>
-              <li class="base">
-                <i class="sw lv0" aria-hidden="true" />
-                <b class="serif">100%</b>
-                <span>{b.who}</span>
-              </li>
-              {b.items.map((it, k) => (
-                <li>
-                  <button type="button" role="tab" data-step data-b={bi} data-lv={k + 1} aria-selected="false">
-                    <i class={`sw lv${k + 1}`} aria-hidden="true" />
-                    <b class="serif">{it.big}</b>
-                    <span>
-                      {it.text}
-                      <sup>{circled(it.ref)}</sup>
-                    </span>
-                  </button>
-                </li>
+              <polyline class="ln" points={l.pts.map((p) => `${px(p.x)},${py(p.v, l.max)}`).join(' ')} pathLength="1" />
+              {l.pts.map((p) => (
+                <circle
+                  cx={px(p.x)}
+                  cy={py(p.v, l.max)}
+                  r="5"
+                  class={'soft' in p && p.soft ? 'pt soft' : 'pt'}
+                  data-read={`${p.t}：${p.label}，${p.k}`}
+                />
               ))}
-              {b.note && (
-                <li class="note">
-                  <button type="button" role="tab" data-step data-b={bi} data-lv="0" aria-selected="false">
-                    <i class="sw low" aria-hidden="true" />
-                    <b class="serif">{b.note.big}</b>
-                    <span>
-                      {b.note.text}
-                      <sup>{circled(b.note.ref)}</sup>
-                    </span>
-                  </button>
-                </li>
-              )}
-            </ol>
+            </svg>
+            <p class="t-read" aria-live="polite" data-read-out data-hint={l.say}>
+              {l.say}
+            </p>
+            <details class="src">
+              <summary>
+                <b>{g.srcK}</b>
+                {l.src}
+              </summary>
+              <div class="pop">
+                <p>
+                  <b>{g.trustK}</b>
+                  {l.trust}
+                </p>
+                {l.href && (
+                  <a href={l.href} target="_blank" rel="noopener">
+                    {g.openK} ↗
+                  </a>
+                )}
+              </div>
+            </details>
           </section>
         ))
       }
     </div>
-
     <p class="end serif">{g.end}</p>
-
-    <ol class="refs">
-      {
-        g.refs.map((r, i) => (
-          <li>
-            {circled(i + 1)} {r}
-          </li>
-        ))
-      }
-    </ol>
+    <p class="t-hint">{g.hint}</p>
   </div>
 </section>
 
 <style>
-  .gap {
-    --unit: clamp(14px, 1.15vw, 22px);
-  }
-
-  /* 每块一个色相，由浅到深 = 由浅到深地用 */
   .k-ai {
-    --c1: var(--heat-1);
-    --c2: var(--heat-3);
-    --c3: var(--heat-4);
+    --c: var(--accent);
+    --c-soft: var(--accent-soft);
   }
 
   .k-dig {
-    --c1: var(--blue-soft);
-    --c2: var(--cat-blue);
-    --c3: color-mix(in srgb, var(--cat-blue) 62%, var(--ink));
+    --c: var(--cat-blue);
+    --c-soft: var(--blue-soft);
   }
 
   .body {
@@ -110,17 +106,17 @@ const level = (items: { v: number }[], i: number) => items.filter((it) => it.v >
     gap: clamp(12px, 2.4vh, 28px);
   }
 
-  .blocks {
+  .lines {
     display: grid;
     grid-template-columns: repeat(4, minmax(0, 1fr));
-    gap: clamp(14px, 1.8vw, 36px);
+    gap: clamp(14px, 1.6vw, 32px);
   }
 
-  .block {
+  .card {
     display: flex;
     flex-direction: column;
-    gap: clamp(8px, 1.4vh, 16px);
-    padding: clamp(12px, 1.2vw, 22px);
+    gap: clamp(8px, 1.4vh, 14px);
+    padding: clamp(14px, 1.3vw, 24px);
     border: 1px solid var(--line);
     border-radius: var(--r);
     background: var(--card);
@@ -128,176 +124,181 @@ const level = (items: { v: number }[], i: number) => items.filter((it) => it.v >
     transition: opacity 0.5s var(--ease), transform 0.45s var(--ease), border-color 0.3s;
   }
 
-  /* 渐进披露：还没讲到的块先淡着 */
-  [data-at] .block:not(.seen) {
-    opacity: 0.32;
+  /* 渐进披露：还没讲到的先淡着，正在讲的那条抬起来 */
+  [data-at] .card:not(.seen) {
+    opacity: 0.3;
   }
 
-  .block.on {
-    border-color: var(--line-2);
+  .card.on {
+    border-color: var(--c);
     transform: translateY(-4px);
   }
 
-  .bh {
-    display: flex;
-    align-items: baseline;
-    justify-content: space-between;
-    gap: 8px;
-    flex-wrap: wrap;
-  }
-
-  .bh h3 {
-    margin: 0;
-    font-size: clamp(20px, 1.75vw, 32px);
-    font-weight: 600;
-  }
-
-  .bh span {
-    font-size: clamp(12px, 0.9vw, 15px);
-    color: var(--ink-3);
-  }
-
-  .waffle {
-    display: grid;
-    grid-template-columns: repeat(10, 1fr);
-    gap: clamp(2px, 0.22vw, 4px);
-    width: min(100%, 24vh);
-    aspect-ratio: 1;
-    align-self: center;
-  }
-
-  .waffle i {
-    border-radius: 3px;
-    background: var(--heat-0);
-    transition:
-      opacity 0.35s ease calc(var(--i) * 3ms),
-      transform 0.35s var(--ease) calc(var(--i) * 3ms);
-  }
-
-  .waffle .lv1,
-  .sw.lv1 {
-    background: var(--c1);
-  }
-  .waffle .lv2,
-  .sw.lv2 {
-    background: var(--c2);
-  }
-  .waffle .lv3,
-  .sw.lv3 {
-    background: var(--c3);
-  }
-
-  /* 选中某个数：只亮这个数占的格（这一层和更深的层），其余变淡 */
-  .waffle[data-hl] i {
-    opacity: 0.22;
-  }
-  .waffle[data-hl='1'] i:is(.lv1, .lv2, .lv3),
-  .waffle[data-hl='2'] i:is(.lv2, .lv3),
-  .waffle[data-hl='3'] i.lv3 {
-    opacity: 1;
-    transform: scale(1.06);
-  }
-
-  .items {
-    list-style: none;
-    margin: 0;
-    padding: 0;
+  .ch {
     display: flex;
     flex-direction: column;
-    gap: 2px;
-  }
-
-  .items button {
-    width: 100%;
-    display: grid;
-    grid-template-columns: 12px clamp(70px, 5.4vw, 108px) 1fr;
-    align-items: baseline;
-    gap: 8px;
-    padding: 6px 8px;
-    text-align: left;
+    align-items: flex-start;
+    gap: 4px;
+    padding: 0;
     font: inherit;
-    color: var(--ink-2);
-    background: transparent;
-    border: 1.5px solid transparent;
-    border-radius: var(--r-sm);
+    text-align: left;
+    color: inherit;
+    background: none;
+    border: 0;
     cursor: pointer;
-    transition: border-color 0.25s, background 0.25s, color 0.25s;
   }
 
-  /* 100% 那一行：底色格子就是全体，也有自己的颜色和说明 */
-  .base {
-    display: grid;
-    grid-template-columns: 12px clamp(70px, 5.4vw, 108px) 1fr;
-    align-items: baseline;
-    gap: 8px;
-    padding: 2px 9.5px 6px;
-    margin-bottom: 2px;
-    border-bottom: 1px solid var(--line);
-    color: var(--ink-3);
-  }
-
-  .base b {
-    color: var(--ink-3) !important;
-  }
-
-  .sw.lv0 {
-    background: var(--heat-0);
-    box-shadow: inset 0 0 0 1px var(--line-2);
-  }
-
-  .sw {
-    width: 12px;
-    height: 12px;
-    border-radius: 3px;
-    align-self: center;
-  }
-
-  .sw.low {
-    background: transparent;
-    border: 1.5px dashed var(--ink-3);
-  }
-
-  .items b {
-    font-size: clamp(17px, 1.4vw, 28px);
-    line-height: 1;
+  .ch h3 {
+    margin: 0;
+    font-size: clamp(18px, 1.5vw, 28px);
     font-weight: 600;
-    color: var(--ink);
+    color: var(--ink-2);
+  }
+
+  .big {
+    font-size: clamp(30px, 3vw, 58px);
+    font-weight: 600;
+    line-height: 1.05;
+    color: var(--c);
     white-space: nowrap;
   }
 
-  .items span {
-    font-size: clamp(13px, 1vw, 18px);
-    line-height: 1.35;
+  .bk {
+    font-size: clamp(13px, 1vw, 17px);
+    line-height: 1.4;
+    color: var(--ink-2);
   }
 
-  .note {
-    margin-top: 6px;
-    padding-top: 6px;
-    border-top: 1px dashed var(--line-2);
+  .chart {
+    width: 100%;
+    height: auto;
+    overflow: visible;
   }
 
-  .note b {
-    color: var(--ink-3) !important;
+  .axis {
+    stroke: var(--line-2);
+    stroke-width: 1.5;
   }
 
-  sup {
-    font-size: 0.7em;
-    color: var(--ink-3);
-    margin-left: 2px;
+  .grid {
+    stroke: var(--line);
+    stroke-dasharray: 2 4;
   }
 
-  .items button[aria-selected='true'] {
+  .yr {
+    font-family: var(--mono);
+    font-size: 10px;
+    fill: var(--ink-3);
+  }
+
+  .ln {
+    fill: none;
+    stroke: var(--c);
+    stroke-width: 3;
+    stroke-linecap: round;
+    stroke-linejoin: round;
+    stroke-dasharray: 1;
+    stroke-dashoffset: 0;
+  }
+
+  .card.seen .ln {
+    animation: draw 1.1s var(--ease) both;
+  }
+
+  @keyframes draw {
+    from {
+      stroke-dashoffset: 1;
+    }
+  }
+
+  .pt {
+    fill: var(--card);
+    stroke: var(--c);
+    stroke-width: 2.5;
+    transition: r 0.2s;
+    outline: none;
+  }
+
+  .pt.soft {
+    stroke-dasharray: 2 2;
+  }
+
+  .pt[data-on],
+  .pt:focus-visible {
+    fill: var(--c);
+    r: 8;
+  }
+
+  .card .t-read {
+    min-height: 2.9em;
+    font-size: clamp(14px, 1.05vw, 18px);
+    line-height: 1.45;
+    color: var(--ink-2);
+  }
+
+  .card .t-read.on {
     color: var(--ink);
-    border-color: var(--line-2);
-    background: var(--bg-2);
+    font-weight: 600;
   }
 
-  .items button:focus-visible {
+  .src {
+    position: relative;
+    margin-top: auto;
+    padding-top: 8px;
+    border-top: 1px solid var(--line);
+    font-size: clamp(11px, 0.8vw, 14px);
+    line-height: 1.45;
+    color: var(--ink-3);
+  }
+
+  .src summary {
+    cursor: pointer;
+  }
+
+  .src summary b {
+    margin-right: 6px;
+    color: var(--ink-2);
+    font-weight: 600;
+  }
+
+  .src summary:focus-visible {
     outline: 2px solid var(--accent);
     outline-offset: 2px;
   }
 
-  /* 结论讲到最后一个数才出来 */
+  /* 可信度向上弹出，不把卡片撑高 */
+  .pop {
+    position: absolute;
+    left: 0;
+    bottom: calc(100% + 8px);
+    width: min(30em, 80vw);
+    padding: 12px 14px;
+    border: 1px solid var(--line);
+    border-radius: var(--r-sm);
+    background: var(--card);
+    box-shadow: var(--shadow);
+    color: var(--ink-2);
+    z-index: 5;
+  }
+
+  .card:last-child .pop {
+    left: auto;
+    right: 0;
+  }
+
+  .pop p {
+    margin: 0 0 6px;
+  }
+
+  .pop b {
+    margin-right: 6px;
+    color: var(--accent-ink);
+  }
+
+  .pop a {
+    color: var(--accent-ink);
+  }
+
   .end {
     margin: 0;
     font-size: clamp(20px, 2vw, 36px);
@@ -311,72 +312,55 @@ const level = (items: { v: number }[], i: number) => items.filter((it) => it.v >
     transform: translateY(8px);
   }
 
-  .refs {
-    list-style: none;
-    margin: 0;
-    padding: 10px 0 0;
-    border-top: 1px solid var(--line);
-    display: flex;
-    flex-wrap: wrap;
-    gap: 2px 18px;
-    font-size: clamp(10px, 0.7vw, 12px);
-    line-height: 1.5;
-    color: var(--ink-3);
-  }
-
-  @media (max-height: 800px) and (min-width: 901px) {
-    .waffle {
-      width: min(100%, 21vh);
+  @media (max-width: 1200px) and (min-width: 901px) {
+    .lines {
+      grid-template-columns: repeat(2, minmax(0, 1fr));
     }
-    .items button {
-      padding: 4px 6px;
+    .chart {
+      max-height: 16vh;
     }
   }
 
   @media (max-width: 900px) {
-    .blocks {
+    .lines {
       grid-template-columns: 1fr;
     }
-    [data-at] .block:not(.seen) {
+    [data-at] .card:not(.seen) {
       opacity: 1;
-    }
-    .waffle {
-      width: min(60vw, 220px);
     }
     .body:not(.at-end) .end {
       opacity: 1;
       transform: none;
     }
+    .pop,
+    .card:last-child .pop {
+      position: static;
+      width: auto;
+      margin-top: 8px;
+    }
   }
 
   @media (prefers-reduced-motion: reduce) {
-    .waffle i,
-    .block,
+    .card,
     .end {
       transition: none;
+    }
+    .card.seen .ln {
+      animation: none;
     }
   }
 </style>
 
 <script>
-  // 选中一个数：对应那块色块图只亮这个数占的格；讲到过的块亮起来，最后一个数讲完出结论
+  // 讲到第几条：这条抬起来、讲过的亮着，最后一条讲完出结论
   document.querySelectorAll<HTMLElement>('[data-gap]').forEach((root) => {
-    const steps = [...root.querySelectorAll<HTMLElement>('[data-step]')];
-    const blocks = [...root.querySelectorAll<HTMLElement>('[data-block]')];
-    const waffles = [...root.querySelectorAll<HTMLElement>('[data-waffle]')];
+    const cards = [...root.querySelectorAll<HTMLElement>('[data-card]')];
     const paint = (i: number) => {
-      const s = steps[i];
-      const b = s.dataset.b!;
-      const lv = s.dataset.lv;
-      waffles.forEach((w) => {
-        if (w.dataset.waffle === b && lv && lv !== '0') w.dataset.hl = lv;
-        else delete w.dataset.hl;
+      cards.forEach((c, j) => {
+        c.classList.toggle('on', j === i);
+        if (j <= i) c.classList.add('seen');
       });
-      blocks.forEach((bl) => {
-        bl.classList.toggle('on', bl.dataset.block === b);
-        if (Number(bl.dataset.block) <= Number(b)) bl.classList.add('seen');
-      });
-      root.classList.toggle('at-end', i === steps.length - 1);
+      root.classList.toggle('at-end', i === cards.length - 1);
     };
     root.addEventListener('step', (e) => paint((e as CustomEvent<number>).detail));
     paint(Number(root.dataset.at ?? 0));

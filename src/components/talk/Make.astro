@@ -1,11 +1,11 @@
 ---
 /**
- * 演讲 03「怎么做出来」：工具准备 → 模型能力 → 地基 Harness → 一张单 → 一个大需求（Project + 定时任务）
- * → 一堆需求（分诊）→ 做出来一件事。
+ * 演讲 04「Agentic Engineering 系统」：工具 → 模型 → 地基（代码仓库）→ 最小单 → 一个大需求（Project + 定时任务）
+ * → 一堆需求（AI 切片）→ 验证（poteto 金字塔）。每步右栏大字是核心句，下面一行「参考」写参考了谁。
  * 顶上是步骤 tab，← → 下一步；左边一张图，右边只放两层：一个问题、一句备注。
  * 每步的例子统一放在底部一条独立色块里，依据在色块右边点开才看（渐进披露）。
- * 4 → 5、5 → 6、6 → 7 用 View Transition 串起来（data-vt 列出哪两步之间变形，切换时写进 data-vt-pair）：
- * 「一张单」缩进定时任务里；「一个大需求」缩成一堆需求里的 Project A；「一堆需求」缩成最后一步的起点。
+ * 4 → 5、5 → 6 用 View Transition 串起来（data-vt 列出哪两步之间变形，切换时写进 data-vt-pair）：
+ * 「一张单」缩进定时任务里；「一个大需求」缩成一堆需求里的 Project A。
  */
 import { talk } from '../../i18n/talk';
 import { rich } from '../../lib/rich';
@@ -18,12 +18,12 @@ const SHOW = 3;
 
 <section class="slide t-slide make" data-slide data-notes={m.notes} aria-labelledby="make-title">
   <header class="t-head">
-    <p class="kicker">{m.no} · {m.kicker}</p>
+    <p class="no">{m.no}</p>
     <h2 id="make-title">{m.title}</h2>
     <p class="lead">{m.lead}</p>
   </header>
 
-  <div class="body t-body t-steps" data-stepper data-vt="3-4 4-5 5-6" style={`--n: ${L.length}`}>
+  <div class="body t-body t-steps" data-stepper data-vt="3-4 4-5" style={`--n: ${L.length}`}>
     <ol class="line" role="tablist" aria-label={m.title}>
       {
         L.map((l, i) => (
@@ -215,7 +215,7 @@ const SHOW = 3;
 
         <!-- 6 一堆需求：先框成一堆 → 分诊 → 一个个 Project（里面全是最小的单）→ 定时任务一直跑 -->
         <div class="frame" data-pane="5" hidden>
-          <div class="flow vt-pile">
+          <div class="flow">
             <div class="pile">
               <em>{m.triage.pile}</em>
               <ul>
@@ -252,30 +252,22 @@ const SHOW = 3;
           </div>
         </div>
 
-        <!-- 7 做出来一件事：上一步那一堆缩成起点；三个例子各是一条拆开的链 -->
+        <!-- 7 验证：poteto 金字塔，上宽下窄，越往下越贵；每层悬停看小程序里的例子 -->
         <div class="frame" data-pane="6" hidden>
-          <div class="craft" data-craft>
-            <div class="from vt-pile">
-              <b>{m.craft.from}</b>
-              <span>{m.craft.fromV}</span>
-            </div>
-            <ul class="rows">
+          <div class="pyr" data-reads>
+            <ol>
               {
-                m.craft.rows.map((r, i) => (
-                  <li class="fin" style={`--d:${1 + i}`}>
-                    <button type="button" data-plain={r.plain} aria-pressed={i === 0 ? 'true' : 'false'}>
-                      <b class="serif">{r.k}</b>
-                      <ol>
-                        {r.steps.map((x) => (
-                          <li>{x}</li>
-                        ))}
-                      </ol>
-                    </button>
+                m.pyramid.layers.map((x, i) => (
+                  <li class="fin" style={`--d:${i + 1}; --k:${i}`} data-read={`${x.k}（${x.v}）。小程序里：${x.ex}`}>
+                    <b class="serif">{x.k}</b>
+                    <em>{x.en}</em>
+                    <span>{x.v}</span>
                   </li>
                 ))
               }
-            </ul>
-            <p class="say fin" style="--d:5" aria-live="polite" data-craft-out>{m.craft.rows[0].plain}</p>
+            </ol>
+            <p class="cost fin" style="--d:6" aria-hidden="true"><span>{[...m.pyramid.cost].map((ch) => <i>{ch}</i>)}</span></p>
+            <p class="t-read" aria-live="polite" data-read-out data-hint={m.pyramid.hint}>{m.pyramid.hint}</p>
           </div>
         </div>
       </div>
@@ -386,7 +378,7 @@ const SHOW = 3;
   .tools td,
   .board th,
   .board td {
-    padding: clamp(4px, 0.8vh, 12px) clamp(8px, 0.9vw, 16px);
+    padding: clamp(3px, 0.6vh, 9px) clamp(8px, 0.9vw, 14px);
     border-bottom: 1px solid var(--line);
     text-align: left;
     vertical-align: baseline;
@@ -405,7 +397,7 @@ const SHOW = 3;
   .tools tbody th,
   .board tbody th {
     width: 1%;
-    font-size: clamp(14px, 1.1vw, 19px);
+    font-size: clamp(13px, 0.95vw, 17px);
     font-weight: 500;
     color: var(--ink-2);
     white-space: nowrap;
@@ -414,7 +406,7 @@ const SHOW = 3;
   .tools td a {
     display: inline-block;
     margin-right: clamp(8px, 0.9vw, 16px);
-    font-size: clamp(14px, 1.15vw, 20px);
+    font-size: clamp(13px, 1vw, 18px);
     line-height: 1.35;
     color: var(--ink);
     text-decoration: none;
@@ -1158,105 +1150,138 @@ const SHOW = 3;
     font-size: clamp(16px, 1.4vw, 24px);
   }
 
-  /* 做出来一件事：起点是上一步那一堆，下面三条拆开的链 */
-  .craft {
-    display: flex;
-    flex-direction: column;
-    gap: clamp(10px, 1.8vh, 20px);
+  /* 验证金字塔：倒着放，上宽下窄；右边一根箭头写「越往下越贵」 */
+  .pyr {
+    display: grid;
+    grid-template-columns: minmax(0, 1fr) auto;
+    gap: 10px clamp(12px, 1.4vw, 24px);
   }
 
-  .from {
-    align-self: flex-start;
-    display: flex;
-    align-items: baseline;
-    gap: 10px;
-    padding: 0.5em 1em;
-    border: 2px dashed var(--ink);
-    border-radius: var(--r);
-    background: var(--card);
-  }
-
-  .from b {
-    font-size: clamp(15px, 1.3vw, 22px);
-  }
-
-  .from span {
-    font-size: clamp(12px, 0.95vw, 16px);
-    color: var(--ink-3);
-  }
-
-  .rows {
+  .pyr ol {
     list-style: none;
     margin: 0;
     padding: 0;
     display: flex;
     flex-direction: column;
-    gap: 8px;
-  }
-
-  .rows button {
-    width: 100%;
-    display: grid;
-    grid-template-columns: clamp(110px, 10vw, 180px) 1fr;
     align-items: center;
-    gap: 12px;
-    padding: clamp(10px, 1.4vh, 16px) clamp(12px, 1.2vw, 20px);
-    font: inherit;
-    text-align: left;
+    gap: 6px;
+  }
+
+  .pyr li {
+    width: calc(100% - var(--k) * 15%);
+    display: flex;
+    align-items: baseline;
+    justify-content: center;
+    flex-wrap: wrap;
+    gap: 2px 12px;
+    padding: clamp(6px, 1.1vh, 12px) 12px;
+    border-radius: var(--r-sm);
+    text-align: center;
+    background: var(--heat-1);
     color: var(--ink);
-    background: var(--card);
-    border: 1.5px solid var(--line-2);
-    border-radius: var(--r);
-    cursor: pointer;
-    transition: border-color 0.25s, background 0.25s, transform 0.25s var(--ease);
+    transition: transform 0.25s var(--ease), box-shadow 0.25s;
   }
 
-  .rows button[aria-pressed='true'] {
-    border-color: var(--accent);
-    background: var(--accent-soft);
+  .pyr li:nth-child(2) {
+    background: var(--heat-2);
   }
 
-  .rows button:focus-visible {
-    outline: 2px solid var(--accent);
-    outline-offset: 2px;
+  .pyr li:nth-child(3) {
+    background: var(--heat-3);
   }
 
-  .rows b {
-    font-size: clamp(17px, 1.5vw, 26px);
+  .pyr li:nth-child(4) {
+    background: var(--accent);
+    color: var(--bg);
+  }
+
+  .pyr li:nth-child(5) {
+    background: var(--heat-4);
+    color: var(--bg);
+  }
+
+  .pyr li[data-on] {
+    transform: scale(1.03);
+    box-shadow: 0 0 0 3px var(--accent-glow);
+  }
+
+  .pyr li b {
+    font-size: clamp(17px, 1.5vw, 27px);
     font-weight: 600;
   }
 
-  .rows ol {
-    list-style: none;
-    margin: 0;
-    padding: 0;
-    display: flex;
-    flex-wrap: wrap;
-    align-items: center;
-    gap: 6px 20px;
+  .pyr li em {
+    font-style: normal;
+    font-family: var(--mono);
+    font-size: clamp(11px, 0.8vw, 14px);
+    opacity: 0.75;
   }
 
-  .rows ol li {
+  .pyr li span {
+    flex-basis: 100%;
+    font-size: clamp(12px, 0.95vw, 16px);
+    opacity: 0.85;
+  }
+
+  .cost {
+    margin: 0;
+    width: 2.4em;
     position: relative;
-    padding: 0.2em 0.65em;
-    border-radius: var(--r-sm);
-    background: var(--bg-2);
-    font-size: clamp(12px, 1vw, 17px);
-    white-space: nowrap;
-  }
-
-  .rows ol li + li::before {
-    content: '→';
-    position: absolute;
-    left: -16px;
-    color: var(--ink-3);
-  }
-
-  .say {
-    margin: 0;
-    min-height: 1.5em;
-    font-size: clamp(16px, 1.45vw, 26px);
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    font-size: clamp(13px, 1vw, 17px);
     color: var(--accent-ink);
+  }
+
+  .cost::before {
+    content: '';
+    position: absolute;
+    top: 0;
+    bottom: 10px;
+    left: 50%;
+    width: 2px;
+    background: linear-gradient(var(--line-2), var(--accent));
+  }
+
+  .cost::after {
+    content: '';
+    position: absolute;
+    bottom: 0;
+    left: calc(50% - 6px);
+    border: 6px solid transparent;
+    border-top: 10px solid var(--accent);
+    border-bottom: 0;
+  }
+
+  .cost span {
+    position: relative;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 2px;
+    line-height: 1.1;
+    padding: 8px 4px;
+    background: var(--bg);
+    letter-spacing: 0.2em;
+  }
+
+  .cost i {
+    font-style: normal;
+  }
+
+  /* 矮屏：每层只留名字，说明进读数行 */
+  @media (max-height: 820px) and (min-width: 901px) {
+    .pyr li span {
+      display: none;
+    }
+  }
+
+  .pyr .t-read {
+    grid-column: 1 / -1;
+    min-height: 2.9em;
+    line-height: 1.45;
   }
 
   /* View Transition：只在相邻两步之间命名，同名元素从上一步变形过来 */
@@ -1268,13 +1293,8 @@ const SHOW = 3;
     view-transition-name: mk-need;
   }
 
-  [data-vt-pair='5-6'] .vt-pile {
-    view-transition-name: mk-pile;
-  }
-
   ::view-transition-group(mk-ticket),
-  ::view-transition-group(mk-need),
-  ::view-transition-group(mk-pile) {
+  ::view-transition-group(mk-need) {
     animation-duration: 0.7s;
     animation-timing-function: var(--ease);
   }
@@ -1287,9 +1307,7 @@ const SHOW = 3;
 
   /* 整条流水线缩成一个 Project：保持比例，不压扁 */
   ::view-transition-old(mk-need),
-  ::view-transition-new(mk-need),
-  ::view-transition-old(mk-pile),
-  ::view-transition-new(mk-pile) {
+  ::view-transition-new(mk-need) {
     width: 100%;
     height: 100%;
     object-fit: contain;
@@ -1330,8 +1348,8 @@ const SHOW = 3;
     .swap li::after {
       display: none;
     }
-    .rows button {
-      grid-template-columns: 1fr;
+    .pyr li {
+      width: 100%;
     }
     .flow {
       flex-direction: column;
@@ -1441,21 +1459,6 @@ const SHOW = 3;
         pinned = pinned === r ? null : r;
         show(pinned ?? r);
       });
-    });
-  });
-
-  // 做出来一件事：悬停、聚焦或点一行，下面一行换成这个例子的大白话
-  document.querySelectorAll<HTMLElement>('[data-craft]').forEach((root) => {
-    const out = root.querySelector<HTMLElement>('[data-craft-out]')!;
-    const btns = [...root.querySelectorAll<HTMLButtonElement>('button[data-plain]')];
-    const pick = (b: HTMLButtonElement) => {
-      out.textContent = b.dataset.plain!;
-      btns.forEach((x) => x.setAttribute('aria-pressed', String(x === b)));
-    };
-    btns.forEach((b) => {
-      b.addEventListener('mouseenter', () => pick(b));
-      b.addEventListener('focus', () => pick(b));
-      b.addEventListener('click', () => pick(b));
     });
   });
 </script>
