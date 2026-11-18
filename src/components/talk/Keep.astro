@@ -1,6 +1,6 @@
 ---
 /**
- * 演讲 04「怎么维护和迭代」：收反馈 → AI 读表 → 接上流水线 → 告诉用户 → 两条时间线。
+ * 演讲 04「怎么维护和迭代」：收反馈、开单 → 接上流水线 → 告诉用户 → 两条时间线。
  * 版式照 03（共用 Talk.astro 里的 .t-steps）：顶上步骤条，左图右文，例子在底部色块。
  * 全程跟着同一条真实反馈（HAN-1688）走；最后一步把它和一个大需求（装备商店）的时间线并排。
  */
@@ -55,7 +55,7 @@ const lanes = k.tl.lanes.map((lane) => {
 
     <div class="main">
       <div class="stage">
-        <!-- 1 收反馈：小程序里一句话 → 飞书表的一行 -->
+        <!-- 1 收反馈、开单：小程序里一句话 → 飞书表的一行 → 定时任务开成单 -->
         <div class="frame" data-pane="0">
           <div class="flow">
             <div class="phone fin" style="--d:0">
@@ -70,7 +70,7 @@ const lanes = k.tl.lanes.map((lane) => {
               </div>
               <div class="tr hot">
                 <span>{k.intake.row.t}</span>
-                <b class="pill new">{k.intake.row.st}</b>
+                <b class="pill flip"><span class="new">{k.intake.row.st}</span><span class="ok">{k.intake.done}</span></b>
               </div>
               {
                 [0, 1].map(() => (
@@ -81,36 +81,19 @@ const lanes = k.tl.lanes.map((lane) => {
                 ))
               }
             </div>
-          </div>
-        </div>
-
-        <!-- 2 AI 读表：定时任务 → 查重 → 开单 → 写回表格；那一行的状态从「新反馈」变成「已转单」 -->
-        <div class="frame" data-pane="1" hidden>
-          <div class="flow">
-            <div class="clockbox fin" style="--d:0">
+            <span class="arr fin" style="--d:5">→</span>
+            <div class="clockbox fin" style="--d:6">
               <span class="clock" aria-hidden="true">◷</span>
-              <b>{k.read.clock}</b>
-              <small>{k.read.clockV}</small>
+              <b>{k.open.clock}</b>
+              <small>{k.open.clockV}</small>
             </div>
-            {
-              k.read.steps.map((s, i) => (
-                <>
-                  <span class="arr fin" style={`--d:${1 + i * 2}`}>→</span>
-                  <span class="chip fin" style={`--d:${2 + i * 2}`}>{s}</span>
-                </>
-              ))
-            }
+            <span class="arr fin" style="--d:7">→</span>
+            <span class="chip card fin" style="--d:8">{k.open.card}</span>
           </div>
-          <p class="swap fin" style="--d:8">
-            <span>{k.intake.row.t}</span>
-            <b class="pill new old">{k.read.from}</b>
-            <span class="arr">→</span>
-            <b class="pill ok">{k.read.to}</b>
-          </p>
         </div>
 
-        <!-- 3 接上流水线：新单 → 分诊 AI → 快速修复 / Project → 痛点一那套流程 -->
-        <div class="frame" data-pane="2" hidden>
+        <!-- 2 接上流水线：新单 → AI 切片 → 快速修复 / Project；下面画出痛点一那条流水线，写这张单的真实时间 -->
+        <div class="frame" data-pane="1" hidden>
           <div class="flow">
             <span class="chip card fin" style="--d:0">{k.join.card}</span>
             <span class="arr fin" style="--d:1">→</span>
@@ -122,16 +105,24 @@ const lanes = k.tl.lanes.map((lane) => {
             <ul class="lanes fin" style="--d:4">
               {k.join.lanes.map((x, i) => <li class={i === 0 ? 'on' : ''}>{x}</li>)}
             </ul>
-            <span class="arr fin" style="--d:5">→</span>
-            <div class="pipe fin" style="--d:6">
-              <b>{k.join.flow}</b>
-              <span>{k.join.flowV}</span>
-            </div>
+          </div>
+          <div class="chainbox fin" style="--d:5">
+            <p class="ck">↓ {k.join.flow}</p>
+            <ol class="chain">
+              {
+                k.join.chain.map((c, i) => (
+                  <li class={`fin${i === 3 || i === 4 ? ' gate' : ''}${i === k.join.chain.length - 1 ? ' done' : ''}`} style={`--d:${6 + i}`}>
+                    <b>{c.k}</b>
+                    <span>{c.ex}</span>
+                  </li>
+                ))
+              }
+            </ol>
           </div>
         </div>
 
-        <!-- 4 告诉用户：PR 附一行更新说明 → 版本更新 → 回到用户 -->
-        <div class="frame" data-pane="3" hidden>
+        <!-- 3 告诉用户：PR 附一行更新说明 → 版本更新 → 回到用户 -->
+        <div class="frame" data-pane="2" hidden>
           <div class="flow">
             <div class="note fin" style="--d:0">
               <b>{k.tell.pr}</b>
@@ -146,8 +137,8 @@ const lanes = k.tl.lanes.map((lane) => {
           <p class="ret fin" style="--d:6"><span aria-hidden="true">↩</span> {k.tell.back}</p>
         </div>
 
-        <!-- 5 两条时间线：每个点是一步，悬停、聚焦或点一下看时间和事 -->
-        <div class="frame" data-pane="4" hidden>
+        <!-- 4 两条时间线：每个点是一步，悬停、聚焦或点一下看时间和事 -->
+        <div class="frame" data-pane="3" hidden>
           <div class="tl" data-tl>
             {
               lanes.map((lane, li) => (
@@ -438,26 +429,46 @@ const lanes = k.tl.lanes.map((lane) => {
   }
 
   /* 2：那一行状态变了 */
-  .swap {
-    display: flex;
-    align-items: center;
-    flex-wrap: wrap;
-    gap: 10px 14px;
-    margin: clamp(16px, 3vh, 36px) 0 0;
-    padding: 0.8em 1em;
-    border-radius: var(--r);
-    background: var(--bg-2);
-    font-size: clamp(15px, 1.3vw, 23px);
+  /* 1：那一行的状态先是「新反馈」，定时任务开单后翻成「已转单」 */
+  .pill.flip {
+    display: inline-grid;
+    padding: 0;
+    background: none;
   }
 
-  .swap .old {
-    text-decoration: line-through;
-    opacity: 0.7;
+  .pill.flip span {
+    grid-area: 1 / 1;
+    padding: 2px 10px;
+    border-radius: var(--r-pill);
+    text-align: center;
   }
 
-  .frame:not([hidden]) .swap .ok {
+  .pill.flip .new {
+    color: var(--accent-ink);
+    background: var(--accent-soft);
+  }
+
+  .pill.flip .ok {
+    color: var(--ok);
+    background: var(--ok-soft);
+    opacity: 0;
+  }
+
+  .frame:not([hidden]) .pill.flip .new {
+    animation: keep-out 0.4s var(--ease) both;
+    animation-delay: 1.6s;
+  }
+
+  .frame:not([hidden]) .pill.flip .ok {
     animation: keep-pop 0.5s var(--ease) both;
-    animation-delay: 1s;
+    animation-delay: 1.7s;
+  }
+
+  @keyframes keep-out {
+    to {
+      opacity: 0;
+      transform: scale(0.8);
+    }
   }
 
   @keyframes keep-pop {
@@ -465,6 +476,80 @@ const lanes = k.tl.lanes.map((lane) => {
       opacity: 0;
       transform: scale(0.6);
     }
+    to {
+      opacity: 1;
+    }
+  }
+
+  /* 2：痛点一那条流水线，写 HAN-1688 走过的真实时间 */
+  .chainbox {
+    margin-top: clamp(18px, 3.4vh, 40px);
+    padding: clamp(12px, 1.6vh, 20px) clamp(12px, 1.2vw, 20px);
+    border-radius: var(--r);
+    background: var(--bg-2);
+  }
+
+  .ck {
+    margin: 0 0 clamp(8px, 1.2vh, 14px);
+    font-size: clamp(13px, 1vw, 17px);
+    font-weight: 600;
+    color: var(--ink-2);
+  }
+
+  .chain {
+    list-style: none;
+    margin: 0;
+    padding: 0;
+    display: grid;
+    grid-template-columns: repeat(6, minmax(0, 1fr));
+    gap: clamp(6px, 0.6vw, 12px);
+    counter-reset: c;
+  }
+
+  .chain li {
+    position: relative;
+    display: flex;
+    flex-direction: column;
+    gap: 4px;
+    padding: 0.6em 0.7em;
+    border-radius: var(--r-sm);
+    border: 1.5px solid var(--line-2);
+    background: var(--card);
+  }
+
+  .chain li:not(:last-child)::after {
+    content: '→';
+    position: absolute;
+    right: calc(-1 * clamp(6px, 0.6vw, 12px));
+    top: 50%;
+    transform: translate(50%, -50%);
+    font-size: 12px;
+    color: var(--ink-3);
+  }
+
+  .chain b {
+    font-size: clamp(13px, 1.05vw, 18px);
+    font-weight: 600;
+    white-space: nowrap;
+  }
+
+  .chain span {
+    font-size: clamp(12px, 0.9vw, 15px);
+    color: var(--ink-3);
+  }
+
+  .chain li.gate {
+    border-style: dashed;
+  }
+
+  .chain li.done {
+    background: var(--ink);
+    border-color: var(--ink);
+    color: var(--bg);
+  }
+
+  .chain li.done span {
+    color: color-mix(in srgb, var(--bg) 75%, transparent);
   }
 
   /* 4：回到用户 */
@@ -628,11 +713,23 @@ const lanes = k.tl.lanes.map((lane) => {
     .butler {
       align-self: stretch;
     }
+    .chain {
+      grid-template-columns: repeat(2, minmax(0, 1fr));
+    }
+    .chain li::after {
+      display: none;
+    }
   }
 
   @media (prefers-reduced-motion: reduce) {
-    .frame .swap .ok {
+    .frame .pill.flip span {
       animation: none !important;
+    }
+    .pill.flip .new {
+      opacity: 0;
+    }
+    .pill.flip .ok {
+      opacity: 1;
     }
     .dot {
       transition: none;
