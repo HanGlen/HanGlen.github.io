@@ -29,6 +29,10 @@ export interface Node {
   quiet?: boolean;
   /** 文字挂在点的哪一边，默认挂下面；用来避开连线和别的字 */
   lab?: 'right' | 'top';
+  /** 点旁边的小标：AI 用在哪 */
+  ai?: string;
+  /** 大一号的点（重点讲） */
+  big?: boolean;
 }
 
 export const talk = {
@@ -56,6 +60,13 @@ export const talk = {
     name: '李睿涵',
     role: 'AI 应用工程师 · 西电本硕 · 后端出身',
     hint: '鼠标放到点上，看每件事是什么',
+    /** 四组各自的色块图例，挂在画布四角（1000 × 760 坐标） */
+    regions: [
+      { k: 'school', v: '学校', x: 24, y: 28 },
+      { k: 'work', v: '工作', x: 976, y: 28 },
+      { k: 'trpg', v: '跑团', x: 976, y: 740 },
+      { k: 'partner', v: '现在合作', x: 24, y: 740 },
+    ],
     legendGroup: [
       { k: 'school', v: '学校' },
       { k: 'work', v: '工作' },
@@ -93,10 +104,25 @@ export const talk = {
         statusText: '已完成',
         x: 330,
         y: 80,
+        big: true,
         links: ['xidian'],
         title: '应激生理监测系统',
         lines: ['西电和第四军医大那边军工企业的校企联合项目，腕表采集心电、脉搏波和皮电。', '我是软件总负责人：桌面、Web、App、云端四端和压力分类模型。'],
         stat: { v: '3 项', k: '软著，另获国赛三等奖' },
+      },
+      {
+        id: 'award',
+        label: '国赛三等奖',
+        group: 'school',
+        status: 'done',
+        statusText: '获奖',
+        big: true,
+        lab: 'top',
+        x: 110,
+        y: 110,
+        links: ['signal'],
+        title: '全国大学生生物医学工程创新设计竞赛',
+        lines: ['研究生组三等奖。'],
       },
       {
         id: 'huawei',
@@ -126,6 +152,7 @@ export const talk = {
         group: 'trpg',
         status: 'done',
         lab: 'right',
+        ai: '0 行手写代码，全部 AI 开发',
         x: 680,
         y: 450,
         title: '洛山达 DND 助手 · 微信小程序',
@@ -138,6 +165,7 @@ export const talk = {
         group: 'trpg',
         status: 'done',
         lab: 'top',
+        ai: 'AI 开发',
         x: 900,
         y: 300,
         links: ['dnd'],
@@ -149,11 +177,12 @@ export const talk = {
         label: '自媒体',
         group: 'trpg',
         status: 'doing',
+        ai: 'AI 工作流',
         x: 610,
         y: 650,
         links: ['dnd'],
         title: '晨曦酒馆 · 跑团自媒体',
-        lines: ['一个人做的跑团动画账号，脚本、画面、配音、剪辑分给不同的 AI。', '目标是国内跑团领域的大号。'],
+        lines: ['一个人做的跑团动画账号，脚本、画面、配音、剪辑分给不同的 AI。', '我只看两次：脚本和成片。目标是国内跑团领域的大号。'],
         img: { src: '/shots/tavern/cover.jpg', alt: '晨曦酒馆封面：酒馆里举杯的矮人老板和抱着书跑进来的半身人', cap: '第一条《晨曦酒馆今天开张》的封面' },
       },
       {
@@ -184,6 +213,7 @@ export const talk = {
         label: 'G School · 教育\n合伙项目',
         group: 'partner',
         status: 'doing',
+        ai: 'AI 开发',
         x: 250,
         y: 560,
         title: 'G School · 教育赛道',
@@ -197,6 +227,7 @@ export const talk = {
         label: '吊车租赁平台',
         group: 'partner',
         status: 'doing',
+        ai: 'AI 开发',
         x: 430,
         y: 665,
         title: '吊车租赁平台',

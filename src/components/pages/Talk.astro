@@ -86,6 +86,15 @@ import { talk } from '../../i18n/talk';
           return;
         }
         if (t === cur) return;
+        // 封面 ↔ 01：封面上的名字变形到 01 的圆心（View Transition）；不支持就走下面的普通翻页
+        if (Math.abs(t - cur) === 1 && Math.min(t, cur) === 0 && 'startViewTransition' in document && !reduce) {
+          deck.dataset.dir = t > cur ? 'down' : 'up';
+          deck.dataset.vtName = '';
+          slides.forEach((s) => s.classList.remove('is-leaving'));
+          document.startViewTransition(() => mark(t)).finished.finally(() => delete deck.dataset.vtName);
+          lock = Date.now() + 750;
+          return;
+        }
         const dir = t > cur ? 'down' : 'up';
         const old = slides[cur];
         deck.dataset.dir = dir;
@@ -279,6 +288,24 @@ import { talk } from '../../i18n/talk';
 
   body::after {
     z-index: 30;
+  }
+
+  /* 封面 ↔ 01 的名字变形：只在这次翻页时起名，两页各有一个同名元素 */
+  [data-vt-name] .cover .who b,
+  [data-vt-name] .me .center {
+    view-transition-name: talk-name;
+  }
+  [data-vt-name] .slide.is-current,
+  [data-vt-name] .slide.is-current .t-body {
+    animation: none !important;
+  }
+  ::view-transition-group(talk-name) {
+    animation-duration: 0.8s;
+    animation-timing-function: var(--ease);
+  }
+  ::view-transition-old(root),
+  ::view-transition-new(root) {
+    animation-duration: 0.55s;
   }
 
   /* 分步页共用版式（03–06）：顶部步骤条、左图右文、底部例子色块。步数写在 style="--n: 5" */

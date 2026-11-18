@@ -39,21 +39,33 @@ const pct = (v: number, of: number) => `${(v / of) * 100}%`;
           }
         </svg>
 
+        {
+          m.regions.map((r) => (
+            <p class={`region g-${r.k}${r.x > 500 ? ' r' : ''}${r.y > 380 ? ' b' : ''}`} style={`left:${pct(r.x, 1000)};top:${pct(r.y, 760)}`} aria-hidden="true">
+              <i class={`sw g-${r.k}`} />
+              {r.v}
+            </p>
+          ))
+        }
+
         <div class="center" style={`left:${pct(C.x, 1000)};top:${pct(C.y, 760)}`}>
-          <span class="serif">我</span>
+          <span class="serif">{m.name}</span>
         </div>
 
         {
           nodes.map((n, i) => (
             <button
               type="button"
-              class={`node g-${n.group} st-${n.status} ${n.lab ? `lab-${n.lab}` : ''}`}
+              class={`node g-${n.group} st-${n.status} ${n.lab ? `lab-${n.lab}` : ''} ${n.big ? 'big' : ''}`}
               style={`left:${pct(n.x, 1000)};top:${pct(n.y, 760)};--d:${0.25 + i * 0.05}s`}
               data-node={n.id}
               aria-label={`${n.title}：${n.lines.join('')}`}
             >
               <i class="dot" aria-hidden="true" />
-              <span class="lab">{n.label}</span>
+              <span class="lab">
+                {n.label}
+                {n.ai && <em class="ai">{n.ai}</em>}
+              </span>
             </button>
           ))
         }
@@ -229,9 +241,111 @@ const pct = (v: number, of: number) => `${(v / of) * 100}%`;
     stroke-width: 3;
   }
 
+  /* 背景：四组各铺一层很淡的底色，再叠一层淡淡的点阵（接着封面的 PR 点阵） */
+  .stage::before {
+    content: '';
+    position: absolute;
+    inset: -4% -6%;
+    z-index: 0;
+    pointer-events: none;
+    background:
+      radial-gradient(ellipse 36% 34% at 18% 18%, color-mix(in srgb, var(--school) 13%, transparent), transparent 70%),
+      radial-gradient(ellipse 34% 30% at 80% 16%, color-mix(in srgb, var(--work) 12%, transparent), transparent 70%),
+      radial-gradient(ellipse 40% 42% at 80% 78%, color-mix(in srgb, var(--trpg) 11%, transparent), transparent 70%),
+      radial-gradient(ellipse 36% 40% at 22% 80%, color-mix(in srgb, var(--partner) 12%, transparent), transparent 70%);
+  }
+
+  .stage::after {
+    content: '';
+    position: absolute;
+    inset: -4% -6%;
+    z-index: 0;
+    pointer-events: none;
+    background-image: radial-gradient(color-mix(in srgb, var(--accent) 22%, transparent) 1px, transparent 1.6px);
+    background-size: 22px 22px;
+    mask-image: radial-gradient(ellipse at center, #000 30%, transparent 75%);
+    opacity: 0.6;
+  }
+
+  svg {
+    z-index: 1;
+  }
+
+  /* 四角的分组图例 */
+  .region {
+    position: absolute;
+    margin: 0;
+    display: inline-flex;
+    align-items: center;
+    gap: 8px;
+    padding: 4px 12px;
+    border-radius: var(--r-pill);
+    background: color-mix(in srgb, var(--c) 14%, var(--bg));
+    color: color-mix(in srgb, var(--c) 70%, var(--ink));
+    font-size: clamp(12px, 1.4cqw, 16px);
+    font-weight: 600;
+    letter-spacing: 0.08em;
+    white-space: nowrap;
+    z-index: 2;
+    transform: translateY(-50%);
+  }
+
+  .region.r {
+    transform: translate(-100%, -50%);
+  }
+
+  .region.g-school {
+    --c: var(--school);
+  }
+  .region.g-work {
+    --c: var(--work);
+  }
+  .region.g-trpg {
+    --c: var(--trpg);
+  }
+  .region.g-partner {
+    --c: var(--partner);
+  }
+
+  /* AI 用在哪：挂在名字下面的小标 */
+  .ai {
+    display: block;
+    width: max-content;
+    margin: 4px auto 0;
+    padding: 1px 8px;
+    border-radius: var(--r-pill);
+    background: var(--ink);
+    color: var(--bg);
+    font-style: normal;
+    font-size: clamp(10px, 1.2cqw, 13px);
+    font-weight: 500;
+    line-height: 1.5;
+    text-shadow: none;
+  }
+
+  .lab-right .ai {
+    margin-left: 0;
+  }
+
+  .node.big {
+    --s: clamp(22px, 2.9cqw, 36px);
+  }
+
+  /* 手机上画布太小：四角图例和 AI 小标收起来，右边卡片里有同样的分组 */
+  @media (max-width: 600px) {
+    .region,
+    .ai {
+      display: none;
+    }
+    .stage::before,
+    .stage::after {
+      inset: 0;
+    }
+  }
+
   .center {
     position: absolute;
-    width: clamp(64px, 9cqw, 112px);
+    width: clamp(76px, 10.5cqw, 128px);
     aspect-ratio: 1;
     transform: translate(-50%, -50%);
     border-radius: 50%;
@@ -240,8 +354,9 @@ const pct = (v: number, of: number) => `${(v / of) * 100}%`;
     background: var(--ink);
     color: var(--bg);
     box-shadow: 0 0 0 10px var(--accent-soft), 0 0 0 22px color-mix(in srgb, var(--accent-soft) 50%, transparent);
-    font-size: clamp(24px, 3.4cqw, 44px);
+    font-size: clamp(17px, 2.5cqw, 32px);
     font-weight: 600;
+    white-space: nowrap;
     z-index: 2;
   }
 
