@@ -1,11 +1,34 @@
 ---
 /**
- * 演讲 04「怎么维护和迭代」：用户提反馈 → AI 审核 → 开发 → 上线告诉用户，四步大白话。
- * 两条回到用户的弧线；下面一排是谁在什么时候动（定时任务）。← → 或悬停一步步讲。
+ * 演讲 04「怎么维护和迭代」：收反馈 → AI 读表 → 接上流水线 → 告诉用户 → 两条时间线。
+ * 版式照 03（共用 Talk.astro 里的 .t-steps）：顶上步骤条，左图右文，例子在底部色块。
+ * 全程跟着同一条真实反馈（HAN-1688）走；最后一步把它和一个大需求（装备商店）的时间线并排。
  */
 import { talk } from '../../i18n/talk';
 
 const k = talk.keep;
+const L = k.levels;
+
+// 时间线：第一个点到第二个点是「等」的那一段，画成虚线、压到 0–36%，旁边写实际等了多久；
+// 后面的点按真实时间铺在 36–100%。挨得太近的点至少隔 4%，顺序不变。
+const ms = (t: string) => new Date(`${t}:00+08:00`).getTime();
+const dur = (a: string, b: string) => {
+  const m = Math.round((ms(b) - ms(a)) / 60000);
+  const d = Math.floor(m / 1440);
+  const h = Math.floor((m % 1440) / 60);
+  const mm = m % 60;
+  return d ? `${d} 天 ${h} 小时` : `${h} 小时 ${mm} 分`;
+};
+const GAP = 36;
+const MIN = 4;
+const lanes = k.tl.lanes.map((lane) => {
+  const p = lane.pts;
+  const t0 = ms(p[1].t);
+  const t1 = ms(p[p.length - 1].t);
+  const xs = p.map((pt, i) => (i === 0 ? 0 : GAP + ((ms(pt.t) - t0) / (t1 - t0)) * (100 - GAP)));
+  for (let i = xs.length - 2; i >= 1; i--) xs[i] = Math.min(xs[i], xs[i + 1] - MIN);
+  return { ...lane, xs, wait: dur(p[0].t, p[1].t) };
+});
 ---
 
 <section class="slide t-slide keep" data-slide data-notes={k.notes} aria-labelledby="keep-title">
@@ -15,241 +38,629 @@ const k = talk.keep;
     <p class="lead">{k.lead}</p>
   </header>
 
-  <div class="body t-body" data-stepper data-hover>
-    <ol class="flow" role="tablist" aria-label={k.title}>
+  <div class="body t-body t-steps" data-stepper style={`--n: ${L.length}`}>
+    <ol class="line" role="tablist" aria-label={k.title}>
       {
-        k.nodes.map((n, i) => (
-          <li class={n.back ? 'back' : ''}>
+        L.map((l, i) => (
+          <li>
             <button type="button" role="tab" data-step aria-selected={i === 0 ? 'true' : 'false'}>
-              <span class="n">{i + 1}</span>
-              <b class="serif">{n.k}</b>
-              <span class="who">{n.who}</span>
-              <span class="what">{n.what}</span>
+              <i aria-hidden="true">{i + 1}</i>
+              <span>{l.k}</span>
+              <em>{l.tag}</em>
             </button>
-            {n.back && <span class="ret" aria-hidden="true">↩ {k.backLabel}</span>}
           </li>
         ))
       }
     </ol>
 
-    <div class="more">
-      {
-        k.nodes.map((n, i) => (
-          <p data-pane={String(i)} hidden={i !== 0}>
-            {n.more}
-          </p>
-        ))
-      }
-    </div>
+    <div class="main">
+      <div class="stage">
+        <!-- 1 收反馈：小程序里一句话 → 飞书表的一行 -->
+        <div class="frame" data-pane="0">
+          <div class="flow">
+            <div class="phone fin" style="--d:0">
+              <p class="ph">{k.intake.app}</p>
+              <p class="bubble">{k.intake.quote}</p>
+            </div>
+            <span class="arr fin" style="--d:2">→</span>
+            <div class="sheet fin" style="--d:3">
+              <p class="sh">{k.intake.table}</p>
+              <div class="tr th">
+                {k.intake.cols.map((c) => <span>{c}</span>)}
+              </div>
+              <div class="tr hot">
+                <span>{k.intake.row.t}</span>
+                <b class="pill new">{k.intake.row.st}</b>
+              </div>
+              {
+                [0, 1].map(() => (
+                  <div class="tr ghost" aria-hidden="true">
+                    <span class="bar" />
+                    <b class="pill">{k.intake.done}</b>
+                  </div>
+                ))
+              }
+            </div>
+          </div>
+        </div>
 
-    <div class="clocks">
-      <p class="ck">{k.clocksK}</p>
-      <ul>
+        <!-- 2 AI 读表：定时任务 → 查重 → 开单 → 写回表格；那一行的状态从「新反馈」变成「已转单」 -->
+        <div class="frame" data-pane="1" hidden>
+          <div class="flow">
+            <div class="clockbox fin" style="--d:0">
+              <span class="clock" aria-hidden="true">◷</span>
+              <b>{k.read.clock}</b>
+              <small>{k.read.clockV}</small>
+            </div>
+            {
+              k.read.steps.map((s, i) => (
+                <>
+                  <span class="arr fin" style={`--d:${1 + i * 2}`}>→</span>
+                  <span class="chip fin" style={`--d:${2 + i * 2}`}>{s}</span>
+                </>
+              ))
+            }
+          </div>
+          <p class="swap fin" style="--d:8">
+            <span>{k.intake.row.t}</span>
+            <b class="pill new old">{k.read.from}</b>
+            <span class="arr">→</span>
+            <b class="pill ok">{k.read.to}</b>
+          </p>
+        </div>
+
+        <!-- 3 接上流水线：新单 → 分诊 AI → 快速修复 / Project → 痛点一那套流程 -->
+        <div class="frame" data-pane="2" hidden>
+          <div class="flow">
+            <span class="chip card fin" style="--d:0">{k.join.card}</span>
+            <span class="arr fin" style="--d:1">→</span>
+            <div class="butler fin" style="--d:2">
+              <b>{k.join.butler}</b>
+              <span>{k.join.butlerV}</span>
+            </div>
+            <span class="arr fin" style="--d:3">→</span>
+            <ul class="lanes fin" style="--d:4">
+              {k.join.lanes.map((x, i) => <li class={i === 0 ? 'on' : ''}>{x}</li>)}
+            </ul>
+            <span class="arr fin" style="--d:5">→</span>
+            <div class="pipe fin" style="--d:6">
+              <b>{k.join.flow}</b>
+              <span>{k.join.flowV}</span>
+            </div>
+          </div>
+        </div>
+
+        <!-- 4 告诉用户：PR 附一行更新说明 → 版本更新 → 回到用户 -->
+        <div class="frame" data-pane="3" hidden>
+          <div class="flow">
+            <div class="note fin" style="--d:0">
+              <b>{k.tell.pr}</b>
+              <small>{k.tell.note}</small>
+            </div>
+            <span class="arr fin" style="--d:2">→</span>
+            <div class="phone fin" style="--d:4">
+              <p class="ph">{k.tell.page}</p>
+              <p class="log">{k.tell.noteV}</p>
+            </div>
+          </div>
+          <p class="ret fin" style="--d:6"><span aria-hidden="true">↩</span> {k.tell.back}</p>
+        </div>
+
+        <!-- 5 两条时间线：每个点是一步，悬停、聚焦或点一下看时间和事 -->
+        <div class="frame" data-pane="4" hidden>
+          <div class="tl" data-tl>
+            {
+              lanes.map((lane, li) => (
+                <div class="lane fin" style={`--d:${li * 2}`}>
+                  <p class="lh">
+                    <b class="serif">{lane.k}</b>
+                    <span>{lane.v}</span>
+                    <em>{lane.sum}</em>
+                    <small>{lane.sub}</small>
+                  </p>
+                  <div class="track">
+                    <span class="wait" style={`width:${lane.xs[1]}%`}>
+                      <small>
+                        {lane.gap.k} · {lane.wait}
+                      </small>
+                    </span>
+                    <span class="run" style={`left:${lane.xs[1]}%`} />
+                    {lane.pts.map((pt, i) => (
+                      <button
+                        type="button"
+                        class={`dot${pt.end ? ' end' : ''}`}
+                        style={`left:${lane.xs[i]}%`}
+                        data-at={pt.at}
+                        data-k={pt.k}
+                        aria-label={`${pt.at} ${pt.k}`}
+                      />
+                    ))}
+                    <span class="t0">{lane.pts[0].at}</span>
+                    <span class="t1">{lane.pts[lane.pts.length - 1].at}</span>
+                  </div>
+                </div>
+              ))
+            }
+            <p class="out" data-tl-out data-hint={k.tl.hint} aria-live="polite">{k.tl.hint}</p>
+          </div>
+        </div>
+      </div>
+
+      <aside class="side" aria-live="polite">
         {
-          k.clocks.map((c) => (
-            <li>
-              <i aria-hidden="true">◷</i>
-              <b>{c.k}</b>
-              <span>{c.v}</span>
-            </li>
+          L.map((l, i) => (
+            <div class="sp" data-pane={String(i)} hidden={i !== 0}>
+              <h3 class="serif">{l.q}</h3>
+              <p class="plain">{l.plain}</p>
+            </div>
           ))
         }
-      </ul>
+        <p class="t-hint">{k.hint}</p>
+      </aside>
     </div>
 
-    <p class="proof serif">{k.proof}</p>
+    {
+      L.map((l, i) => (
+        <div class="ex" data-pane={String(i)} hidden={i !== 0}>
+          <b>{k.caseK}</b>
+          <p>{l.case}</p>
+          {l.src && (
+            <details class="src">
+              <summary>{k.srcK}</summary>
+              <p>{l.src}</p>
+            </details>
+          )}
+        </div>
+      ))
+    }
   </div>
 </section>
 
 <style>
-  .body {
-    flex: 1;
-    min-height: 0;
-    display: flex;
-    flex-direction: column;
-    justify-content: center;
-    gap: clamp(16px, 3vh, 36px);
+  .stage {
+    min-width: 0;
   }
 
   .flow {
-    list-style: none;
-    margin: 0;
-    padding: 0;
-    display: grid;
-    grid-template-columns: repeat(4, minmax(0, 1fr));
-    gap: clamp(18px, 2.4vw, 44px);
-  }
-
-  .flow li {
-    position: relative;
     display: flex;
-    flex-direction: column;
-    gap: 10px;
+    align-items: center;
+    gap: clamp(8px, 1vw, 16px);
   }
 
-  /* 步与步之间的箭头 */
-  .flow li + li::before {
-    content: '→';
-    position: absolute;
-    left: calc(-1 * clamp(18px, 2.4vw, 44px));
-    width: clamp(18px, 2.4vw, 44px);
-    top: clamp(40px, 6vh, 64px);
-    text-align: center;
-    font-size: clamp(18px, 1.8vw, 30px);
+  .arr {
+    flex: none;
+    font-size: clamp(18px, 1.6vw, 28px);
     color: var(--ink-3);
   }
 
-  .flow button {
-    display: flex;
-    flex-direction: column;
-    align-items: flex-start;
-    gap: 6px;
-    min-height: clamp(170px, 24vh, 250px);
-    padding: clamp(16px, 2vw, 28px);
-    text-align: left;
-    font: inherit;
-    color: var(--ink-2);
+  .chip {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    padding: 0.5em 0.9em;
+    border-radius: var(--r-sm);
+    border: 1.5px solid var(--line-2);
     background: var(--card);
-    border: 1.5px solid var(--line);
-    border-radius: var(--r);
-    box-shadow: var(--shadow);
-    cursor: pointer;
-    transition: border-color 0.25s, background 0.25s, transform 0.25s, opacity 0.25s;
-    opacity: 0.55;
+    font-size: clamp(14px, 1.3vw, 24px);
+    white-space: nowrap;
   }
 
-  .flow button.seen {
-    opacity: 1;
-  }
-
-  .flow button[aria-selected='true'] {
-    opacity: 1;
-    border-color: var(--accent);
-    background: var(--accent-soft);
-    transform: translateY(-4px);
-  }
-
-  .n {
+  .chip.card {
     font-family: var(--mono);
-    font-size: 14px;
+    border-color: var(--accent);
     color: var(--accent-ink);
   }
 
-  .flow b {
-    font-size: clamp(24px, 2.4vw, 42px);
+  .pill {
+    flex: none;
+    padding: 2px 10px;
+    border-radius: var(--r-pill);
+    font-size: clamp(12px, 0.95vw, 16px);
     font-weight: 600;
-    line-height: 1.15;
-    color: var(--ink);
-  }
-
-  .who {
-    font-size: clamp(12px, 1vw, 16px);
     color: var(--ink-3);
-    letter-spacing: 0.04em;
+    background: var(--bg-2);
   }
 
-  .what {
-    font-size: clamp(16px, 1.45vw, 25px);
+  .pill.new {
+    color: var(--accent-ink);
+    background: var(--accent-soft);
+  }
+
+  .pill.ok {
+    color: var(--ok);
+    background: var(--ok-soft);
+  }
+
+  /* 小程序里的一屏：只画一个圆角框，不画手机外壳 */
+  .phone {
+    flex: 1 1 0;
+    min-width: 0;
+    padding: clamp(14px, 1.4vw, 24px);
+    border: 1.5px solid var(--line-2);
+    border-radius: calc(var(--r) * 1.6);
+    background: var(--card);
+    box-shadow: var(--shadow);
+  }
+
+  .ph,
+  .sh {
+    margin: 0 0 12px;
+    font-size: clamp(13px, 1vw, 17px);
+    font-weight: 600;
+    color: var(--ink-3);
+    letter-spacing: 0.06em;
+  }
+
+  .bubble {
+    margin: 0;
+    padding: 0.7em 0.9em;
+    border-radius: var(--r-sm);
+    background: var(--accent-soft);
+    font-size: clamp(16px, 1.45vw, 26px);
     line-height: 1.45;
-    color: var(--ink);
   }
 
+  .log {
+    margin: 0;
+    padding-left: 0.9em;
+    border-left: 3px solid var(--accent);
+    font-size: clamp(15px, 1.3vw, 23px);
+    line-height: 1.45;
+  }
+
+  .sheet {
+    flex: 1.3 1 0;
+    min-width: 0;
+    padding: clamp(14px, 1.4vw, 24px);
+    border: 1.5px solid var(--line-2);
+    border-radius: var(--r);
+    background: var(--card);
+    box-shadow: var(--shadow);
+  }
+
+  .tr {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 12px;
+    padding: 0.55em 0;
+    border-top: 1px solid var(--line);
+    font-size: clamp(15px, 1.3vw, 23px);
+  }
+
+  .tr.th {
+    border-top: 0;
+    font-size: clamp(12px, 0.95vw, 15px);
+    color: var(--ink-3);
+  }
+
+  .tr.hot span {
+    font-weight: 600;
+  }
+
+  .tr.ghost {
+    opacity: 0.5;
+  }
+
+  .bar {
+    flex: 1;
+    max-width: 60%;
+    height: 0.6em;
+    border-radius: var(--r-pill);
+    background: var(--line-2);
+  }
+
+  .clockbox,
+  .butler,
+  .pipe,
+  .note {
+    display: flex;
+    flex-direction: column;
+    gap: 4px;
+    padding: clamp(12px, 1.2vw, 20px);
+    border-radius: var(--r);
+    border: 1.5px solid var(--line-2);
+    background: var(--card);
+  }
+
+  .clockbox {
+    flex: none;
+    align-items: center;
+    text-align: center;
+    border-style: dashed;
+  }
+
+  .clock {
+    font-size: clamp(26px, 2.4vw, 42px);
+    line-height: 1;
+    color: var(--accent);
+  }
+
+  .clockbox b,
+  .butler b,
+  .pipe b {
+    font-size: clamp(16px, 1.45vw, 26px);
+  }
+
+  .clockbox small,
+  .butler span,
+  .pipe span,
+  .note small {
+    font-size: clamp(12px, 0.95vw, 16px);
+    color: var(--ink-3);
+  }
+
+  .butler {
+    flex: none;
+    border-color: var(--ink);
+  }
+
+  .pipe {
+    flex: 1 1 0;
+    min-width: 0;
+    background: var(--accent-soft);
+    border-color: var(--accent);
+  }
+
+  .note {
+    flex: none;
+  }
+
+  .note b {
+    font-family: var(--mono);
+    font-size: clamp(16px, 1.45vw, 26px);
+  }
+
+  .lanes {
+    list-style: none;
+    margin: 0;
+    padding: 0;
+    flex: none;
+    display: flex;
+    flex-direction: column;
+    gap: 8px;
+  }
+
+  .lanes li {
+    padding: 0.4em 0.8em;
+    border-radius: var(--r-sm);
+    border: 1.5px dashed var(--line-2);
+    font-size: clamp(14px, 1.2vw, 21px);
+    color: var(--ink-3);
+    white-space: nowrap;
+  }
+
+  .lanes li.on {
+    border-style: solid;
+    border-color: var(--accent);
+    color: var(--ink);
+    background: var(--card);
+  }
+
+  /* 2：那一行状态变了 */
+  .swap {
+    display: flex;
+    align-items: center;
+    flex-wrap: wrap;
+    gap: 10px 14px;
+    margin: clamp(16px, 3vh, 36px) 0 0;
+    padding: 0.8em 1em;
+    border-radius: var(--r);
+    background: var(--bg-2);
+    font-size: clamp(15px, 1.3vw, 23px);
+  }
+
+  .swap .old {
+    text-decoration: line-through;
+    opacity: 0.7;
+  }
+
+  .frame:not([hidden]) .swap .ok {
+    animation: keep-pop 0.5s var(--ease) both;
+    animation-delay: 1s;
+  }
+
+  @keyframes keep-pop {
+    from {
+      opacity: 0;
+      transform: scale(0.6);
+    }
+  }
+
+  /* 4：回到用户 */
   .ret {
     align-self: flex-start;
-    padding: 4px 12px;
+    margin: clamp(14px, 2.4vh, 28px) 0 0;
+    padding: 6px 16px;
     border-radius: var(--r-pill);
-    font-size: clamp(13px, 1.1vw, 18px);
+    font-size: clamp(14px, 1.2vw, 20px);
+    font-weight: 600;
     color: var(--bg);
     background: var(--ok);
   }
 
-  .more {
-    min-height: 1.6em;
-  }
-
-  .more p {
-    margin: 0;
-    font-size: clamp(18px, 1.7vw, 30px);
-    color: var(--accent-ink);
-    animation: keep-in 0.3s ease both;
-  }
-
-  .more p[hidden] {
-    display: none;
-  }
-
-  @keyframes keep-in {
-    from {
-      opacity: 0;
-      transform: translateY(6px);
-    }
-  }
-
-  .clocks {
+  /* 5：两条时间线 */
+  .tl {
     display: flex;
-    flex-wrap: wrap;
-    align-items: center;
-    gap: 10px 20px;
-    padding: clamp(12px, 1.6vh, 18px) clamp(14px, 1.6vw, 24px);
-    border-radius: var(--r);
-    background: var(--bg-2);
+    flex-direction: column;
+    gap: clamp(22px, 4.4vh, 48px);
   }
 
-  .ck {
-    margin: 0;
-    font-size: 14px;
-    color: var(--ink-3);
-  }
-
-  .clocks ul {
-    list-style: none;
-    margin: 0;
-    padding: 0;
-    display: flex;
-    flex-wrap: wrap;
-    gap: 8px 22px;
-  }
-
-  .clocks li {
+  .lh {
     display: flex;
     align-items: baseline;
-    gap: 6px;
-    font-size: clamp(14px, 1.25vw, 21px);
+    flex-wrap: wrap;
+    gap: 4px 14px;
+    margin: 0 0 clamp(20px, 3vh, 34px);
   }
 
-  .clocks i {
-    font-style: normal;
-    color: var(--accent);
+  .lh b {
+    font-size: clamp(22px, 2vw, 34px);
+    font-weight: 600;
   }
 
-  .clocks span {
+  .lh span {
     color: var(--ink-3);
-    font-size: 0.85em;
+    font-size: clamp(14px, 1.15vw, 20px);
   }
 
-  .proof {
+  .lh em {
+    font-style: normal;
+    font-weight: 600;
+    color: var(--accent-ink);
+    font-size: clamp(15px, 1.3vw, 23px);
+  }
+
+  .lh small {
+    color: var(--ink-3);
+    font-size: clamp(13px, 1vw, 17px);
+  }
+
+  .track {
+    position: relative;
+    height: 2px;
+    margin: 0 9px 30px;
+  }
+
+  .wait {
+    position: absolute;
+    left: 0;
+    top: 0;
+    border-top: 2px dashed var(--line-2);
+  }
+
+  .wait small {
+    position: absolute;
+    left: 0;
+    bottom: 10px;
+    white-space: nowrap;
+    font-size: clamp(12px, 0.95vw, 15px);
+    color: var(--ink-3);
+  }
+
+  .run {
+    position: absolute;
+    right: 0;
+    top: 0;
+    height: 2px;
+    background: var(--accent);
+  }
+
+  .dot {
+    position: absolute;
+    top: 1px;
+    width: 18px;
+    height: 18px;
+    margin: -9px 0 0 -9px;
+    padding: 0;
+    border-radius: 50%;
+    border: 2px solid var(--accent);
+    background: var(--bg);
+    cursor: pointer;
+    transition: transform 0.2s, background 0.2s, box-shadow 0.2s;
+  }
+
+  .dot.end {
+    background: var(--ok);
+    border-color: var(--ok);
+  }
+
+  .dot:hover,
+  .dot:focus-visible,
+  .dot[aria-pressed='true'] {
+    outline: none;
+    transform: scale(1.35);
+    background: var(--accent);
+    box-shadow: 0 0 0 6px var(--accent-glow);
+  }
+
+  .dot.end:hover,
+  .dot.end:focus-visible,
+  .dot.end[aria-pressed='true'] {
+    background: var(--ok);
+    box-shadow: 0 0 0 6px var(--ok-soft);
+  }
+
+  .t0,
+  .t1 {
+    position: absolute;
+    top: 14px;
+    font-family: var(--mono);
+    font-size: clamp(11px, 0.85vw, 14px);
+    color: var(--ink-3);
+    white-space: nowrap;
+  }
+
+  .t0 {
+    left: -9px;
+  }
+
+  .t1 {
+    right: -9px;
+  }
+
+  .out {
     margin: 0;
-    font-size: clamp(18px, 1.7vw, 30px);
+    min-height: 1.5em;
+    font-size: clamp(16px, 1.45vw, 26px);
+    color: var(--ink-3);
+  }
+
+  .out.on {
+    color: var(--accent-ink);
     font-weight: 600;
   }
 
   @media (max-width: 900px) {
     .flow {
-      grid-template-columns: 1fr 1fr;
+      flex-direction: column;
+      align-items: stretch;
     }
-    .flow li + li::before {
-      display: none;
+    .flow > .arr {
+      transform: rotate(90deg);
+      align-self: center;
     }
-    .flow button {
-      opacity: 1;
+    .lanes {
+      flex-direction: row;
+      justify-content: center;
+    }
+    .clockbox,
+    .butler {
+      align-self: stretch;
     }
   }
 
   @media (prefers-reduced-motion: reduce) {
-    .flow button,
-    .more p {
+    .frame .swap .ok {
+      animation: none !important;
+    }
+    .dot {
       transition: none;
-      animation: none;
     }
   }
 </style>
+
+<script>
+  // 时间线：悬停、聚焦或点一个点，下面一行写这一步的时间和事；点一下钉住
+  document.querySelectorAll<HTMLElement>('[data-tl]').forEach((root) => {
+    const out = root.querySelector<HTMLElement>('[data-tl-out]')!;
+    const dots = [...root.querySelectorAll<HTMLButtonElement>('.dot')];
+    let pinned: HTMLButtonElement | null = null;
+    const show = (b: HTMLButtonElement | null) => {
+      out.textContent = b ? `${b.dataset.at} · ${b.dataset.k}` : out.dataset.hint!;
+      out.classList.toggle('on', !!b);
+      dots.forEach((x) => x.setAttribute('aria-pressed', String(x === pinned)));
+    };
+    dots.forEach((b) => {
+      b.setAttribute('aria-pressed', 'false');
+      b.addEventListener('mouseenter', () => show(b));
+      b.addEventListener('mouseleave', () => show(pinned));
+      b.addEventListener('focus', () => show(b));
+      b.addEventListener('blur', () => show(pinned));
+      b.addEventListener('click', () => {
+        pinned = pinned === b ? null : b;
+        show(pinned ?? b);
+      });
+    });
+  });
+</script>
