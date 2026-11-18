@@ -286,6 +286,7 @@ const SHOW = 3;
             <div class="sp" data-pane={String(i)} hidden={i !== 0}>
               <h3 class="serif">{l.q}</h3>
               <p class="plain">{l.plain}</p>
+              {'ref' in l && l.ref && <p class="ref"><b>{m.refK}</b><span set:html={rich(l.ref)} /></p>}
             </div>
           ))
         }
@@ -312,6 +313,37 @@ const SHOW = 3;
 </section>
 
 <style>
+  /* 参考了谁：右栏大白话下面一行小字，名字链到原文 */
+  .ref {
+    margin: clamp(10px, 1.6vh, 18px) 0 0;
+    display: flex;
+    gap: 10px;
+    align-items: baseline;
+    font-size: clamp(13px, 0.95vw, 16px);
+    line-height: 1.5;
+    color: var(--ink-3);
+  }
+
+  .ref b {
+    flex: none;
+    font-weight: 600;
+    letter-spacing: 0.08em;
+    color: var(--accent-ink);
+  }
+
+  .ref :global(a) {
+    color: var(--ink-2);
+    text-decoration: underline;
+    text-decoration-color: var(--line-2);
+    text-underline-offset: 3px;
+  }
+
+  .ref :global(a:hover),
+  .ref :global(a:focus-visible) {
+    color: var(--accent-ink);
+    text-decoration-color: var(--accent);
+  }
+
   .chip {
     display: inline-flex;
     align-items: center;
