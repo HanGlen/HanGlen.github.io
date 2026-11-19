@@ -161,6 +161,18 @@ import { talk } from '../../i18n/talk';
         // data-vt="2-3 3-4"：列出哪两步之间用 View Transition 变形；切换时把这一对写进 data-vt-pair，
         // 页面 CSS 只在这一对上给元素起 view-transition-name，同名元素就从上一步变形到下一步
         const pairs = (root.dataset.vt ?? '').split(/\s+/).filter(Boolean);
+        // 宽屏一页放不下时，把左边的图按比例缩小（zoom 会参与排版），不压到底部的例子色块
+        const main = root.querySelector<HTMLElement>('.main');
+        const stage = main?.firstElementChild as HTMLElement | null;
+        const fit = () => {
+          if (!main || !stage) return;
+          stage.style.zoom = '';
+          if (!wide.matches) return;
+          const avail = main.clientHeight;
+          const need = stage.getBoundingClientRect().height;
+          if (avail > 0 && need > avail) stage.style.zoom = String(Math.max(0.55, Math.floor((avail / need) * 100) / 100));
+        };
+        if (main) new ResizeObserver(() => fit()).observe(main);
         const sel = (i: number) => {
           const was = Number(root.dataset.at ?? -1);
           if (was === i) return;
@@ -172,6 +184,7 @@ import { talk } from '../../i18n/talk';
               s.classList.toggle('seen', j <= i || s.classList.contains('seen'));
             });
             panes.forEach((p) => (p.hidden = p.dataset.pane !== String(i)));
+            fit();
             root.dispatchEvent(new CustomEvent('step', { detail: i }));
           };
           const pair = `${Math.min(was, i)}-${Math.max(was, i)}`;

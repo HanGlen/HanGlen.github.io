@@ -26,7 +26,7 @@ const gmax = 16000;
 const gy = (v: number) => G.t + (1 - v / gmax) * (G.h - G.t - G.b);
 const gpts = c.growth.pts.map((p) => ({ ...p, x: gx(p.t), y: gy(p.v) }));
 const gline = gpts.map((p, i) => `${i ? 'L' : 'M'}${p.x.toFixed(1)},${p.y.toFixed(1)}`).join(' ');
-const gai = gx(c.growth.ai.t);
+const garea = `${gline} L${gpts[gpts.length - 1].x.toFixed(1)},${G.h - G.b} L${gpts[0].x.toFixed(1)},${G.h - G.b} Z`;
 const gmon = ['1 月', '3 月', '5 月', '7 月', '9 月', '11 月'].map((k, i) => ({ k, x: gx(`2026-${String(i * 2 + 1).padStart(2, '0')}-01`) }));
 ---
 
@@ -107,12 +107,10 @@ const gmon = ['1 月', '3 月', '5 月', '7 月', '9 月', '11 月'].map((k, i) 
           <p class="t-read" aria-live="polite" data-read-out data-hint="悬停一段看读数">悬停一段看读数</p>
         </div>
 
-        <!-- 3 用户增长：累计用户折线，竖线标出交给 AI 那天 -->
+        <!-- 3 用户增长：累计用户折线 -->
         <div class="frame" data-pane="2" hidden data-reads>
           <svg class="growth fin" viewBox={`0 0 ${G.w} ${G.h}`} role="img" aria-label={c.levels[2].q}>
-            <rect class="after" x={gai} y={G.t} width={G.w - G.r - gai} height={G.h - G.t - G.b} />
-            <line class="ai" x1={gai} x2={gai} y1={G.t - 8} y2={G.h - G.b} />
-            <text class="ai-k" x={gai + 6} y={G.t + 6}>{c.growth.ai.k}</text>
+            <path class="area" d={garea} />
             <line class="base" x1={G.l} x2={G.w - G.r} y1={G.h - G.b} y2={G.h - G.b} />
             {gmon.map((m) => <text class="mon" x={m.x} y={G.h - 8}>{m.k}</text>)}
             <path class="ln" d={gline} />
@@ -120,7 +118,7 @@ const gmon = ['1 月', '3 月', '5 月', '7 月', '9 月', '11 月'].map((k, i) 
               gpts.map((p, i) => (
                 <g class="pt" tabindex="0" data-read={`${p.t.slice(5).replace('-', ' 月 ')} 日：累计 ${p.label} 人`}>
                   <circle cx={p.x} cy={p.y} r="5" />
-                  {(i === 0 || i === 4 || i === gpts.length - 1) && (
+                  {(i === 0 || i === gpts.length - 1) && (
                     <text x={p.x} y={p.y - 12} text-anchor={i === gpts.length - 1 ? 'end' : 'middle'}>{p.label}</text>
                   )}
                 </g>
@@ -506,19 +504,8 @@ const gmon = ['1 月', '3 月', '5 月', '7 月', '9 月', '11 月'].map((k, i) 
     overflow: visible;
   }
 
-  .growth .after {
+  .growth .area {
     fill: var(--accent-soft);
-  }
-
-  .growth .ai {
-    stroke: var(--accent);
-    stroke-width: 1.5;
-    stroke-dasharray: 4 4;
-  }
-
-  .growth .ai-k {
-    font-size: 13px;
-    fill: var(--accent-ink);
   }
 
   .growth .base {
