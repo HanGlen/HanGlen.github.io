@@ -92,13 +92,16 @@ import { talk } from '../../i18n/talk';
         if (Math.abs(t - cur) === 1 && Math.min(t, cur) === 0 && 'startViewTransition' in document && !reduce) {
           deck.dataset.dir = t > cur ? 'down' : 'up';
           deck.dataset.vtName = '';
-          slides.forEach((s) => s.classList.remove('is-leaving'));
+          slides.forEach((s) => s.classList.remove('is-leaving', 'vt-in'));
+          // 新页的入场动画在变形期间关掉；变形结束后也保持关着（vt-in 留到下次翻页），否则会从头再播一遍，像刷新
+          slides[t].classList.add('vt-in');
           document.startViewTransition(() => mark(t)).finished.finally(() => delete deck.dataset.vtName);
           lock = Date.now() + 750;
           return;
         }
         const dir = t > cur ? 'down' : 'up';
         const old = slides[cur];
+        slides.forEach((s) => s.classList.remove('vt-in'));
         deck.dataset.dir = dir;
         slides.forEach((s) => s.classList.remove('is-leaving'));
         if (!reduce) {
@@ -311,7 +314,9 @@ import { talk } from '../../i18n/talk';
     view-transition-name: talk-name;
   }
   [data-vt-name] .slide.is-current,
-  [data-vt-name] .slide.is-current .t-body {
+  [data-vt-name] .slide.is-current .t-body,
+  .slide.vt-in.is-current,
+  .slide.vt-in.is-current .t-body {
     animation: none !important;
   }
   ::view-transition-group(talk-name) {
