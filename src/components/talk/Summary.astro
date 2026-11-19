@@ -1,7 +1,7 @@
 ---
 /**
- * 演讲 07 总结：快、专业、省三句，← → 或悬停一句句讲，讲过的保持亮着。
- * 下面「谢谢」+ 寻求合作 + 车主微信二维码 + 网站地址。
+ * 演讲 07 总结：回答封面的三个问题，每张卡「以前 → 现在」+ 一个真数字；← → 或悬停一问一问讲，讲过的保持亮着。
+ * 「谢谢」和微信二维码在下一页 08 交流与合作。
  */
 import { talk } from '../../i18n/talk';
 
@@ -23,22 +23,15 @@ const s = talk.sum;
             <button type="button" role="tab" data-step aria-selected={i === 0 ? 'true' : 'false'}>
               <i>{String(i + 1).padStart(2, '0')}</i>
               <b class="serif">{it.q}</b>
-              <span>{it.a}</span>
+              <p class="was"><small>{s.beforeK}</small>{it.before}</p>
+              <p class="now"><small>{s.nowK}</small>{it.now}</p>
+              <span class="num">{it.num}</span>
               <em>{it.ref}</em>
             </button>
           </li>
         ))
       }
     </ol>
-    <div class="bye">
-      <b class="serif">{s.end}</b>
-      <div class="ask">
-        <p class="serif">{s.ask}</p>
-        <span>{s.askV}</span>
-        <small>{s.site}</small>
-      </div>
-      <img src={s.qr.src} alt={s.qr.alt} width="776" height="771" loading="lazy" />
-    </div>
     <p class="t-hint">{s.hint}</p>
   </div>
 </section>
@@ -121,54 +114,42 @@ const s = talk.sum;
     color: var(--ink-3);
   }
 
-  .bye {
-    display: flex;
-    align-items: center;
-    gap: clamp(20px, 3vw, 56px);
-  }
-
-  .ask {
-    margin-left: auto;
+  button p {
+    margin: 0;
     display: flex;
     flex-direction: column;
-    align-items: flex-end;
-    gap: 6px;
-    text-align: right;
+    gap: 2px;
+    line-height: 1.45;
   }
 
-  .ask p {
-    margin: 0;
-    font-size: clamp(22px, 2vw, 36px);
+  button p small {
+    font-family: var(--mono);
+    font-size: clamp(11px, 0.8vw, 14px);
+    letter-spacing: 0.08em;
+    color: var(--ink-3);
+  }
+
+  .was {
+    font-size: clamp(15px, 1.2vw, 21px);
+    color: var(--ink-3);
+  }
+
+  .now {
+    font-size: clamp(18px, 1.55vw, 28px);
     font-weight: 600;
     color: var(--ink);
   }
 
-  .ask span {
-    font-size: clamp(14px, 1.1vw, 19px);
-    color: var(--ink-2);
+  .now small {
+    color: var(--accent-ink);
   }
 
-  .ask small {
-    font-family: var(--mono);
-    font-size: clamp(13px, 1vw, 17px);
-    color: var(--ink-3);
-  }
-
-  /* 二维码保持白底，深色模式也能扫 */
-  .bye img {
-    width: clamp(110px, 17vh, 200px);
-    height: auto;
+  .num {
+    padding: 6px 12px;
     border-radius: var(--r-sm);
-    border: 1px solid var(--line);
+    background: var(--accent-soft);
+    color: var(--ink);
   }
-
-  .bye b {
-    font-size: clamp(36px, 4vw, 76px);
-    font-weight: 600;
-    color: var(--accent);
-  }
-
-
 
   @media (max-width: 900px) {
     ol {
@@ -176,14 +157,6 @@ const s = talk.sum;
     }
     button {
       opacity: 1;
-    }
-    .bye {
-      flex-wrap: wrap;
-    }
-    .ask {
-      margin-left: 0;
-      align-items: flex-start;
-      text-align: left;
     }
   }
 

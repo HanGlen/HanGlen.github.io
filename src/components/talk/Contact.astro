@@ -1,0 +1,189 @@
+---
+/**
+ * 演讲 08 交流与合作：左边「我能帮上忙」和「想向大家请教」，右边微信二维码和「谢谢」。
+ * 卡片悬停、聚焦时柔光微移；二维码保持白底，深色模式也能扫。
+ */
+import { talk } from '../../i18n/talk';
+
+const c = talk.contact;
+---
+
+<section class="slide t-slide contact" data-slide data-notes={c.notes} aria-labelledby="contact-title">
+  <header class="t-head">
+    <p class="no">{c.no}</p>
+    <h2 id="contact-title">{c.title}</h2>
+    <p class="lead">{c.lead}</p>
+  </header>
+
+  <div class="body t-body">
+    <div class="cols">
+      <div class="group help">
+        <p class="gk">{c.help.k}</p>
+        {
+          c.help.items.map((h) => (
+            <div class="card" tabindex="0">
+              <b class="serif">{h.k}</b>
+              <span>{h.v}</span>
+            </div>
+          ))
+        }
+      </div>
+      <div class="group learn">
+        <p class="gk">{c.learn.k}</p>
+        <ul>
+          {
+            c.learn.items.map((x) => (
+              <li class="card" tabindex="0">
+                <b class="serif">{x}</b>
+              </li>
+            ))
+          }
+        </ul>
+        <span class="lv">{c.learn.v}</span>
+      </div>
+    </div>
+
+    <aside class="qr">
+      <img src={c.qr.src} alt={c.qr.alt} width="776" height="771" loading="lazy" />
+      <p>{c.askV}</p>
+      <small>{c.site}</small>
+      <b class="serif">{c.end}</b>
+    </aside>
+  </div>
+</section>
+
+<style>
+  .body {
+    flex: 1;
+    min-height: 0;
+    display: grid;
+    grid-template-columns: minmax(0, 1.6fr) minmax(220px, 1fr);
+    gap: clamp(24px, 4vw, 72px);
+    align-items: center;
+  }
+
+  .cols {
+    display: flex;
+    flex-direction: column;
+    gap: clamp(20px, 4vh, 44px);
+  }
+
+  .group {
+    display: flex;
+    flex-direction: column;
+    gap: 12px;
+  }
+
+  .gk {
+    margin: 0;
+    font-family: var(--mono);
+    font-size: clamp(13px, 1vw, 17px);
+    letter-spacing: 0.08em;
+    color: var(--accent-ink);
+  }
+
+  .card {
+    display: flex;
+    flex-direction: column;
+    gap: 8px;
+    padding: clamp(16px, 1.8vw, 30px);
+    border: 1px solid var(--line);
+    border-radius: var(--r);
+    background: var(--card);
+    box-shadow: var(--shadow);
+    transition: transform 0.25s var(--ease), border-color 0.25s;
+  }
+
+  .card:hover,
+  .card:focus-visible {
+    transform: translateY(-3px);
+    border-color: var(--accent);
+    outline: none;
+  }
+
+  .help .card {
+    border-top: 4px solid var(--accent);
+  }
+
+  .card b {
+    font-size: clamp(22px, 2.1vw, 38px);
+    font-weight: 600;
+    line-height: 1.2;
+  }
+
+  .card span {
+    font-size: clamp(16px, 1.35vw, 24px);
+    line-height: 1.5;
+    color: var(--ink-2);
+  }
+
+  .learn ul {
+    list-style: none;
+    margin: 0;
+    padding: 0;
+    display: grid;
+    grid-template-columns: repeat(3, minmax(0, 1fr));
+    gap: clamp(10px, 1.4vw, 24px);
+  }
+
+  .learn .card {
+    align-items: center;
+    text-align: center;
+  }
+
+  .lv {
+    font-size: clamp(15px, 1.2vw, 21px);
+    color: var(--ink-2);
+  }
+
+  .qr {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 8px;
+    text-align: center;
+  }
+
+  /* 二维码保持白底，深色模式也能扫 */
+  .qr img {
+    width: min(100%, clamp(160px, 34vh, 320px));
+    height: auto;
+    border-radius: var(--r-sm);
+    border: 1px solid var(--line);
+    box-shadow: var(--shadow);
+  }
+
+  .qr p {
+    margin: 8px 0 0;
+    font-size: clamp(16px, 1.35vw, 24px);
+    color: var(--ink);
+  }
+
+  .qr small {
+    font-family: var(--mono);
+    font-size: clamp(13px, 1vw, 17px);
+    color: var(--ink-3);
+  }
+
+  .qr b {
+    margin-top: clamp(8px, 2vh, 24px);
+    font-size: clamp(36px, 4vw, 76px);
+    font-weight: 600;
+    color: var(--accent);
+  }
+
+  @media (max-width: 900px) {
+    .body {
+      grid-template-columns: 1fr;
+    }
+    .learn ul {
+      grid-template-columns: 1fr;
+    }
+  }
+
+  @media (prefers-reduced-motion: reduce) {
+    .card {
+      transition: none;
+    }
+  }
+</style>
