@@ -90,9 +90,14 @@ const SHOW = 3;
               <tbody>
                 {
                   m.models.map((x, i) => (
-                    <tr class="fin" style={`--d:${i + 1}`} tabindex="0" data-row={`${x.k}：${x.top}`}>
+                    <tr class="fin" style={`--d:${i + 1}`} tabindex="0" data-row={`${x.k}：${x.note}`}>
                       <th scope="row">{x.k}</th>
-                      <td class="lead serif">{x.lead}</td>
+                      {x.top.map(([name, score], j) => (
+                        <td class={`top3${j === 0 ? ' first' : ''}`}>
+                          <b>{name}</b>
+                          {score && <span>{score}</span>}
+                        </td>
+                      ))}
                       <td class="bd">
                         <a href={x.href} target="_blank" rel="noopener">
                           {x.board} ↗
@@ -255,6 +260,7 @@ const SHOW = 3;
         <!-- 7 验证：poteto 金字塔，上宽下窄，越往下越贵；每层悬停看小程序里的例子 -->
         <div class="frame" data-pane="6" hidden>
           <div class="pyr" data-reads>
+            <p class="cost up fin" style="--d:6" aria-hidden="true"><span>{[...m.pyramid.sure].map((ch) => <i>{ch}</i>)}</span></p>
             <ol>
               {
                 m.pyramid.layers.map((x, i) => (
@@ -506,10 +512,24 @@ const SHOW = 3;
     background: var(--accent-soft);
   }
 
-  .board td.lead {
-    font-size: clamp(17px, 1.6vw, 28px);
+  /* 前三名：型号一行、分数一行；第一名用强调色 */
+  .board td.top3 b {
+    display: block;
     font-weight: 600;
+    font-size: clamp(13px, 1.1vw, 19px);
     line-height: 1.25;
+  }
+
+  .board td.top3 span {
+    display: block;
+    margin-top: 2px;
+    font-family: var(--mono);
+    font-size: clamp(11px, 0.85vw, 14px);
+    color: var(--ink-3);
+  }
+
+  .board td.top3.first b {
+    color: var(--accent-ink);
   }
 
   .board td.bd {
@@ -1153,7 +1173,7 @@ const SHOW = 3;
   /* 验证金字塔：倒着放，上宽下窄；右边一根箭头写「越往下越贵」 */
   .pyr {
     display: grid;
-    grid-template-columns: minmax(0, 1fr) auto;
+    grid-template-columns: auto minmax(0, 1fr) auto;
     gap: 10px clamp(12px, 1.4vw, 24px);
   }
 
@@ -1278,10 +1298,28 @@ const SHOW = 3;
     }
   }
 
+  /* 读数行：只在金字塔那一栏，居中贴在最下面一层下方 */
   .pyr .t-read {
-    grid-column: 1 / -1;
+    grid-column: 2;
     min-height: 2.9em;
+    margin-top: 4px;
     line-height: 1.45;
+    text-align: center;
+    text-wrap: balance;
+  }
+
+  /* 左边那根往上：越往上越确定 */
+  .cost.up::before {
+    top: 10px;
+    bottom: 0;
+    background: linear-gradient(var(--accent), var(--line-2));
+  }
+
+  .cost.up::after {
+    top: 0;
+    bottom: auto;
+    border-top: 0;
+    border-bottom: 10px solid var(--accent);
   }
 
   /* View Transition：只在相邻两步之间命名，同名元素从上一步变形过来 */

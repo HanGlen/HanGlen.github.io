@@ -5,13 +5,13 @@ export const en: Content = {
 
   home: {
     title: 'Ruihan Li',
-    description: 'Ruihan Li built a tabletop RPG mini program with 14.6k users to date. Today most of its code is written by AI.',
+    description: 'Ruihan Li built a tabletop RPG mini program with 15.2k users to date. Today most of its code is written by AI.',
     hello: 'Ruihan Li · AI application engineer',
     line: 'One person.\nAn AI engineering team.',
-    sub: 'I built a tabletop RPG mini program with 14.6k users to date. Since June it has been run by a crew of AI agents (Claude, Codex, Cursor and more) on 8 scheduled shifts; I bring ideas, approve plans and ship releases.',
+    sub: 'I built a tabletop RPG mini program with 15.2k users to date. Since June it has been run by a crew of AI agents (Claude, Codex, Cursor and more) on 8 scheduled shifts; I bring ideas, approve plans and ship releases.',
     proof: [
-      { v: '1,633', k: 'PRs written and merged by AI', src: 'Merge log of the mini program dev branch, Jun 17 to Nov 6' },
-      { v: '26 / day', k: 'merged on average, last 30 days', src: 'dev branch merge log: 795 from Oct 8 to Nov 6' },
+      { v: '1,839', k: 'PRs written and merged by AI', src: 'Merge log of the mini program dev branch, Jun 17 to Nov 18' },
+      { v: '24 / day', k: 'merged on average, last 30 days', src: 'dev branch merge log: 705 from Oct 20 to Nov 18' },
       { v: '8', k: 'scheduled AI shifts', src: 'The 7 jobs in the mini program’s routine table, plus the business-analytics patrol' },
       { v: '2.5 h', k: 'from player feedback to merged fix', src: 'Issue #2593 filed 08:50, PR #2598 merged 11:21' },
     ],
@@ -56,7 +56,7 @@ export const en: Content = {
       slug: 'dnd',
       name: 'Lathander D&D Assistant',
       kind: 'WeChat mini program · 2022 – now',
-      stat: '14.6k users · 9,669 characters',
+      stat: '15.2k users · 9,669 characters',
       line: 'Build D&D characters and run games. Maintained by AI agents since June.',
       shot: '/shots/dnd/premade.jpg',
       shot2: '/shots/dnd/sheet.jpg',
@@ -99,7 +99,7 @@ export const en: Content = {
   },
 
   usage: [
-    { v: '14.6k', k: 'total users' },
+    { v: '15.2k', k: 'total users' },
     { v: '9,669', k: 'characters created' },
     { v: '1,136', k: 'campaign rooms' },
     { v: '28 min', k: 'average daily time per active user' },
@@ -107,14 +107,14 @@ export const en: Content = {
 
   dnd: {
     title: 'Lathander D&D Assistant · Ruihan Li',
-    description: 'A D&D mini program with 14.6k users, maintained mostly by AI agents since June 2026.',
+    description: 'A D&D mini program with 15.2k users, maintained mostly by AI agents since June 2026.',
     kind: 'WeChat mini program · 2022 – now',
     name: 'Lathander D&D Assistant',
     line: 'A mini program for building D&D characters, managing them and running games. I wrote it alone in 2022; since June 2026 AI agents maintain it.',
     stats: [
-      { v: '14.6k', k: 'total users', src: 'WeChat console, as of Nov 6' },
+      { v: '15.2k', k: 'total users', src: 'WeChat Official Accounts Platform, as of Nov 18' },
       { v: '209', k: 'daily active, 30-day avg', src: 'WeChat dashboard, average of Oct 8 to Nov 6' },
-      { v: '1,633', k: 'PRs merged by AI', src: 'dev branch merge log, as of Nov 6' },
+      { v: '1,839', k: 'PRs merged by AI', src: 'dev branch merge log, as of Nov 18' },
       { v: '88', k: 'requests in queue', src: 'Open tickets in Linear (duplicates excluded), as of Nov 7' },
     ],
     shots: [
@@ -170,7 +170,7 @@ export const en: Content = {
     opsTabs: ['Users', 'Player feedback', 'Content & cost'],
     usageNote: 'Daily active users from Sep 8 to Nov 6. The National Day holiday peaked at 378 in one day.',
     usageStats: [
-      { v: '14.6k', k: 'total users' },
+      { v: '15.2k', k: 'total users' },
       { v: '209', k: 'daily actives, 30-day avg' },
       { v: '1,388', k: 'new users, last 30 days' },
       { v: '28 min', k: 'average daily time per active user' },
@@ -288,8 +288,8 @@ export const en: Content = {
         },
       },
     ],
-    trendTitle: 'Throughput: 26 PRs a day',
-    trendBody: '795 PRs merged in the last 30 days: 26 a day on average, 52 on the busiest day. 88 requests are still queued; the limit is compute, not people.',
+    trendTitle: 'Throughput: 24 PRs a day',
+    trendBody: '705 PRs merged in the last 30 days: 24 a day on average, 52 on the busiest day. 88 requests are still queued; the limit is compute, not people.',
 
     qaTitle: 'Rules Q&A: no answer beats a wrong one',
     qaBody: 'Players ask rules questions in plain words, and every claim in the answer must cite the rulebook. If the evidence is thin, it says so instead of guessing.',
@@ -518,7 +518,7 @@ export const en: Content = {
     open: 'Looking for roles in AI applications and AI engineering.',
     exp: [
       { t: '2025.07 – 2026.07', org: 'BYD Company Limited', href: 'https://www.byd.com', role: 'Senior Systems Engineer', pts: ['Brought AI tools such as Trae into the team, and wrote skills and guidelines for code review, backend work and project docs', 'Backend of the global quality management system, millions of users', 'Owned the color-matching module (30+ APIs from build to launch) and several group- and division-level OA workflows', 'Cut several slow APIs from ~10 s to under 2 s'] },
-      { t: '2022.07 – now', org: 'Lathander D&D Assistant', href: '/en/work/dnd/', role: 'Own project', pts: ['14.6k total users, 9,669 character sheets created', 'Built a multi-agent dev workflow: 1,633 PRs merged in 5 months', 'Built rules Q&A (RAG): 35 rulebooks indexed, every claim cited, declines when evidence is thin; launched in November', 'Partnered with Adventure Box, a store in Xi\'an, to ship its Box of the Gods ruleset in the app: the store signed off 57 rule questions, AI merged 58 PRs', 'Paid features live; AI text and image items run at 78%+ gross margin'] },
+      { t: '2022.07 – now', org: 'Lathander D&D Assistant', href: '/en/work/dnd/', role: 'Own project', pts: ['15.2k total users, 9,669 character sheets created', 'Built a multi-agent dev workflow: 1,839 PRs merged in 5 months', 'Built rules Q&A (RAG): 35 rulebooks indexed, every claim cited, declines when evidence is thin; launched in November', 'Partnered with Adventure Box, a store in Xi\'an, to ship its Box of the Gods ruleset in the app: the store signed off 57 rule questions, AI merged 58 PRs', 'Paid features live; AI text and image items run at 78%+ gross margin'] },
       { t: '2022.09 – 2025.06', org: 'Xidian University', href: 'https://www.xidian.edu.cn', role: 'M.Eng., Electronic Information', pts: ['Software lead of a stress monitoring system built with the Fourth Military Medical University, 3 software copyrights', 'Thesis: stress classification from ECG + skin conductance (CNN + BiLSTM), 83.3% on 5-minute windows', 'Third Prize, graduate track, National BME Innovation Design Competition'] },
       { t: '2021.04 – 2021.09', org: 'Huawei OD', role: 'Java Developer', pts: ['Backend development and integration testing for Huawei'] },
       { t: '2016.09 – 2020.06', org: 'Xidian University', href: 'https://www.xidian.edu.cn', role: 'B.Eng., Electronic Information Engineering', pts: [] },
