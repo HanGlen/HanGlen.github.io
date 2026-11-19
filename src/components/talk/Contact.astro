@@ -1,7 +1,7 @@
 ---
 /**
- * 演讲 08 交流与合作：左边「我能帮上忙」和「想向大家请教」，右边微信二维码和「谢谢」。
- * 卡片悬停、聚焦时柔光微移；二维码保持白底，深色模式也能扫。
+ * 演讲 08 交流与合作：左边一句邀请，右边微信二维码和「谢谢」。不分类（车主 2026-11-19 定）。
+ * 二维码保持白底，深色模式也能扫。
  */
 import { talk } from '../../i18n/talk';
 
@@ -12,43 +12,18 @@ const c = talk.contact;
   <header class="t-head">
     <p class="no">{c.no}</p>
     <h2 id="contact-title">{c.title}</h2>
-    <p class="lead">{c.lead}</p>
   </header>
 
   <div class="body t-body">
-    <div class="cols">
-      <div class="group help">
-        <p class="gk">{c.help.k}</p>
-        {
-          c.help.items.map((h) => (
-            <div class="card" tabindex="0">
-              <b class="serif">{h.k}</b>
-              <span>{h.v}</span>
-            </div>
-          ))
-        }
-      </div>
-      <div class="group learn">
-        <p class="gk">{c.learn.k}</p>
-        <ul>
-          {
-            c.learn.items.map((x) => (
-              <li class="card" tabindex="0">
-                <b class="serif">{x}</b>
-              </li>
-            ))
-          }
-        </ul>
-        <span class="lv">{c.learn.v}</span>
-      </div>
-    </div>
+    <p class="say serif">{c.say}</p>
 
     <aside class="qr">
       <img src={c.qr.src} alt={c.qr.alt} width="776" height="771" loading="lazy" />
       <p>{c.askV}</p>
       <small>{c.site}</small>
-      <b class="serif">{c.end}</b>
     </aside>
+
+    <b class="end serif">{c.end}</b>
   </div>
 </section>
 
@@ -57,86 +32,23 @@ const c = talk.contact;
     flex: 1;
     min-height: 0;
     display: grid;
-    grid-template-columns: minmax(0, 1.6fr) minmax(220px, 1fr);
-    gap: clamp(24px, 4vw, 72px);
+    grid-template-columns: minmax(0, 1.5fr) minmax(220px, 1fr);
+    grid-template-rows: 1fr auto;
+    gap: clamp(16px, 3vh, 40px) clamp(24px, 5vw, 96px);
     align-items: center;
   }
 
-  .cols {
-    display: flex;
-    flex-direction: column;
-    gap: clamp(20px, 4vh, 44px);
-  }
-
-  .group {
-    display: flex;
-    flex-direction: column;
-    gap: 12px;
-  }
-
-  .gk {
+  .say {
     margin: 0;
-    font-family: var(--mono);
-    font-size: clamp(13px, 1vw, 17px);
-    letter-spacing: 0.08em;
-    color: var(--accent-ink);
-  }
-
-  .card {
-    display: flex;
-    flex-direction: column;
-    gap: 8px;
-    padding: clamp(16px, 1.8vw, 30px);
-    border: 1px solid var(--line);
-    border-radius: var(--r);
-    background: var(--card);
-    box-shadow: var(--shadow);
-    transition: transform 0.25s var(--ease), border-color 0.25s;
-  }
-
-  .card:hover,
-  .card:focus-visible {
-    transform: translateY(-3px);
-    border-color: var(--accent);
-    outline: none;
-  }
-
-  .help .card {
-    border-top: 4px solid var(--accent);
-  }
-
-  .card b {
-    font-size: clamp(22px, 2.1vw, 38px);
+    max-width: 18em;
+    font-size: clamp(28px, 3vw, 56px);
     font-weight: 600;
-    line-height: 1.2;
-  }
-
-  .card span {
-    font-size: clamp(16px, 1.35vw, 24px);
-    line-height: 1.5;
-    color: var(--ink-2);
-  }
-
-  .learn ul {
-    list-style: none;
-    margin: 0;
-    padding: 0;
-    display: grid;
-    grid-template-columns: repeat(3, minmax(0, 1fr));
-    gap: clamp(10px, 1.4vw, 24px);
-  }
-
-  .learn .card {
-    align-items: center;
-    text-align: center;
-  }
-
-  .lv {
-    font-size: clamp(15px, 1.2vw, 21px);
-    color: var(--ink-2);
+    line-height: 1.4;
+    color: var(--ink);
   }
 
   .qr {
+    grid-row: span 2;
     display: flex;
     flex-direction: column;
     align-items: center;
@@ -144,13 +56,17 @@ const c = talk.contact;
     text-align: center;
   }
 
-  /* 二维码保持白底，深色模式也能扫 */
   .qr img {
-    width: min(100%, clamp(160px, 34vh, 320px));
+    width: min(100%, clamp(180px, 40vh, 360px));
     height: auto;
     border-radius: var(--r-sm);
     border: 1px solid var(--line);
     box-shadow: var(--shadow);
+    transition: transform 0.25s var(--ease);
+  }
+
+  .qr img:hover {
+    transform: translateY(-3px);
   }
 
   .qr p {
@@ -165,9 +81,9 @@ const c = talk.contact;
     color: var(--ink-3);
   }
 
-  .qr b {
-    margin-top: clamp(8px, 2vh, 24px);
-    font-size: clamp(36px, 4vw, 76px);
+  .end {
+    align-self: end;
+    font-size: clamp(40px, 4.5vw, 84px);
     font-weight: 600;
     color: var(--accent);
   }
@@ -175,14 +91,15 @@ const c = talk.contact;
   @media (max-width: 900px) {
     .body {
       grid-template-columns: 1fr;
+      grid-template-rows: auto;
     }
-    .learn ul {
-      grid-template-columns: 1fr;
+    .qr {
+      grid-row: auto;
     }
   }
 
   @media (prefers-reduced-motion: reduce) {
-    .card {
+    .qr img {
       transition: none;
     }
   }

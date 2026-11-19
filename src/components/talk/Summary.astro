@@ -1,6 +1,6 @@
 ---
 /**
- * 演讲 07 总结：回答封面的三个问题，每张卡「以前 → 现在」+ 一个真数字；← → 或悬停一问一问讲，讲过的保持亮着。
+ * 演讲 07 总结：回答封面的三个问题，每张卡「以前 → 现在」；← → 或悬停一问一问讲，讲过的保持亮着。
  * 「谢谢」和微信二维码在下一页 08 交流与合作。
  */
 import { talk } from '../../i18n/talk';
@@ -23,9 +23,8 @@ const s = talk.sum;
             <button type="button" role="tab" data-step aria-selected={i === 0 ? 'true' : 'false'}>
               <i>{String(i + 1).padStart(2, '0')}</i>
               <b class="serif">{it.q}</b>
-              <p class="was"><small>{s.beforeK}</small>{it.before}</p>
-              <p class="now"><small>{s.nowK}</small>{it.now}</p>
-              <span class="num">{it.num}</span>
+              <p class="was" aria-label={`${s.beforeK}：${it.before}`}>{it.before}</p>
+              <p class="now" aria-label={`${s.nowK}：${it.now}`}><i aria-hidden="true">→</i>{it.now}</p>
               <em>{it.ref}</em>
             </button>
           </li>
@@ -95,7 +94,7 @@ const s = talk.sum;
   }
 
   button b {
-    font-size: clamp(24px, 2.3vw, 42px);
+    font-size: clamp(20px, 1.8vw, 32px);
     font-weight: 600;
     line-height: 1.2;
     color: var(--ink);
@@ -116,39 +115,31 @@ const s = talk.sum;
 
   button p {
     margin: 0;
-    display: flex;
-    flex-direction: column;
-    gap: 2px;
-    line-height: 1.45;
-  }
-
-  button p small {
-    font-family: var(--mono);
-    font-size: clamp(11px, 0.8vw, 14px);
-    letter-spacing: 0.08em;
-    color: var(--ink-3);
+    line-height: 1.3;
   }
 
   .was {
-    font-size: clamp(15px, 1.2vw, 21px);
+    font-size: clamp(16px, 1.35vw, 24px);
     color: var(--ink-3);
+    text-decoration: line-through;
+    text-decoration-color: var(--line-2);
   }
 
   .now {
-    font-size: clamp(18px, 1.55vw, 28px);
+    display: flex;
+    align-items: baseline;
+    gap: 10px;
+    white-space: nowrap;
+    font-family: var(--serif);
+    font-size: clamp(24px, 2.2vw, 42px);
     font-weight: 600;
-    color: var(--ink);
+    color: var(--accent);
   }
 
-  .now small {
-    color: var(--accent-ink);
-  }
-
-  .num {
-    padding: 6px 12px;
-    border-radius: var(--r-sm);
-    background: var(--accent-soft);
-    color: var(--ink);
+  .now i {
+    font-style: normal;
+    font-size: 0.7em;
+    color: var(--ink-3);
   }
 
   @media (max-width: 900px) {
