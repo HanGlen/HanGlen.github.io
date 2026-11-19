@@ -1,6 +1,7 @@
 ---
 /**
- * 演讲 03「一个人 + Agentic Engineering = 一个团队」：一家公司 → 几个人 → 一个人 → 工具 → 我自己。
+ * 演讲 03「AI 前后，写软件变了多少」：一个人 → 一个团队 → 一个产品 → 工具 → 我自己 → 怎么做到的。
+ * 前四步左「以前」右「现在」；口径不同的不相除（docs/research/talk-03-before-after.md，HAN-1891）。
  * 版式同 04、05（.t-steps）：← → 一步步亮，左边一张图，右边一个问题 + 一句大白话，例子在底部色块。
  * 每张图都能悬停、聚焦读数（Talk.astro 的 [data-reads]）。口径不同的数各自成行，不放进同一个比较。
  * 依据 docs/research/talk-03-team.md（HAN-1864）；我自己的每月 PR 来自 src/data/dnd.json。
@@ -11,8 +12,6 @@ import { rich } from '../../lib/rich';
 
 const t = talk.team;
 const L = t.levels;
-const amax = Math.max(...t.anth.bars.map((b) => b.v));
-const tmax = Math.max(...t.tools.rows.map((r) => r.v));
 const months = Object.entries(data.monthlyPRs as Record<string, number>);
 const mmax = Math.max(...months.map(([, v]) => v));
 const mlabel = (m: string) => `${Number(m.slice(5))} 月`;
@@ -42,80 +41,25 @@ const mlabel = (m: string) => `${Number(m.slice(5))} 月`;
 
     <div class="main">
       <div class="stage">
-        <!-- 1 一家公司：每天合入次数，5 月 vs 9 月 -->
-        <div class="frame" data-pane="0" data-reads>
-          <p class="unit fin">{t.anth.unit}</p>
-          <ul class="hbars">
-            {
-              t.anth.bars.map((b, i) => (
-                <li class="fin" style={`--d:${i + 1}`} data-read={`${b.k}：每天合入${b.label}`}>
-                  <span class="hk">{b.k}</span>
-                  <span class="track">
-                    <i class={i ? 'hot' : ''} style={`--w:${(b.v / amax) * 100}%`} />
-                  </span>
-                  <b class="serif">{b.label}</b>
-                </li>
-              ))
-            }
-          </ul>
-          <p class="times serif fin" style="--d:3">{t.anth.x}</p>
-          <p class="t-read" aria-live="polite" data-read-out data-hint={t.readK}>{t.readK}</p>
-        </div>
-
-        <!-- 2 几个人：从空仓库开始的五个月 -->
-        <div class="frame" data-pane="1" hidden data-reads>
-          <ol class="tl">
-            {
-              t.oai.map((x, i) => (
-                <li class={`fin${i === 1 ? ' mid' : ''}`} style={`--d:${i + 1}`} data-read={`${x.at}：${x.k}，${x.v}`}>
-                  <em>{x.at}</em>
-                  <b class="serif">{x.v}</b>
-                  <span>{x.k}</span>
-                </li>
-              ))
-            }
-          </ol>
-          <p class="t-read" aria-live="polite" data-read-out data-hint={t.readK}>{t.readK}</p>
-        </div>
-
-        <!-- 3 一个人：每张卡片写自己的口径 -->
-        <div class="frame" data-pane="2" hidden data-reads>
-          <ul class="people">
-            {
-              t.people.map((p, i) => (
-                <li class="fin" style={`--d:${i + 1}`} data-read={`${p.who}：${p.how}`}>
-                  <p class="pw">
-                    <b>{p.who}</b>
-                    <span>{p.role}</span>
-                  </p>
-                  <p class="pb serif">{p.big}</p>
-                  <p class="pk">{p.k}</p>
-                  <p class="ph">{p.how}</p>
-                </li>
-              ))
-            }
-          </ul>
-          <p class="t-read" aria-live="polite" data-read-out data-hint={t.readK}>{t.readK}</p>
-        </div>
-
-        <!-- 4 工具：平均几天一更新，越短越勤 -->
-        <div class="frame" data-pane="3" hidden data-reads>
-          <p class="unit fin">{t.tools.unit} · {t.tools.win}</p>
-          <ul class="hbars days">
-            {
-              t.tools.rows.map((r, i) => (
-                <li class="fin" style={`--d:${i + 1}`} data-read={`${r.k}：三个月 ${r.n}（数的是${r.what}），平均 ${r.v} 天一次`}>
-                  <span class="hk">{r.k}</span>
-                  <span class="track">
-                    <i class={i === 0 ? 'hot' : ''} style={`--w:${(r.v / tmax) * 100}%`} />
-                  </span>
-                  <b class="serif">{r.v.toFixed(1)} 天</b>
-                </li>
-              ))
-            }
-          </ul>
-          <p class="t-read" aria-live="polite" data-read-out data-hint={t.readK}>{t.readK}</p>
-        </div>
+        <!-- 1–4 以前 | 现在 -->
+        {
+          L.slice(0, 4).map((l, i) => (
+            <div class="frame" data-pane={String(i)} hidden={i !== 0} data-reads>
+              <div class="vs">
+                {(l.vs ?? []).map((v, j) => (
+                  <div class={`side-${j ? 'now' : 'before'} fin`} style={`--d:${j * 2 + 1}`} tabindex="0" data-read={`${j ? t.nowK : t.beforeK}（${v.at}）：${v.big}，${v.k}`}>
+                    <p class="vk">{j ? t.nowK : t.beforeK}</p>
+                    <em>{v.at}</em>
+                    <b class="serif">{v.big}</b>
+                    <span>{v.k}</span>
+                  </div>
+                ))}
+                <span class="vsarr fin" style="--d:2" aria-hidden="true">→</span>
+              </div>
+              <p class="t-read" aria-live="polite" data-read-out data-hint={t.readK}>{t.readK}</p>
+            </div>
+          ))
+        }
 
         <!-- 5 我自己：每月合入的 PR -->
         <div class="frame" data-pane="4" hidden data-reads>
@@ -133,7 +77,40 @@ const mlabel = (m: string) => `${Number(m.slice(5))} 月`;
               ))
             }
           </ol>
+          <p class="cost fin" style="--d:8">
+            <span>{t.mine.costK}</span>
+            {t.mine.cost.map((c, i) => <>{i > 0 && <i aria-hidden="true">→</i>}<b>{c.k} {c.v}</b></>)}
+          </p>
           <p class="t-read" aria-live="polite" data-read-out data-hint={t.mine.partial}>{t.mine.partial}</p>
+        </div>
+
+        <!-- 6 怎么做到的：左边模型得分，右边 Agentic Engineering -->
+        <div class="frame" data-pane="5" hidden data-reads>
+          <div class="why">
+            <div class="fin" style="--d:1">
+              <p class="unit">{t.swe.k}</p>
+              <ul class="hbars">
+                {
+                  t.swe.pts.map((p, i) => (
+                    <li data-read={`${p.at} ${p.who}：${p.v}%`}>
+                      <span class="hk">{p.at}</span>
+                      <span class="track">
+                        <i class={i === t.swe.pts.length - 1 ? 'hot' : ''} style={`--w:${p.v}%`} />
+                      </span>
+                      <b class="serif">{p.v.toFixed(1)}%</b>
+                    </li>
+                  ))
+                }
+              </ul>
+            </div>
+            <span class="plus fin" style="--d:3" aria-hidden="true">+</span>
+            <div class="ae fin" style="--d:4">
+              <b class="serif">{t.swe.ae}</b>
+              <span>{t.swe.aeV}</span>
+              <em>{t.swe.next}</em>
+            </div>
+          </div>
+          <p class="t-read" aria-live="polite" data-read-out data-hint={t.readK}>{t.readK}</p>
         </div>
       </div>
 
@@ -169,6 +146,174 @@ const mlabel = (m: string) => `${Number(m.slice(5))} 月`;
   .stage {
     min-width: 0;
   }
+
+  /* 1–4：以前 | 现在，两张卡，中间一个箭头 */
+  .vs {
+    display: grid;
+    grid-template-columns: minmax(0, 1fr) auto minmax(0, 1fr);
+    align-items: stretch;
+    gap: clamp(12px, 1.6vw, 28px);
+  }
+
+  .vs .side-before {
+    grid-column: 1;
+    grid-row: 1;
+  }
+
+  .vs .vsarr {
+    grid-column: 2;
+    grid-row: 1;
+    align-self: center;
+    font-size: clamp(22px, 2vw, 36px);
+    color: var(--ink-3);
+  }
+
+  .vs .side-now {
+    grid-column: 3;
+    grid-row: 1;
+  }
+
+  .vs > div {
+    display: flex;
+    flex-direction: column;
+    gap: 8px;
+    padding: clamp(16px, 1.8vw, 32px);
+    border: 1px solid var(--line);
+    border-radius: var(--r);
+    background: var(--card);
+    outline: none;
+    transition: box-shadow 0.25s, transform 0.25s var(--ease);
+  }
+
+  .vs > div[data-on],
+  .vs > div:focus-visible {
+    box-shadow: 0 0 0 3px var(--accent-glow);
+  }
+
+  .vs .side-now {
+    border-color: var(--accent);
+    box-shadow: var(--shadow);
+  }
+
+  .vk {
+    margin: 0;
+    font-size: clamp(12px, 0.9vw, 15px);
+    letter-spacing: 0.1em;
+    color: var(--ink-3);
+  }
+
+  .side-now .vk {
+    color: var(--accent-ink);
+  }
+
+  .vs em {
+    font-style: normal;
+    font-family: var(--mono);
+    font-size: clamp(12px, 0.9vw, 15px);
+    color: var(--ink-3);
+  }
+
+  .vs b {
+    font-size: clamp(34px, 3.6vw, 68px);
+    font-weight: 600;
+    line-height: 1.1;
+    color: var(--ink-2);
+  }
+
+  .side-now b {
+    color: var(--accent);
+  }
+
+  .vs span {
+    font-size: clamp(14px, 1.15vw, 20px);
+    line-height: 1.45;
+    color: var(--ink-2);
+  }
+
+  /* 5：每月订阅花费一行 */
+  .cost {
+    margin: clamp(8px, 1.4vh, 16px) 0 0;
+    display: flex;
+    align-items: baseline;
+    flex-wrap: wrap;
+    gap: 10px;
+    font-size: clamp(14px, 1.1vw, 19px);
+    color: var(--ink-2);
+  }
+
+  .cost span {
+    color: var(--ink-3);
+  }
+
+  .cost i {
+    font-style: normal;
+    color: var(--ink-3);
+  }
+
+  /* 6：模型得分 + Agentic Engineering */
+  .why {
+    display: grid;
+    grid-template-columns: minmax(0, 1.3fr) auto minmax(0, 1fr);
+    align-items: center;
+    gap: clamp(12px, 1.6vw, 28px);
+  }
+
+  .why .hbars li {
+    grid-template-columns: clamp(70px, 5vw, 96px) minmax(0, 1fr) clamp(70px, 5.5vw, 110px);
+    gap: 10px;
+  }
+
+  .plus {
+    font-size: clamp(28px, 2.6vw, 48px);
+    color: var(--ink-3);
+  }
+
+  .ae {
+    display: flex;
+    flex-direction: column;
+    gap: 8px;
+    padding: clamp(16px, 1.8vw, 32px);
+    border: 2px solid var(--accent);
+    border-radius: var(--r);
+    background: var(--accent-soft);
+  }
+
+  .ae b {
+    font-size: clamp(22px, 2vw, 38px);
+    font-weight: 600;
+  }
+
+  .ae span {
+    font-size: clamp(14px, 1.15vw, 20px);
+    line-height: 1.45;
+    color: var(--ink-2);
+  }
+
+  .ae em {
+    font-style: normal;
+    font-family: var(--mono);
+    font-size: clamp(12px, 0.9vw, 15px);
+    color: var(--accent-ink);
+  }
+
+  @media (max-width: 900px) {
+    .vs,
+    .why {
+      grid-template-columns: 1fr;
+    }
+    .vs .side-before,
+    .vs .vsarr,
+    .vs .side-now {
+      grid-column: 1;
+      grid-row: auto;
+    }
+    .vs .vsarr,
+    .plus {
+      transform: rotate(90deg);
+      justify-self: start;
+    }
+  }
+
 
   .unit {
     margin: 0;
