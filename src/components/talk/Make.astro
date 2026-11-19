@@ -12,8 +12,11 @@ import { rich } from '../../lib/rich';
 
 const m = talk.make;
 const L = m.levels;
-// 工具表每格先露 3 个，多的点类名展开
+// 工具：三类大卡每格露 3 个；其余几类收成一行
 const SHOW = 3;
+const hot = m.tools.filter((t) => t.hot);
+const rest = m.tools.filter((t) => !t.hot);
+const used = m.toolsUsed;
 ---
 
 <section class="slide t-slide make" data-slide data-notes={m.notes} aria-labelledby="make-title">
@@ -40,64 +43,57 @@ const SHOW = 3;
 
     <div class="main">
       <div class="stage">
-        <!-- 1 工具准备：八类，国内 / 国外，名字链到官网 -->
-        <div class="frame" data-pane="0">
-          <table class="tools">
-            <thead>
-              <tr class="fin">
-                {m.toolsHead.map((h) => <th scope="col">{h}</th>)}
-              </tr>
-            </thead>
-            <tbody>
-              {
-                m.tools.map((t, i) => (
-                  <tr class={`fin${t.hot ? ' hot' : ''}`} style={`--d:${i + 1}`}>
-                    <th scope="row">
-                      {t.cn.length > SHOW || t.en.length > SHOW ? (
-                        <button type="button" class="more" aria-expanded="false" data-more>
-                          {t.k}
-                        </button>
-                      ) : (
-                        t.k
-                      )}
-                    </th>
-                    {[t.cn, t.en].map((xs) => (
-                      <td>
-                        {xs.map(([name, href], j) => (
-                          <a href={href} target="_blank" rel="noopener" class={j >= SHOW ? 'extra' : undefined}>
-                            {name}
-                          </a>
-                        ))}
-                        {xs.length > SHOW && <span class="plus" aria-hidden="true">+{xs.length - SHOW}</span>}
-                      </td>
-                    ))}
-                  </tr>
-                ))
-              }
-            </tbody>
-          </table>
+        <!-- 1 工具：只放做定制软件要先备的三类（大卡），其余五类收成一行，悬停看推荐 -->
+        <div class="frame" data-pane="0" data-reads data-wide="1240">
+          <ul class="kit">
+            {
+              hot.map((t, i) => (
+                <li class="fin" style={`--d:${i + 1}`}>
+                  <b class="serif">{t.k}</b>
+                  {[[m.toolsHead[2], t.en], [m.toolsHead[1], t.cn]].map(([k, xs]) => (
+                    <p>
+                      <em>{k}</em>
+                      {(xs as [string, string][]).slice(0, SHOW).map(([name, href]) => (
+                        <a href={href} target="_blank" rel="noopener" class={used.includes(name) ? 'mine' : undefined}>
+                          {name}
+                        </a>
+                      ))}
+                    </p>
+                  ))}
+                </li>
+              ))
+            }
+          </ul>
+          <p class="rest fin" style="--d:4">
+            <span>{m.restK}</span>
+            {
+              rest.map((t) => (
+                <button type="button" data-read={`${t.k}　${m.toolsHead[1]}：${t.cn.map(([n]) => n).join('、')}；${m.toolsHead[2]}：${t.en.map(([n]) => n).join('、')}`}>
+                  {t.k}
+                </button>
+              ))
+            }
+          </p>
+          <p class="t-read" aria-live="polite" data-read-out data-hint={m.toolsHint}>{m.toolsHint}</p>
         </div>
 
-        <!-- 2 模型能力：每个领域写领先的那家；悬停看前三，点榜单打开原页 -->
+        <!-- 2 模型：每个领域只写第一名，悬停一行看前三和口径，点榜单打开原页 -->
         <div class="frame" data-pane="1" hidden>
           <div class="models" data-rows>
             <table class="board">
               <thead>
                 <tr class="fin">
-                  {m.modelsHead.map((h) => <th scope="col">{h}</th>)}
+                  {[m.modelsHead[0], m.modelsHead[1], m.modelsHead[4]].map((h) => <th scope="col">{h}</th>)}
                 </tr>
               </thead>
               <tbody>
                 {
                   m.models.map((x, i) => (
-                    <tr class="fin" style={`--d:${i + 1}`} tabindex="0" data-row={`${x.k}：${x.note}`}>
+                    <tr class="fin" style={`--d:${i + 1}`} tabindex="0" data-row={`${x.k}　${x.top.map(([n, sc], j) => `${j + 1}. ${n}${sc ? `（${sc}）` : ''}`).join('　')}。${x.note}`}>
                       <th scope="row">{x.k}</th>
-                      {x.top.map(([name, score], j) => (
-                        <td class={`top3${j === 0 ? ' first' : ''}`}>
-                          <b>{name}</b>
-                          {score && <span>{score}</span>}
-                        </td>
-                      ))}
+                      <td class="first">
+                        <b>{x.top[0][0]}</b>
+                      </td>
                       <td class="bd">
                         <a href={x.href} target="_blank" rel="noopener">
                           {x.board} ↗
@@ -157,7 +153,7 @@ const SHOW = 3;
         </div>
 
         <!-- 4 一张单：上面专业说法，下面同一个过程的真实例子 -->
-        <div class="frame" data-pane="3" hidden>
+        <div class="frame" data-pane="3" hidden data-wide="900">
           <ol class="pipe vt-ticket">
             {
               m.ticket.map((t, i) => (
@@ -176,7 +172,7 @@ const SHOW = 3;
         </div>
 
         <!-- 5 一个大需求：横着一条线；上一步那张单缩进「定时任务」里（View Transition） -->
-        <div class="frame" data-pane="4" hidden>
+        <div class="frame" data-pane="4" hidden data-wide="1160">
           <div class="flow vt-need">
             <div class="req">
               <em>{m.need.project}</em>
@@ -219,7 +215,7 @@ const SHOW = 3;
         </div>
 
         <!-- 6 一堆需求：先框成一堆 → 分诊 → 一个个 Project（里面全是最小的单）→ 定时任务一直跑 -->
-        <div class="frame" data-pane="5" hidden>
+        <div class="frame" data-pane="5" hidden data-wide="1160">
           <div class="flow">
             <div class="pile">
               <em>{m.triage.pile}</em>
@@ -373,24 +369,128 @@ const SHOW = 3;
     font-size: clamp(14px, 1.2vw, 20px);
   }
 
-  /* 工具准备：八类 × 国内 / 国外，名字是官网链接 */
-  .tools,
+  /* 工具：三张大卡（类名 + 国外 / 国内各三个），我在用的标一个红点 */
+  .kit {
+    list-style: none;
+    margin: 0;
+    padding: 0;
+    display: grid;
+    grid-template-columns: repeat(3, minmax(0, 1fr));
+    gap: clamp(12px, 1.4vw, 24px);
+  }
+
+  .kit li {
+    display: flex;
+    flex-direction: column;
+    gap: clamp(8px, 1.2vh, 14px);
+    padding: clamp(18px, 1.8vw, 32px);
+    border: 1px solid var(--line);
+    border-top: 3px solid var(--accent);
+    border-radius: var(--r);
+    background: var(--card);
+    box-shadow: var(--shadow);
+  }
+
+  .kit b {
+    font-size: clamp(24px, 2.2vw, 40px);
+    font-weight: 600;
+    line-height: 1.15;
+  }
+
+  .kit p {
+    margin: 0;
+    display: flex;
+    flex-wrap: wrap;
+    align-items: baseline;
+    gap: 4px clamp(10px, 1vw, 16px);
+  }
+
+  .kit em {
+    flex: none;
+    width: 2.6em;
+    font-style: normal;
+    font-size: clamp(12px, 0.9vw, 15px);
+    letter-spacing: 0.08em;
+    color: var(--ink-3);
+  }
+
+  .kit a {
+    font-size: clamp(16px, 1.35vw, 24px);
+    line-height: 1.35;
+    color: var(--ink);
+    text-decoration: none;
+    border-bottom: 1px solid transparent;
+    transition: color 0.2s, border-color 0.2s;
+  }
+
+  .kit a.mine {
+    font-weight: 600;
+  }
+
+  .kit a.mine::before {
+    content: '';
+    display: inline-block;
+    width: 0.4em;
+    height: 0.4em;
+    margin-right: 0.35em;
+    border-radius: 50%;
+    background: var(--accent);
+    vertical-align: 0.2em;
+  }
+
+  .kit a:hover,
+  .kit a:focus-visible {
+    outline: none;
+    color: var(--accent-ink);
+    border-bottom-color: var(--accent);
+  }
+
+  .rest {
+    margin: clamp(14px, 2.4vh, 28px) 0 0;
+    display: flex;
+    flex-wrap: wrap;
+    align-items: center;
+    gap: 8px;
+  }
+
+  .rest span {
+    margin-right: 6px;
+    font-size: clamp(14px, 1.1vw, 19px);
+    color: var(--ink-3);
+  }
+
+  .rest button {
+    padding: 0.35em 0.9em;
+    font: inherit;
+    font-size: clamp(14px, 1.1vw, 19px);
+    color: var(--ink-2);
+    background: transparent;
+    border: 1.5px solid var(--line-2);
+    border-radius: var(--r-pill);
+    cursor: pointer;
+    transition: border-color 0.2s, color 0.2s;
+  }
+
+  .rest button[data-on],
+  .rest button:focus-visible {
+    outline: none;
+    color: var(--accent-ink);
+    border-color: var(--accent);
+  }
+
   .board {
     width: 100%;
     border-collapse: collapse;
   }
 
-  .tools th,
-  .tools td,
   .board th,
   .board td {
-    padding: clamp(3px, 0.6vh, 9px) clamp(8px, 0.9vw, 14px);
+    padding: clamp(6px, 1.1vh, 14px) clamp(10px, 1vw, 18px);
     border-bottom: 1px solid var(--line);
     text-align: left;
     vertical-align: baseline;
   }
 
-  .tools thead th,
   .board thead th {
     padding-top: 0;
     font-size: clamp(12px, 0.9vw, 15px);
@@ -400,97 +500,12 @@ const SHOW = 3;
     border-bottom: 1.5px solid var(--line-2);
   }
 
-  .tools tbody th,
   .board tbody th {
     width: 1%;
-    font-size: clamp(13px, 0.95vw, 17px);
+    font-size: clamp(15px, 1.25vw, 22px);
     font-weight: 500;
     color: var(--ink-2);
     white-space: nowrap;
-  }
-
-  .tools td a {
-    display: inline-block;
-    margin-right: clamp(8px, 0.9vw, 16px);
-    font-size: clamp(13px, 1vw, 18px);
-    line-height: 1.35;
-    color: var(--ink);
-    text-decoration: none;
-    border-bottom: 1px solid transparent;
-    transition: color 0.2s, border-color 0.2s;
-  }
-
-  .tools td a:hover,
-  .tools td a:focus-visible {
-    outline: none;
-    color: var(--accent-ink);
-    border-bottom-color: var(--accent);
-  }
-
-  .tools tbody tr {
-    transition: background 0.2s;
-  }
-
-  .tools tbody tr:hover {
-    background: var(--bg-2);
-  }
-
-  .tools td {
-    white-space: nowrap;
-  }
-
-  .tools td a.extra {
-    display: none;
-  }
-
-  .tools tr.open td {
-    white-space: normal;
-  }
-
-  .tools tr.open td a.extra {
-    display: inline-block;
-  }
-
-  .tools tr.open .plus {
-    display: none;
-  }
-
-  .plus {
-    font-family: var(--mono);
-    font-size: clamp(11px, 0.85vw, 14px);
-    color: var(--ink-3);
-  }
-
-  .tools .more {
-    padding: 0;
-    font: inherit;
-    color: inherit;
-    background: none;
-    border: 0;
-    border-bottom: 1px dashed var(--ink-3);
-    cursor: pointer;
-  }
-
-  .tools .more::after {
-    content: ' ▸';
-    font-size: 0.75em;
-    color: var(--ink-3);
-  }
-
-  .tools .more[aria-expanded='true']::after {
-    content: ' ▾';
-  }
-
-  .tools .more:focus-visible {
-    outline: 2px solid var(--accent);
-    outline-offset: 2px;
-  }
-
-  /* 做定制软件先看的三类：左边一条陶土红 */
-  .tools tr.hot th {
-    color: var(--accent-ink);
-    font-weight: 600;
-    box-shadow: inset 3px 0 0 var(--accent);
   }
 
   /* 模型能力：领域 × 领先的那家 × 榜单 */
@@ -512,29 +527,18 @@ const SHOW = 3;
     background: var(--accent-soft);
   }
 
-  /* 前三名：型号一行、分数一行；第一名用强调色 */
-  .board td.top3 b {
-    display: block;
+  /* 只写第一名：大字、强调色 */
+  .board td.first b {
+    font-family: var(--serif);
     font-weight: 600;
-    font-size: clamp(13px, 1.1vw, 19px);
-    line-height: 1.25;
-  }
-
-  .board td.top3 span {
-    display: block;
-    margin-top: 2px;
-    font-family: var(--mono);
-    font-size: clamp(11px, 0.85vw, 14px);
-    color: var(--ink-3);
-  }
-
-  .board td.top3.first b {
+    font-size: clamp(20px, 1.9vw, 34px);
+    line-height: 1.2;
     color: var(--accent-ink);
   }
 
   .board td.bd {
     white-space: nowrap;
-    font-size: clamp(12px, 0.95vw, 16px);
+    font-size: clamp(13px, 1.05vw, 18px);
     color: var(--ink-3);
   }
 
@@ -1226,15 +1230,17 @@ const SHOW = 3;
   }
 
   .pyr li b {
-    font-size: clamp(17px, 1.5vw, 27px);
+    font-size: clamp(19px, 1.8vw, 34px);
     font-weight: 600;
   }
 
+  /* 英文原名只留给读屏，投影上不显示 */
   .pyr li em {
-    font-style: normal;
-    font-family: var(--mono);
-    font-size: clamp(11px, 0.8vw, 14px);
-    opacity: 0.75;
+    position: absolute;
+    width: 1px;
+    height: 1px;
+    overflow: hidden;
+    clip-path: inset(50%);
   }
 
   .pyr li span {
@@ -1355,16 +1361,14 @@ const SHOW = 3;
     .pipe {
       grid-template-columns: 1fr 1fr;
     }
-    .tools td,
     .board td.bd {
       white-space: normal;
     }
-    .tools tbody th,
     .board tbody th {
       font-size: 13px;
     }
-    .tools td a {
-      font-size: 14px;
+    .kit {
+      grid-template-columns: 1fr;
     }
     .pipe li + li::before,
     .retry .loop {
@@ -1466,15 +1470,6 @@ const SHOW = 3;
         out.textContent = off ? root.dataset.unplug!.replace('{x}', b.dataset.plug!) : out.dataset.hint!;
         out.classList.toggle('on', off);
       });
-    });
-  });
-
-  // 工具表：点类名展开这一类的完整清单
-  document.querySelectorAll<HTMLButtonElement>('.tools [data-more]').forEach((b) => {
-    b.addEventListener('click', () => {
-      const open = b.getAttribute('aria-expanded') !== 'true';
-      b.setAttribute('aria-expanded', String(open));
-      b.closest('tr')!.classList.toggle('open', open);
     });
   });
 

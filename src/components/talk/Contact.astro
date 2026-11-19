@@ -1,7 +1,7 @@
 ---
 /**
  * 演讲 08 交流与合作：左边一句邀请，右边微信二维码和「谢谢」。不分类（车主 2026-11-19 定）。
- * 二维码保持白底，深色模式也能扫。
+ * 「谢谢」是主角，邀请一句在下面；二维码保持白底（深色模式也能扫），去色成近黑，和全场配色一致。
  */
 import { talk } from '../../i18n/talk';
 
@@ -15,7 +15,10 @@ const c = talk.contact;
   </header>
 
   <div class="body t-body">
-    <p class="say serif">{c.say}</p>
+    <div class="words">
+      <b class="end serif">{c.end}</b>
+      <p class="say">{c.say}</p>
+    </div>
 
     <aside class="qr">
       <img src={c.qr.src} alt={c.qr.alt} width="776" height="771" loading="lazy" />
@@ -23,7 +26,6 @@ const c = talk.contact;
       <small>{c.site}</small>
     </aside>
 
-    <b class="end serif">{c.end}</b>
   </div>
 </section>
 
@@ -33,22 +35,25 @@ const c = talk.contact;
     min-height: 0;
     display: grid;
     grid-template-columns: minmax(0, 1.5fr) minmax(220px, 1fr);
-    grid-template-rows: 1fr auto;
     gap: clamp(16px, 3vh, 40px) clamp(24px, 5vw, 96px);
     align-items: center;
   }
 
+  .words {
+    display: flex;
+    flex-direction: column;
+    gap: clamp(20px, 4vh, 48px);
+  }
+
   .say {
     margin: 0;
-    max-width: 18em;
-    font-size: clamp(28px, 3vw, 56px);
-    font-weight: 600;
-    line-height: 1.4;
-    color: var(--ink);
+    max-width: 22em;
+    font-size: clamp(20px, 1.9vw, 34px);
+    line-height: 1.55;
+    color: var(--ink-2);
   }
 
   .qr {
-    grid-row: span 2;
     display: flex;
     flex-direction: column;
     align-items: center;
@@ -62,6 +67,7 @@ const c = talk.contact;
     border-radius: var(--r-sm);
     border: 1px solid var(--line);
     box-shadow: var(--shadow);
+    filter: grayscale(1) contrast(1.2);
     transition: transform 0.25s var(--ease);
   }
 
@@ -82,19 +88,15 @@ const c = talk.contact;
   }
 
   .end {
-    align-self: end;
-    font-size: clamp(40px, 4.5vw, 84px);
+    font-size: clamp(72px, 9vw, 176px);
     font-weight: 600;
+    line-height: 1;
     color: var(--accent);
   }
 
   @media (max-width: 900px) {
     .body {
       grid-template-columns: 1fr;
-      grid-template-rows: auto;
-    }
-    .qr {
-      grid-row: auto;
     }
   }
 

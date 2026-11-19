@@ -63,6 +63,14 @@ const gmon = ['1 月', '3 月', '5 月', '7 月', '9 月', '11 月'].map((k, i) 
               c.kinds.map((k, ki) => (
                 <div class={`kind k-${k.kind} fin`} style={`--d:${ki + 1}`}>
                   <p class="kk serif">{k.k}</p>
+                  <div class="phones">
+                    {k.shots.map((x) => (
+                      <figure>
+                        <img src={x.src} alt={`小程序截图：${x.cap}`} width="455" height="983" loading="lazy" decoding="async" />
+                        <figcaption>{x.cap}</figcaption>
+                      </figure>
+                    ))}
+                  </div>
                   <ul>
                     {k.items.map((x) => (
                       <li>{x}</li>
@@ -191,7 +199,7 @@ const gmon = ['1 月', '3 月', '5 月', '7 月', '9 月', '11 月'].map((k, i) 
         </div>
 
         <!-- 6 实现过程：从开 Project 到打开入口，每个点写做了什么 -->
-        <div class="frame" data-pane="5" hidden data-reads>
+        <div class="frame" data-pane="5" hidden data-reads data-wide="1100">
           <ol class="flow">
             {
               c.flow.map((f, i) => (
@@ -301,6 +309,35 @@ const gmon = ['1 月', '3 月', '5 月', '7 月', '9 月', '11 月'].map((k, i) 
     display: flex;
     flex-wrap: wrap;
     gap: 10px;
+  }
+
+  /* 每组两张真实截图，手机外框用近黑色 */
+  .phones {
+    display: flex;
+    gap: clamp(10px, 1.2vw, 20px);
+    margin-bottom: clamp(12px, 2vh, 22px);
+  }
+
+  .phones figure {
+    margin: 0;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 6px;
+  }
+
+  .phones img {
+    display: block;
+    height: min(42vh, 440px);
+    width: auto;
+    border: 5px solid #1c1a17;
+    border-radius: 18px;
+    box-shadow: var(--shadow);
+  }
+
+  .phones figcaption {
+    font-size: clamp(12px, 0.95vw, 16px);
+    color: var(--ink-3);
   }
 
   .kind li {
@@ -749,14 +786,14 @@ const gmon = ['1 月', '3 月', '5 月', '7 月', '9 月', '11 月'].map((k, i) 
 
   .shot img {
     display: block;
-    height: min(46vh, 520px);
+    height: min(56vh, 600px);
     width: auto;
     filter: drop-shadow(var(--shadow-drop));
   }
 
   .shot figcaption {
     max-width: 16em;
-    font-size: clamp(12px, 0.9vw, 14px);
+    font-size: clamp(13px, 1vw, 16px);
     line-height: 1.4;
     color: var(--ink-3);
     text-align: center;

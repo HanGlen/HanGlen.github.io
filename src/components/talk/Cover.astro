@@ -69,7 +69,6 @@ const base = 14;
   <p class="field rise" style={`--i:${base + 9}`}>
     <i aria-hidden="true"></i>{c.field}<span>{c.fieldNote.replace('{n}', total.toLocaleString('en-US'))}</span>
   </p>
-  <p class="next" aria-hidden="true">{c.next}<i></i></p>
 </section>
 
 <style>
@@ -221,27 +220,6 @@ const base = 14;
     color: var(--ink-3);
   }
 
-  .next {
-    position: absolute;
-    right: var(--pad);
-    bottom: clamp(20px, 4vh, 40px);
-    margin: 0;
-    display: flex;
-    flex-direction: column;
-    align-items: center;
-    gap: 8px;
-    font-size: 13px;
-    color: var(--ink-3);
-    pointer-events: none;
-  }
-
-  .next i {
-    width: 1px;
-    height: 36px;
-    background: linear-gradient(var(--ink-3), transparent);
-    animation: drip 1.8s ease-in-out infinite;
-  }
-
   .rise {
     opacity: 0;
     animation: fade 0.9s ease forwards;
@@ -266,22 +244,7 @@ const base = 14;
     }
   }
 
-  @keyframes drip {
-    0%,
-    100% {
-      transform: scaleY(0.4);
-      transform-origin: top;
-    }
-    50% {
-      transform: scaleY(1);
-      transform-origin: top;
-    }
-  }
-
   @media (max-width: 700px) {
-    .next {
-      display: none;
-    }
     .field {
       right: var(--pad);
     }
@@ -293,9 +256,6 @@ const base = 14;
       animation: none;
       opacity: 1;
       transform: none;
-    }
-    .next i {
-      animation: none;
     }
   }
 </style>
