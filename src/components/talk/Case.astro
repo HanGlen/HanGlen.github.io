@@ -1,7 +1,7 @@
 ---
 /**
  * 演讲 06「大案例：洛山达 DND 助手」。版式同 04、05（.t-steps），步骤条上面分两组：
- * 整个产品（数字化 + AI → 体量 → 玩家评分）、一个需求跑完全流程（规则问答从需求到上线 → 上线后怎么答）。
+ * 整个产品（数字化 + AI → 体量 → 用户增长 → 玩家评分）、一个 AI 功能（规则问答 AI 做了什么 → 实现过程）。
  * 每张图悬停、聚焦读数。依据 docs/research/talk-06-case.md（HAN-1866）。
  */
 import { talk } from '../../i18n/talk';
@@ -15,6 +15,19 @@ const other = c.size.bars.filter((b) => !b.me);
 const starMax = Math.max(...c.survey.stars.map((s) => s.n));
 const total = c.survey.stars.reduce((a, s) => a + s.n, 0);
 const groupLen = c.groups.map((_, gi) => L.filter((l) => l.g === gi).length);
+
+// 用户增长折线：横轴按真实日期，纵轴从 0 起
+const G = { w: 640, h: 260, l: 8, r: 8, t: 24, b: 28 };
+const day = (t: string) => new Date(`${t}T00:00:00Z`).getTime();
+const g0 = day('2026-01-01');
+const g1 = day('2026-11-30');
+const gx = (t: string) => G.l + ((day(t) - g0) / (g1 - g0)) * (G.w - G.l - G.r);
+const gmax = 16000;
+const gy = (v: number) => G.t + (1 - v / gmax) * (G.h - G.t - G.b);
+const gpts = c.growth.pts.map((p) => ({ ...p, x: gx(p.t), y: gy(p.v) }));
+const gline = gpts.map((p, i) => `${i ? 'L' : 'M'}${p.x.toFixed(1)},${p.y.toFixed(1)}`).join(' ');
+const gai = gx(c.growth.ai.t);
+const gmon = ['1 月', '3 月', '5 月', '7 月', '9 月', '11 月'].map((k, i) => ({ k, x: gx(`2026-${String(i * 2 + 1).padStart(2, '0')}-01`) }));
 ---
 
 <section class="slide t-slide case" data-slide data-notes={c.notes} aria-labelledby="case-title">
@@ -94,13 +107,37 @@ const groupLen = c.groups.map((_, gi) => L.filter((l) => l.g === gi).length);
           <p class="t-read" aria-live="polite" data-read-out data-hint="悬停一段看读数">悬停一段看读数</p>
         </div>
 
-        <!-- 3 玩家评分：大数 + 每档人数 + 几句原话 -->
+        <!-- 3 用户增长：累计用户折线，竖线标出交给 AI 那天 -->
         <div class="frame" data-pane="2" hidden data-reads>
+          <svg class="growth fin" viewBox={`0 0 ${G.w} ${G.h}`} role="img" aria-label={c.levels[2].q}>
+            <rect class="after" x={gai} y={G.t} width={G.w - G.r - gai} height={G.h - G.t - G.b} />
+            <line class="ai" x1={gai} x2={gai} y1={G.t - 8} y2={G.h - G.b} />
+            <text class="ai-k" x={gai + 6} y={G.t + 6}>{c.growth.ai.k}</text>
+            <line class="base" x1={G.l} x2={G.w - G.r} y1={G.h - G.b} y2={G.h - G.b} />
+            {gmon.map((m) => <text class="mon" x={m.x} y={G.h - 8}>{m.k}</text>)}
+            <path class="ln" d={gline} />
+            {
+              gpts.map((p, i) => (
+                <g class="pt" tabindex="0" data-read={`${p.t.slice(5).replace('-', ' 月 ')} 日：累计 ${p.label} 人`}>
+                  <circle cx={p.x} cy={p.y} r="5" />
+                  {(i === 0 || i === 4 || i === gpts.length - 1) && (
+                    <text x={p.x} y={p.y - 12} text-anchor={i === gpts.length - 1 ? 'end' : 'middle'}>{p.label}</text>
+                  )}
+                </g>
+              ))
+            }
+          </svg>
+          <p class="t-read" aria-live="polite" data-read-out data-hint="悬停或聚焦一个点看读数">悬停或聚焦一个点看读数</p>
+        </div>
+
+        <!-- 4 玩家评分：大数 + 每档人数 + 几句原话 -->
+        <div class="frame" data-pane="3" hidden data-reads>
           <div class="survey">
             <p class="score fin">
               <b class="serif">{c.survey.big}</b>
               <span>{c.survey.of}</span>
               <em>{c.survey.n}</em>
+              <small>{c.survey.nps}</small>
             </p>
             <ul class="stars fin" style="--d:1">
               {
@@ -128,23 +165,7 @@ const groupLen = c.groups.map((_, gi) => L.filter((l) => l.g === gi).length);
           <p class="t-read" aria-live="polite" data-read-out data-hint="悬停一档看人数">悬停一档看人数</p>
         </div>
 
-        <!-- 4 规则问答：从需求到打开入口 -->
-        <div class="frame" data-pane="3" hidden data-reads>
-          <ol class="flow">
-            {
-              c.flow.map((f, i) => (
-                <li class={`fin${'end' in f && f.end ? ' end' : ''}`} style={`--d:${i + 1}`} data-read={`${f.at} ${f.k}：${f.v}（${f.who}）`}>
-                  <em>{f.at}</em>
-                  <b>{f.k}</b>
-                  <span class="who">{f.who}</span>
-                </li>
-              ))
-            }
-          </ol>
-          <p class="t-read" aria-live="polite" data-read-out data-hint="悬停一步看做了什么">悬停一步看做了什么</p>
-        </div>
-
-        <!-- 5 上线后怎么答：四步 + 真实截图 -->
+        <!-- 5 规则问答 AI：四步，每步写怎么做 + 真实截图 -->
         <div class="frame" data-pane="4" hidden>
           <div class="answer">
             <ol class="qa">
@@ -154,6 +175,7 @@ const groupLen = c.groups.map((_, gi) => L.filter((l) => l.g === gi).length);
                     <i>{i + 1}</i>
                     <b class="serif">{s.k}</b>
                     <em>{s.en}</em>
+                    <span class="how">{s.how}</span>
                   </li>
                 ))
               }
@@ -163,6 +185,23 @@ const groupLen = c.groups.map((_, gi) => L.filter((l) => l.g === gi).length);
               <figcaption>{c.img.cap}</figcaption>
             </figure>
           </div>
+        </div>
+
+        <!-- 6 实现过程：从开 Project 到打开入口，每个点写做了什么 -->
+        <div class="frame" data-pane="5" hidden data-reads>
+          <ol class="flow">
+            {
+              c.flow.map((f, i) => (
+                <li class={`fin${'end' in f && f.end ? ' end' : ''}`} style={`--d:${i + 1}`} data-read={`${f.at} ${f.k}：${f.v}（${f.who}）`}>
+                  <em>{f.at}</em>
+                  <b>{f.k}</b>
+                  <span class="what">{f.v}</span>
+                  <span class="who">{f.who}</span>
+                </li>
+              ))
+            }
+          </ol>
+          <p class="t-read" aria-live="polite" data-read-out data-hint="悬停一步看是谁做的">悬停一步看是谁做的</p>
         </div>
       </div>
 
@@ -458,7 +497,92 @@ const groupLen = c.groups.map((_, gi) => L.filter((l) => l.g === gi).length);
     color: var(--ink-2);
   }
 
-  /* 4 规则问答时间线 */
+
+  /* 3 用户增长 */
+  .growth {
+    width: 100%;
+    height: auto;
+    max-height: 46vh;
+    overflow: visible;
+  }
+
+  .growth .after {
+    fill: var(--accent-soft);
+  }
+
+  .growth .ai {
+    stroke: var(--accent);
+    stroke-width: 1.5;
+    stroke-dasharray: 4 4;
+  }
+
+  .growth .ai-k {
+    font-size: 13px;
+    fill: var(--accent-ink);
+  }
+
+  .growth .base {
+    stroke: var(--line-2);
+  }
+
+  .growth .mon {
+    font-size: 12px;
+    fill: var(--ink-3);
+    text-anchor: middle;
+  }
+
+  .growth .ln {
+    fill: none;
+    stroke: var(--ink);
+    stroke-width: 2.5;
+    stroke-linejoin: round;
+  }
+
+  .growth .pt circle {
+    fill: var(--bg);
+    stroke: var(--ink);
+    stroke-width: 2;
+    transition: r 0.2s;
+  }
+
+  .growth .pt text {
+    font-size: 14px;
+    font-weight: 600;
+    fill: var(--ink);
+  }
+
+  .growth .pt {
+    cursor: pointer;
+    outline: none;
+  }
+
+  .growth .pt[data-on] circle,
+  .growth .pt:focus-visible circle {
+    r: 8;
+    fill: var(--accent);
+    stroke: var(--accent);
+  }
+
+  .score small {
+    grid-column: 1 / -1;
+    font-size: clamp(14px, 1.1vw, 19px);
+    color: var(--ink-2);
+  }
+
+  .qa .how {
+    grid-column: 2 / -1;
+    font-size: clamp(13px, 1vw, 17px);
+    line-height: 1.45;
+    color: var(--ink-2);
+  }
+
+  .flow .what {
+    font-size: clamp(12px, 0.9vw, 15px);
+    line-height: 1.4;
+    color: var(--ink-2);
+  }
+
+  /* 6 规则问答实现过程 */
   .flow {
     list-style: none;
     margin: 0;
