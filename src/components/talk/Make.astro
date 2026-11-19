@@ -12,10 +12,8 @@ import { rich } from '../../lib/rich';
 
 const m = talk.make;
 const L = m.levels;
-// 工具：三类大卡每格露 3 个；其余几类收成一行
+// 工具：八类各一张卡，国内 / 国外各露 3 个
 const SHOW = 3;
-const hot = m.tools.filter((t) => t.hot);
-const rest = m.tools.filter((t) => !t.hot);
 const used = m.toolsUsed;
 ---
 
@@ -43,14 +41,14 @@ const used = m.toolsUsed;
 
     <div class="main">
       <div class="stage">
-        <!-- 1 工具：只放做定制软件要先备的三类（大卡），其余五类收成一行，悬停看推荐 -->
-        <div class="frame" data-pane="0" data-reads data-wide="1240">
+        <!-- 1 工具：八类，一类一张卡（国内 / 国外各露 3 个，名字链官网），我在用的标红点；悬停一类看完整清单 -->
+        <div class="frame" data-pane="0" data-reads>
           <ul class="kit">
             {
-              hot.map((t, i) => (
-                <li class="fin" style={`--d:${i + 1}`}>
+              m.tools.map((t, i) => (
+                <li class="fin" style={`--d:${i + 1}`} tabindex="0" data-read={`${t.k}　${m.toolsHead[1]}：${t.cn.map(([n]) => n).join('、')}；${m.toolsHead[2]}：${t.en.map(([n]) => n).join('、')}`}>
                   <b class="serif">{t.k}</b>
-                  {[[m.toolsHead[2], t.en], [m.toolsHead[1], t.cn]].map(([k, xs]) => (
+                  {[[m.toolsHead[1], t.cn], [m.toolsHead[2], t.en]].map(([k, xs]) => (
                     <p>
                       <em>{k}</em>
                       {(xs as [string, string][]).slice(0, SHOW).map(([name, href]) => (
@@ -64,16 +62,6 @@ const used = m.toolsUsed;
               ))
             }
           </ul>
-          <p class="rest fin" style="--d:4">
-            <span>{m.restK}</span>
-            {
-              rest.map((t) => (
-                <button type="button" data-read={`${t.k}　${m.toolsHead[1]}：${t.cn.map(([n]) => n).join('、')}；${m.toolsHead[2]}：${t.en.map(([n]) => n).join('、')}`}>
-                  {t.k}
-                </button>
-              ))
-            }
-          </p>
           <p class="t-read" aria-live="polite" data-read-out data-hint={m.toolsHint}>{m.toolsHint}</p>
         </div>
 
@@ -153,7 +141,7 @@ const used = m.toolsUsed;
         </div>
 
         <!-- 4 一张单：上面专业说法，下面同一个过程的真实例子 -->
-        <div class="frame" data-pane="3" hidden data-wide="900">
+        <div class="frame" data-pane="3" hidden>
           <ol class="pipe vt-ticket">
             {
               m.ticket.map((t, i) => (
@@ -172,7 +160,7 @@ const used = m.toolsUsed;
         </div>
 
         <!-- 5 一个大需求：横着一条线；上一步那张单缩进「定时任务」里（View Transition） -->
-        <div class="frame" data-pane="4" hidden data-wide="1160">
+        <div class="frame" data-pane="4" hidden>
           <div class="flow vt-need">
             <div class="req">
               <em>{m.need.project}</em>
@@ -215,7 +203,7 @@ const used = m.toolsUsed;
         </div>
 
         <!-- 6 一堆需求：先框成一堆 → 分诊 → 一个个 Project（里面全是最小的单）→ 定时任务一直跑 -->
-        <div class="frame" data-pane="5" hidden data-wide="1160">
+        <div class="frame" data-pane="5" hidden>
           <div class="flow">
             <div class="pile">
               <em>{m.triage.pile}</em>
@@ -369,32 +357,38 @@ const used = m.toolsUsed;
     font-size: clamp(14px, 1.2vw, 20px);
   }
 
-  /* 工具：三张大卡（类名 + 国外 / 国内各三个），我在用的标一个红点 */
+  /* 工具：八类 4 × 2 张卡；类名大字，下面国内 / 国外各一行，我在用的标红点 */
   .kit {
     list-style: none;
     margin: 0;
     padding: 0;
     display: grid;
-    grid-template-columns: repeat(3, minmax(0, 1fr));
-    gap: clamp(12px, 1.4vw, 24px);
+    grid-template-columns: repeat(4, minmax(0, 1fr));
+    gap: clamp(8px, 1vw, 16px);
   }
 
   .kit li {
     display: flex;
     flex-direction: column;
-    gap: clamp(8px, 1.2vh, 14px);
-    padding: clamp(18px, 1.8vw, 32px);
+    gap: clamp(6px, 1vh, 10px);
+    padding: clamp(12px, 1.2vw, 20px);
     border: 1px solid var(--line);
-    border-top: 3px solid var(--accent);
     border-radius: var(--r);
     background: var(--card);
-    box-shadow: var(--shadow);
+    outline: none;
+    transition: border-color 0.2s, transform 0.2s var(--ease);
+  }
+
+  .kit li[data-on],
+  .kit li:focus-visible {
+    border-color: var(--accent);
+    transform: translateY(-2px);
   }
 
   .kit b {
-    font-size: clamp(24px, 2.2vw, 40px);
+    font-size: clamp(18px, 1.6vw, 28px);
     font-weight: 600;
-    line-height: 1.15;
+    line-height: 1.2;
   }
 
   .kit p {
@@ -402,22 +396,21 @@ const used = m.toolsUsed;
     display: flex;
     flex-wrap: wrap;
     align-items: baseline;
-    gap: 4px clamp(10px, 1vw, 16px);
+    gap: 2px clamp(8px, 0.7vw, 12px);
   }
 
   .kit em {
-    flex: none;
-    width: 2.6em;
+    flex: 0 0 100%;
     font-style: normal;
-    font-size: clamp(12px, 0.9vw, 15px);
+    font-size: clamp(11px, 0.8vw, 13px);
     letter-spacing: 0.08em;
     color: var(--ink-3);
   }
 
   .kit a {
-    font-size: clamp(16px, 1.35vw, 24px);
-    line-height: 1.35;
-    color: var(--ink);
+    font-size: clamp(14px, 1.05vw, 18px);
+    line-height: 1.4;
+    color: var(--ink-2);
     text-decoration: none;
     border-bottom: 1px solid transparent;
     transition: color 0.2s, border-color 0.2s;
@@ -425,6 +418,7 @@ const used = m.toolsUsed;
 
   .kit a.mine {
     font-weight: 600;
+    color: var(--ink);
   }
 
   .kit a.mine::before {
@@ -432,7 +426,7 @@ const used = m.toolsUsed;
     display: inline-block;
     width: 0.4em;
     height: 0.4em;
-    margin-right: 0.35em;
+    margin-right: 0.3em;
     border-radius: 50%;
     background: var(--accent);
     vertical-align: 0.2em;
@@ -445,37 +439,8 @@ const used = m.toolsUsed;
     border-bottom-color: var(--accent);
   }
 
-  .rest {
-    margin: clamp(14px, 2.4vh, 28px) 0 0;
-    display: flex;
-    flex-wrap: wrap;
-    align-items: center;
-    gap: 8px;
-  }
-
-  .rest span {
-    margin-right: 6px;
-    font-size: clamp(14px, 1.1vw, 19px);
-    color: var(--ink-3);
-  }
-
-  .rest button {
-    padding: 0.35em 0.9em;
-    font: inherit;
-    font-size: clamp(14px, 1.1vw, 19px);
-    color: var(--ink-2);
-    background: transparent;
-    border: 1.5px solid var(--line-2);
-    border-radius: var(--r-pill);
-    cursor: pointer;
-    transition: border-color 0.2s, color 0.2s;
-  }
-
-  .rest button[data-on],
-  .rest button:focus-visible {
-    outline: none;
-    color: var(--accent-ink);
-    border-color: var(--accent);
+  .frame[data-pane='0'] .t-read {
+    margin-top: clamp(8px, 1.6vh, 18px);
   }
 
   .board {
@@ -1368,7 +1333,7 @@ const used = m.toolsUsed;
       font-size: 13px;
     }
     .kit {
-      grid-template-columns: 1fr;
+      grid-template-columns: repeat(2, minmax(0, 1fr));
     }
     .pipe li + li::before,
     .retry .loop {

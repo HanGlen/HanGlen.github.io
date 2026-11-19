@@ -93,7 +93,7 @@ const lanes = k.tl.lanes.map((lane) => {
         </div>
 
         <!-- 2 接上流水线：框外是杂乱的需求；从分诊 AI 到合并整体框起来，就是 04 那套系统 -->
-        <div class="frame" data-pane="1" hidden data-wide="1100">
+        <div class="frame" data-pane="1" hidden>
           <div class="joinrow">
             <div class="pile fin" style="--d:0">
               <p class="pk">{k.join.pile}</p>
@@ -130,7 +130,7 @@ const lanes = k.tl.lanes.map((lane) => {
         </div>
 
         <!-- 3 两条时间线：每个点是一步，悬停、聚焦或点一下看时间和事 -->
-        <div class="frame" data-pane="2" hidden data-wide="1100">
+        <div class="frame" data-pane="2" hidden>
           <div class="tl" data-tl>
             {
               lanes.map((lane, li) => (

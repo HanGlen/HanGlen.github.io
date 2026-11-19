@@ -440,8 +440,8 @@ export const talk = {
       {
         k: '工具',
         tag: 'Tools',
-        q: '做定制软件，先备三类工具',
-        plain: '有一个要解决的问题，先问 AI 我需要什么工具。这三类是我问完、用过之后的答案。',
+        q: '工具拉不开差距，做什么事选什么工具',
+        plain: '工具更新太快，谁也甩不开谁。有一件事要做，先问 AI 该用什么；下面八类是我问完、用过之后的答案。',
         case: '标红点的是我在用的：Claude Code、Codex 写代码，GitHub、Linear 放代码管任务，微信云开发放上线。',
         src: '2026-11-17 打开各家官网整理（HAN-1844）。挑的标准：不用写代码就能上手、有免费档、国内能开通。',
       },
@@ -504,17 +504,16 @@ export const talk = {
     toolsHead: ['类', '国内', '国外'],
     /** 车主在用的（工具卡上标红点） */
     toolsUsed: ['Claude Code', 'Codex', 'GitHub', 'Linear', '微信云开发'],
-    restK: '其余五类按需要再加',
-    toolsHint: '悬停一类，看推荐的工具',
+    toolsHint: '悬停一类，看完整清单',
     tools: [
       { k: '聊天助手', cn: [['豆包', 'https://www.doubao.com/'], ['千问', 'https://www.qianwen.com/'], ['Kimi', 'https://www.kimi.com/'], ['DeepSeek', 'https://www.deepseek.com/'], ['腾讯元宝', 'https://yuanbao.tencent.com/']], en: [['Claude', 'https://claude.ai/'], ['Gemini', 'https://gemini.google.com/'], ['ChatGPT', 'https://chatgpt.com/']] },
-      { k: '写代码', hot: true, cn: [['Trae', 'https://www.trae.cn/'], ['WorkBuddy', 'https://www.workbuddy.cn/'], ['通义灵码', 'https://lingma.aliyun.com/'], ['CodeBuddy', 'https://www.codebuddy.cn/']], en: [['Claude Code', 'https://claude.com/product/claude-code'], ['Codex', 'https://openai.com/codex/'], ['GitHub Copilot', 'https://github.com/features/copilot'], ['Cursor', 'https://cursor.com/']] },
+      { k: '写代码', cn: [['Trae', 'https://www.trae.cn/'], ['WorkBuddy', 'https://www.workbuddy.cn/'], ['通义灵码', 'https://lingma.aliyun.com/'], ['CodeBuddy', 'https://www.codebuddy.cn/']], en: [['Claude Code', 'https://claude.com/product/claude-code'], ['Codex', 'https://openai.com/codex/'], ['GitHub Copilot', 'https://github.com/features/copilot'], ['Cursor', 'https://cursor.com/']] },
       { k: '做图和设计', cn: [['即梦', 'https://jimeng.jianying.com/'], ['可灵', 'https://klingai.com/'], ['创客贴', 'https://www.chuangkit.com/'], ['星流', 'https://www.xingliu.art/']], en: [['Figma', 'https://www.figma.com/'], ['Ideogram', 'https://ideogram.ai/'], ['Recraft', 'https://www.recraft.ai/']] },
       { k: '视频和配音', cn: [['即梦', 'https://jimeng.jianying.com/'], ['可灵', 'https://klingai.com/'], ['海螺', 'https://hailuoai.com/'], ['剪映', 'https://www.jianying.com/'], ['Vidu', 'https://www.vidu.cn/']], en: [['Runway', 'https://runway.com/'], ['HeyGen', 'https://www.heygen.com/'], ['CapCut', 'https://www.capcut.com/'], ['ElevenLabs', 'https://elevenlabs.io/']] },
       { k: '办公和文档', cn: [['WPS AI', 'https://ai.wps.cn/'], ['飞书', 'https://www.feishu.cn/'], ['腾讯文档', 'https://docs.qq.com/'], ['通义听悟', 'https://tingwu.aliyun.com/'], ['ima', 'https://ima.qq.com/']], en: [['Notion', 'https://www.notion.com/'], ['Claude', 'https://claude.ai/'], ['Gemini', 'https://gemini.google.com/']] },
       { k: '自动化', cn: [['扣子', 'https://www.coze.cn/'], ['飞书多维表格', 'https://base.feishu.cn/'], ['宜搭', 'https://www.aliwork.com/']], en: [['Zapier', 'https://zapier.com/'], ['n8n', 'https://n8n.io/'], ['Dify', 'https://dify.ai/']] },
-      { k: '放代码、管任务', hot: true, cn: [['Gitee', 'https://gitee.com/'], ['CODING', 'https://coding.net/'], ['TAPD', 'https://www.tapd.cn/'], ['飞书项目', 'https://project.feishu.cn/']], en: [['GitHub', 'https://github.com/'], ['Linear', 'https://linear.app/']] },
-      { k: '放上线', hot: true, cn: [['微信云开发', 'https://cloud.weixin.qq.com/cloudbase'], ['腾讯云', 'https://cloud.tencent.com/'], ['火山引擎', 'https://www.volcengine.com/']], en: [['Vercel', 'https://vercel.com/'], ['Zeabur', 'https://zeabur.com/']] },
+      { k: '放代码、管任务', cn: [['Gitee', 'https://gitee.com/'], ['CODING', 'https://coding.net/'], ['TAPD', 'https://www.tapd.cn/'], ['飞书项目', 'https://project.feishu.cn/']], en: [['GitHub', 'https://github.com/'], ['Linear', 'https://linear.app/']] },
+      { k: '放上线', cn: [['微信云开发', 'https://cloud.weixin.qq.com/cloudbase'], ['腾讯云', 'https://cloud.tencent.com/'], ['火山引擎', 'https://www.volcengine.com/']], en: [['Vercel', 'https://vercel.com/'], ['Zeabur', 'https://zeabur.com/']] },
     ],
     /** 模型能力：每个领域前三名，写具体型号，有分数的写分数（docs/research/talk-03-models.md） */
     modelsHead: ['领域', '第 1', '第 2', '第 3', '榜单'],
@@ -603,7 +602,7 @@ export const talk = {
     srcK: '依据',
     refK: '参考',
     notes:
-      '7 分钟，每步一分钟左右，每步先念右边那句大字。Agentic Engineering 这个词是 Karpathy 2026 年 2 月提的：人不再直接写代码，而是派 AI 去做、自己负责把关，用来和「不看代码只管接受」的 vibe coding 分开。工具：八类，先问 AI 用什么；做定制软件先看标红的三类。模型：按擅长的领域选；做界面现在是 Anthropic，生图是 OpenAI，视频是 Google，点开就是榜单。顺带一句短板：没把握时也会给很肯定的答案，所以最后一步要验证。地基：以代码仓库为核心，规矩、任务、记录全放在仓库里；点左边一个 AI 拔掉，其余照跑；我的 Claude 账户被封过一次，换个新账户马上接上。仓库多了再建一个 Home Repo。最小单：一位玩家说「灵感」写错了，AI 写、另一个 AI 审，检查不过就打回。大需求：AI 切片，定时任务每轮新开一次会话、领一张单，这叫 Loop，最早是 Geoffrey Huntley 写的 Ralph。一堆需求：先分诊，再切成一个个 Project。验证：怎么敢让 AI 自己合并？Lauren Tan 11 月在 AI Engineer 大会讲的金字塔：最上面两层是代码结构和静态检查，写成代码就不会忘；往下是真跑起来验证、规则文档，最下面才是人看，越往下越贵。我的小程序每层都有对应的东西，真机验收我自己来。',
+      '7 分钟，每步一分钟左右，每步先念右边那句大字。Agentic Engineering 这个词是 Karpathy 2026 年 2 月提的：人不再直接写代码，而是派 AI 去做、自己负责把关，用来和「不看代码只管接受」的 vibe coding 分开。工具：迭代太快，谁也甩不开谁，拉不开差距；做什么事选什么工具，先问 AI 用什么，标红点的是我在用的。模型：按擅长的领域选；做界面现在是 Anthropic，生图是 OpenAI，视频是 Google，点开就是榜单。顺带一句短板：没把握时也会给很肯定的答案，所以最后一步要验证。地基：以代码仓库为核心，规矩、任务、记录全放在仓库里；点左边一个 AI 拔掉，其余照跑；我的 Claude 账户被封过一次，换个新账户马上接上。仓库多了再建一个 Home Repo。最小单：一位玩家说「灵感」写错了，AI 写、另一个 AI 审，检查不过就打回。大需求：AI 切片，定时任务每轮新开一次会话、领一张单，这叫 Loop，最早是 Geoffrey Huntley 写的 Ralph。一堆需求：先分诊，再切成一个个 Project。验证：怎么敢让 AI 自己合并？Lauren Tan 11 月在 AI Engineer 大会讲的金字塔：最上面两层是代码结构和静态检查，写成代码就不会忘；往下是真跑起来验证、规则文档，最下面才是人看，越往下越贵。我的小程序每层都有对应的东西，真机验收我自己来。',
   },
 
   /**
