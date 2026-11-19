@@ -10,6 +10,7 @@ import Gap from '../talk/Gap.astro';
 import Team from '../talk/Team.astro';
 import Make from '../talk/Make.astro';
 import Keep from '../talk/Keep.astro';
+import Any from '../talk/Any.astro';
 import Case from '../talk/Case.astro';
 import Summary from '../talk/Summary.astro';
 import Contact from '../talk/Contact.astro';
@@ -34,6 +35,7 @@ import { talk } from '../../i18n/talk';
       <Team />
       <Make />
       <Keep />
+      <Any />
       <Case />
       <Summary />
       <Contact />
@@ -622,7 +624,7 @@ import { talk } from '../../i18n/talk';
       overflow: hidden;
       transition: max-height 0.45s var(--ease), opacity 0.3s;
     }
-    .t-slide:not(.sum):has([data-stepper]:not([data-at='0'])) .t-head .lead {
+    .t-slide:not(.sum):not(.any):has([data-stepper]:not([data-at='0'])) .t-head .lead {
       max-height: 0;
       opacity: 0;
     }

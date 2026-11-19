@@ -1,0 +1,199 @@
+---
+/**
+ * 演讲 06「这套系统是通用的」：表头是同一套四步（拆开 → 动手 → 检查 → 交付），
+ * 下面三行真事（这场演讲、一篇推文、一次规则问答）各自填进这四格。
+ * ← → 或悬停一行一行讲，讲过的保持亮着；当前行的一句大白话放在表下面。
+ */
+import { talk } from '../../i18n/talk';
+
+const a = talk.any;
+---
+
+<section class="slide t-slide any" data-slide data-notes={a.notes} aria-labelledby="any-title">
+  <header class="t-head">
+    <p class="no">{a.no}</p>
+    <h2 id="any-title">{a.title}</h2>
+    <p class="lead">{a.lead}</p>
+  </header>
+
+  <div class="body t-body" data-stepper data-hover>
+    <div class="grid" style={`--c: ${a.cols.length}`}>
+      <p class="cols" aria-hidden="true">
+        <span></span>
+        {
+          a.cols.map((c, i) => (
+            <b>
+              <i>{String(i + 1).padStart(2, '0')}</i>
+              {c}
+            </b>
+          ))
+        }
+      </p>
+      <ol role="tablist" aria-label={a.title}>
+        {
+          a.rows.map((r, i) => (
+            <li>
+              <button type="button" role="tab" data-step aria-selected={i === 0 ? 'true' : 'false'}>
+                <b class="serif">{r.k}</b>
+                {r.cells.map((c, j) => (
+                  <span data-k={a.cols[j]} aria-label={`${a.cols[j]}：${c.replace('\n', '，')}`}>{c}</span>
+                ))}
+              </button>
+            </li>
+          ))
+        }
+      </ol>
+    </div>
+
+    <div class="say" aria-live="polite">
+      {
+        a.rows.map((r, i) => (
+          <p data-pane={i} hidden={i !== 0}>
+            {r.plain}
+          </p>
+        ))
+      }
+    </div>
+    <p class="t-hint">{a.hint}</p>
+  </div>
+</section>
+
+<style>
+  .body {
+    flex: 1;
+    min-height: 0;
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    gap: clamp(18px, 3.4vh, 40px);
+  }
+
+  .grid {
+    --row: minmax(9em, 1.1fr) repeat(var(--c), minmax(0, 1fr));
+  }
+
+  /* 表头：通用的四步，陶土红细线压在底下 */
+  .cols {
+    display: grid;
+    grid-template-columns: var(--row);
+    gap: clamp(10px, 1.2vw, 24px);
+    margin: 0 0 clamp(10px, 1.6vh, 18px);
+    padding: 0 clamp(16px, 1.8vw, 32px) clamp(10px, 1.4vh, 16px);
+    border-bottom: 2px solid var(--accent);
+  }
+
+  .cols b {
+    display: flex;
+    align-items: baseline;
+    gap: 0.5em;
+    font-family: var(--serif);
+    font-size: clamp(22px, 2.2vw, 40px);
+    font-weight: 600;
+    color: var(--ink);
+  }
+
+  .cols i {
+    font-style: normal;
+    font-family: var(--mono);
+    font-size: clamp(12px, 0.85vw, 15px);
+    color: var(--accent-ink);
+  }
+
+  ol {
+    list-style: none;
+    margin: 0;
+    padding: 0;
+    display: grid;
+    gap: clamp(8px, 1.3vh, 14px);
+  }
+
+  button {
+    width: 100%;
+    display: grid;
+    grid-template-columns: var(--row);
+    gap: clamp(10px, 1.2vw, 24px);
+    align-items: center;
+    padding: clamp(14px, 2.2vh, 26px) clamp(16px, 1.8vw, 32px);
+    font: inherit;
+    text-align: left;
+    color: var(--ink-2);
+    background: var(--card);
+    border: 1px solid var(--line);
+    border-left: 4px solid var(--line-2);
+    border-radius: var(--r);
+    box-shadow: var(--shadow);
+    cursor: pointer;
+    opacity: 0.4;
+    transition: opacity 0.4s var(--ease), transform 0.4s var(--ease), border-color 0.3s;
+  }
+
+  button.seen {
+    opacity: 1;
+  }
+
+  button[aria-selected='true'] {
+    border-left-color: var(--accent);
+    color: var(--ink);
+    transform: translateX(6px);
+  }
+
+  button b {
+    font-size: clamp(20px, 1.9vw, 34px);
+    font-weight: 600;
+    line-height: 1.2;
+    color: var(--ink);
+  }
+
+  button span {
+    white-space: pre-line;
+    font-size: clamp(16px, 1.35vw, 24px);
+    line-height: 1.35;
+  }
+
+  /* 当前行这一句大白话 */
+  .say {
+    min-height: 1.4em;
+    font-family: var(--serif);
+    font-size: clamp(24px, 2.4vw, 44px);
+    font-weight: 600;
+    line-height: 1.25;
+    color: var(--accent);
+  }
+
+  .say p {
+    margin: 0;
+  }
+
+  /* 手机：表头收起，每行竖着排，格子前写上步名 */
+  @media (max-width: 900px) {
+    .cols {
+      display: none;
+    }
+    button {
+      grid-template-columns: 1fr;
+      gap: 6px;
+      opacity: 1;
+      transform: none !important;
+    }
+    button span {
+      display: grid;
+      grid-template-columns: 3em 1fr;
+    }
+    button span::before {
+      content: attr(data-k);
+      padding-top: 0.2em;
+      font-family: var(--mono);
+      font-size: 13px;
+      color: var(--accent-ink);
+    }
+    .say {
+      font-size: 22px;
+    }
+  }
+
+  @media (prefers-reduced-motion: reduce) {
+    button {
+      transition: none;
+    }
+  }
+</style>
