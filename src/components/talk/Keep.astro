@@ -1,6 +1,6 @@
 ---
 /**
- * 演讲 05「怎么维护和迭代」：收反馈、开单 → 接上流水线 → 告诉用户 → 两条时间线。
+ * 演讲 05「怎么维护和迭代」：收反馈、开单 → 接上流水线 → 两条时间线。
  * 版式照 04（共用 Talk.astro 里的 .t-steps）：顶上步骤条，左图右文，例子在底部色块。
  * 全程跟着同一条真实反馈（HAN-1688）走；最后一步把它和一个大需求（装备商店）的时间线并排。
  */
@@ -92,53 +92,45 @@ const lanes = k.tl.lanes.map((lane) => {
           </div>
         </div>
 
-        <!-- 2 接上流水线：新单 → AI 切片 → 快速修复 / Project；下面画出 04 那条流水线，写这张单的真实时间 -->
+        <!-- 2 接上流水线：框外是杂乱的需求；从分诊 AI 到合并整体框起来，就是 04 那套系统 -->
         <div class="frame" data-pane="1" hidden>
-          <div class="flow">
-            <span class="chip card fin" style="--d:0">{k.join.card}</span>
+          <div class="joinrow">
+            <div class="pile fin" style="--d:0">
+              <p class="pk">{k.join.pile}</p>
+              <ul>
+                {k.join.sources.map((x, i) => <li class={i === 0 ? 'on' : ''} style={`--r:${[-3, 2, -1][i]}deg`}>{x}</li>)}
+              </ul>
+              <span class="chip card">{k.join.card}</span>
+            </div>
             <span class="arr fin" style="--d:1">→</span>
-            <div class="butler fin" style="--d:2">
-              <b>{k.join.butler}</b>
-              <span>{k.join.butlerV}</span>
+            <div class="sysbox fin" style="--d:2">
+              <p class="ck">{k.join.flow}</p>
+              <div class="flow">
+                <div class="butler">
+                  <b>{k.join.butler}</b>
+                  <span>{k.join.butlerV}</span>
+                </div>
+                <span class="arr">→</span>
+                <ul class="lanes">
+                  {k.join.lanes.map((x, i) => <li class={i === 0 ? 'on' : ''}>{x}</li>)}
+                </ul>
+              </div>
+              <ol class="chain">
+                {
+                  k.join.chain.map((c, i) => (
+                    <li class={`fin${i === 3 || i === 4 ? ' gate' : ''}${i === k.join.chain.length - 1 ? ' done' : ''}`} style={`--d:${4 + i}`}>
+                      <b>{c.k}</b>
+                      <span>{c.ex}</span>
+                    </li>
+                  ))
+                }
+              </ol>
             </div>
-            <span class="arr fin" style="--d:3">→</span>
-            <ul class="lanes fin" style="--d:4">
-              {k.join.lanes.map((x, i) => <li class={i === 0 ? 'on' : ''}>{x}</li>)}
-            </ul>
-          </div>
-          <div class="chainbox fin" style="--d:5">
-            <p class="ck">↓ {k.join.flow}</p>
-            <ol class="chain">
-              {
-                k.join.chain.map((c, i) => (
-                  <li class={`fin${i === 3 || i === 4 ? ' gate' : ''}${i === k.join.chain.length - 1 ? ' done' : ''}`} style={`--d:${6 + i}`}>
-                    <b>{c.k}</b>
-                    <span>{c.ex}</span>
-                  </li>
-                ))
-              }
-            </ol>
           </div>
         </div>
 
-        <!-- 3 告诉用户：PR 附一行更新说明 → 版本更新 → 回到用户 -->
+        <!-- 3 两条时间线：每个点是一步，悬停、聚焦或点一下看时间和事 -->
         <div class="frame" data-pane="2" hidden>
-          <div class="flow">
-            <div class="note fin" style="--d:0">
-              <b>{k.tell.pr}</b>
-              <small>{k.tell.note}</small>
-            </div>
-            <span class="arr fin" style="--d:2">→</span>
-            <div class="phone fin" style="--d:4">
-              <p class="ph">{k.tell.page}</p>
-              <p class="log">{k.tell.noteV}</p>
-            </div>
-          </div>
-          <p class="ret fin" style="--d:6"><span aria-hidden="true">↩</span> {k.tell.back}</p>
-        </div>
-
-        <!-- 4 两条时间线：每个点是一步，悬停、聚焦或点一下看时间和事 -->
-        <div class="frame" data-pane="3" hidden>
           <div class="tl" data-tl>
             {
               lanes.map((lane, li) => (
@@ -478,6 +470,85 @@ const lanes = k.tl.lanes.map((lane) => {
     }
     to {
       opacity: 1;
+    }
+  }
+
+  /* 2：左边一堆杂乱需求，右边从分诊 AI 到合并整个框起来 */
+  .joinrow {
+    display: grid;
+    grid-template-columns: auto auto minmax(0, 1fr);
+    align-items: center;
+    gap: clamp(10px, 1.2vw, 20px);
+  }
+
+  .pile {
+    display: flex;
+    flex-direction: column;
+    align-items: flex-start;
+    gap: 8px;
+  }
+
+  .pk {
+    margin: 0;
+    font-size: clamp(13px, 1vw, 17px);
+    color: var(--ink-3);
+  }
+
+  .pile ul {
+    list-style: none;
+    margin: 0;
+    padding: 0;
+    display: flex;
+    flex-direction: column;
+    gap: 6px;
+  }
+
+  .pile li {
+    padding: 6px 12px;
+    border: 1px dashed var(--line-2);
+    border-radius: var(--r-sm);
+    background: var(--card);
+    font-size: clamp(13px, 1vw, 17px);
+    color: var(--ink-2);
+    transform: rotate(var(--r));
+  }
+
+  .pile li.on {
+    border-style: solid;
+    border-color: var(--accent);
+    color: var(--ink);
+  }
+
+  .sysbox {
+    padding: clamp(12px, 1.8vh, 22px) clamp(12px, 1.2vw, 22px);
+    border: 2px solid var(--accent);
+    border-radius: var(--r);
+    background: var(--bg-2);
+    display: flex;
+    flex-direction: column;
+    gap: clamp(10px, 1.6vh, 18px);
+  }
+
+  .sysbox .ck {
+    margin: 0;
+    color: var(--accent-ink);
+  }
+
+  .sysbox .flow {
+    justify-content: flex-start;
+  }
+
+  .sysbox .chain {
+    grid-template-columns: repeat(3, minmax(0, 1fr));
+  }
+
+  @media (max-width: 900px) {
+    .joinrow {
+      grid-template-columns: 1fr;
+    }
+    .joinrow > .arr {
+      transform: rotate(90deg);
+      justify-self: start;
     }
   }
 

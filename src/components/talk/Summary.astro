@@ -1,7 +1,7 @@
 ---
 /**
- * 演讲 07 总结：回到主线，三个问题各一句答案。← → 或悬停一句句讲，讲过的保持亮着。
- * 二维码车主 2026-11-18 说先不做（HAN-1872 已关），只留网站地址。
+ * 演讲 07 总结：快、专业、省三句，← → 或悬停一句句讲，讲过的保持亮着。
+ * 下面「谢谢」+ 寻求合作 + 车主微信二维码 + 网站地址。
  */
 import { talk } from '../../i18n/talk';
 
@@ -30,10 +30,15 @@ const s = talk.sum;
         ))
       }
     </ol>
-    <p class="bye">
+    <div class="bye">
       <b class="serif">{s.end}</b>
-      <span>{s.site}</span>
-    </p>
+      <div class="ask">
+        <p class="serif">{s.ask}</p>
+        <span>{s.askV}</span>
+        <small>{s.site}</small>
+      </div>
+      <img src={s.qr.src} alt={s.qr.alt} width="776" height="771" loading="lazy" />
+    </div>
     <p class="t-hint">{s.hint}</p>
   </div>
 </section>
@@ -117,10 +122,44 @@ const s = talk.sum;
   }
 
   .bye {
-    margin: 0;
     display: flex;
-    align-items: baseline;
-    gap: 20px;
+    align-items: center;
+    gap: clamp(20px, 3vw, 56px);
+  }
+
+  .ask {
+    margin-left: auto;
+    display: flex;
+    flex-direction: column;
+    align-items: flex-end;
+    gap: 6px;
+    text-align: right;
+  }
+
+  .ask p {
+    margin: 0;
+    font-size: clamp(22px, 2vw, 36px);
+    font-weight: 600;
+    color: var(--ink);
+  }
+
+  .ask span {
+    font-size: clamp(14px, 1.1vw, 19px);
+    color: var(--ink-2);
+  }
+
+  .ask small {
+    font-family: var(--mono);
+    font-size: clamp(13px, 1vw, 17px);
+    color: var(--ink-3);
+  }
+
+  /* 二维码保持白底，深色模式也能扫 */
+  .bye img {
+    width: clamp(110px, 17vh, 200px);
+    height: auto;
+    border-radius: var(--r-sm);
+    border: 1px solid var(--line);
   }
 
   .bye b {
@@ -129,11 +168,7 @@ const s = talk.sum;
     color: var(--accent);
   }
 
-  .bye span {
-    font-family: var(--mono);
-    font-size: clamp(14px, 1.2vw, 20px);
-    color: var(--ink-2);
-  }
+
 
   @media (max-width: 900px) {
     ol {
@@ -141,6 +176,14 @@ const s = talk.sum;
     }
     button {
       opacity: 1;
+    }
+    .bye {
+      flex-wrap: wrap;
+    }
+    .ask {
+      margin-left: 0;
+      align-items: flex-start;
+      text-align: left;
     }
   }
 
