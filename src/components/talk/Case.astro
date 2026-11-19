@@ -104,7 +104,12 @@ const gmon = ['1 月', '3 月', '5 月', '7 月', '9 月', '11 月'].map((k, i) 
           <p class="legend fin" style="--d:3">
             {me.map((b, i) => <span><i class={i ? 'b2' : 'b1'} />{b.k}</span>)}
           </p>
-          <p class="t-read" aria-live="polite" data-read-out data-hint="悬停一段看读数">悬停一段看读数</p>
+          <p class="eq fin" style="--d:4" tabindex="0" data-read={c.size.eq.read}>
+            <span>{c.size.eq.k}</span>
+            <b class="serif">{c.size.eq.v}</b>
+            <em>{c.size.eq.sub}</em>
+          </p>
+          <p class="t-read" aria-live="polite" data-read-out data-hint="悬停一段或换算看读数">悬停一段或换算看读数</p>
         </div>
 
         <!-- 3 用户增长：累计用户折线 -->
@@ -405,6 +410,45 @@ const gmon = ['1 月', '3 月', '5 月', '7 月', '9 月', '11 月'].map((k, i) 
     width: 12px;
     height: 12px;
     border-radius: 3px;
+  }
+
+  /* 2 体量换算成人年 */
+  .eq {
+    margin: clamp(8px, 2vh, 24px) 0 0;
+    display: flex;
+    flex-wrap: wrap;
+    align-items: baseline;
+    gap: 8px clamp(12px, 1.4vw, 24px);
+    padding: clamp(12px, 1.6vw, 22px) clamp(16px, 1.8vw, 28px);
+    border-radius: var(--r);
+    border: 1px solid var(--line);
+    background: var(--card);
+    box-shadow: var(--shadow);
+    transition: border-color 0.2s;
+  }
+
+  .eq[data-on],
+  .eq:focus-visible {
+    border-color: var(--accent);
+    outline: none;
+  }
+
+  .eq span {
+    font-size: clamp(14px, 1.1vw, 19px);
+    color: var(--ink-3);
+  }
+
+  .eq b {
+    font-size: clamp(32px, 3.4vw, 60px);
+    font-weight: 600;
+    line-height: 1;
+    color: var(--accent);
+  }
+
+  .eq em {
+    font-style: normal;
+    font-size: clamp(16px, 1.4vw, 25px);
+    color: var(--ink);
   }
 
   /* 3 问卷 */
