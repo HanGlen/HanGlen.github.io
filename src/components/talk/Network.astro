@@ -126,7 +126,7 @@ const pct = (v: number, of: number) => `${(v / of) * 100}%`;
             )}
             {n.img && (
               <figure>
-                <img style={n.img.pos ? `object-position: ${n.img.pos}` : undefined} src={n.img.src} alt={n.img.alt} loading="lazy" decoding="async" width="908" height="552" />
+                <img src={n.img.src} alt={n.img.alt} loading="lazy" decoding="async" width="908" height="552" />
                 <figcaption>{n.img.cap}</figcaption>
               </figure>
             )}
@@ -659,12 +659,13 @@ const pct = (v: number, of: number) => `${(v / of) * 100}%`;
     margin: 16px 0 0;
   }
 
+  /* 整张图都显示，不裁切：按高度上限等比缩小 */
   figure img {
     display: block;
-    width: 100%;
-    max-height: 24vh;
-    object-fit: cover;
-    object-position: center;
+    width: auto;
+    height: auto;
+    max-width: 100%;
+    max-height: min(28vh, 100vh - 610px);
     border-radius: var(--r-sm);
   }
 

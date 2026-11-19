@@ -1,7 +1,7 @@
 ---
 /**
- * 演讲 03「AI 前后，写软件变了多少」：模型能力 → 成本 → 软件更新速度 → 一家公司 → 我自己。
- * 每一步前后用同一个指标；按 level.kind 画横条（bars）、以前 | 现在两张卡（vs）或每月柱状图（mine）。
+ * 演讲 03「AI 前后，写软件变了多少」：模型能力 → 成本 → 软件更新速度 → 一家公司 → 我自己 → 案例。
+ * 每一步前后用同一个指标；按 level.kind 画横条（bars）、以前 | 现在两张卡（vs）、每月柱状图（mine）或做法清单（how）。
  * 版式同 04、05（.t-steps）：← → 一步步亮，左边一张图，右边一个问题 + 一句大白话，例子在底部色块。
  * 每张图都能悬停、聚焦读数（Talk.astro 的 [data-reads]）。口径不同的数各自成行，不放进同一个比较。
  * 依据 docs/research/talk-03-team.md（HAN-1864）；我自己的每月 PR 来自 src/data/dnd.json。
@@ -15,6 +15,7 @@ const L = t.levels;
 const months = Object.entries(data.monthlyPRs as Record<string, number>);
 const mmax = Math.max(...months.map(([, v]) => v));
 const mlabel = (m: string) => `${Number(m.slice(5))} 月`;
+const smax = Math.max(...t.swe.pts.map((p) => p.v));
 ---
 
 <section class="slide t-slide team" data-slide data-notes={t.notes} aria-labelledby="team-title">
@@ -62,12 +63,12 @@ const mlabel = (m: string) => `${Number(m.slice(5))} 月`;
                   <p class="unit">{t.swe.k}</p>
                   <ul class="hbars">
                     {t.swe.pts.map((p, j) => (
-                      <li tabindex="0" data-read={`${p.at} ${p.who}：${p.v}%`}>
+                      <li tabindex="0" data-read={`${p.at} ${p.who}：${p.label}`}>
                         <span class="hk">{p.at}<small>{p.who}</small></span>
                         <span class="track">
-                          <i class={j === t.swe.pts.length - 1 ? 'hot' : ''} style={`--w:${p.v}%`} />
+                          <i class={j === t.swe.pts.length - 1 ? 'hot' : ''} style={`--w:${Math.max(0.6, (p.v / smax) * 100)}%`} />
                         </span>
-                        <b class="serif">{p.v.toFixed(1)}%</b>
+                        <b class="serif">{p.label}</b>
                       </li>
                     ))}
                   </ul>
@@ -92,6 +93,17 @@ const mlabel = (m: string) => `${Number(m.slice(5))} 月`;
                     {t.mine.cost.map((c, j) => <>{j > 0 && <i aria-hidden="true">→</i>}<b>{c.k} {c.v}</b></>)}
                   </p>
                 </>
+              )}
+              {l.kind === 'how' && (
+                <ol class="how">
+                  {t.how.map((h, j) => (
+                    <li class="fin" tabindex="0" style={`--d:${j + 1}`} data-read={`${h.k}：${h.v}`}>
+                      <i aria-hidden="true">{j + 1}</i>
+                      <b class="serif">{h.k}</b>
+                      <span>{h.v}</span>
+                    </li>
+                  ))}
+                </ol>
               )}
               <p class="t-read" aria-live="polite" data-read-out data-hint={l.kind === 'mine' ? t.mine.partial : t.readK}>{l.kind === 'mine' ? t.mine.partial : t.readK}</p>
             </div>
@@ -252,6 +264,53 @@ const mlabel = (m: string) => `${Number(m.slice(5))} 月`;
     }
   }
 
+
+  /* 案例：四件事，编号 + 一句 */
+  .how {
+    list-style: none;
+    margin: 0;
+    padding: 0;
+    display: grid;
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+    gap: clamp(10px, 1.4vw, 20px);
+  }
+
+  .how li {
+    display: grid;
+    grid-template-columns: auto minmax(0, 1fr);
+    gap: 6px 12px;
+    padding: clamp(14px, 1.6vw, 24px);
+    border: 1px solid var(--line);
+    border-radius: var(--r);
+    background: var(--card);
+    transition: border-color 0.2s, transform 0.2s var(--ease);
+  }
+
+  .how li[data-on],
+  .how li:focus-visible {
+    border-color: var(--accent);
+    transform: translateY(-2px);
+  }
+
+  .how i {
+    grid-row: span 2;
+    font-style: normal;
+    font-family: var(--mono);
+    font-size: clamp(14px, 1.1vw, 18px);
+    color: var(--accent-ink);
+  }
+
+  .how b {
+    font-size: clamp(19px, 1.7vw, 30px);
+    font-weight: 600;
+    line-height: 1.2;
+  }
+
+  .how span {
+    font-size: clamp(14px, 1.1vw, 19px);
+    line-height: 1.5;
+    color: var(--ink-2);
+  }
 
   .unit {
     margin: 0;
@@ -576,6 +635,9 @@ const mlabel = (m: string) => `${Number(m.slice(5))} 月`;
     }
     .tl::before {
       display: none;
+    }
+    .how {
+      grid-template-columns: 1fr;
     }
     .cols {
       height: 220px;

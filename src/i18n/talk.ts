@@ -24,7 +24,7 @@ export interface Node {
   lines: string[];
   stat?: { v: string; k: string };
   steps?: string[];
-  img?: { src: string; alt: string; cap: string; pos?: string };
+  img?: { src: string; alt: string; cap: string };
   /** 在谈的不写名字，卡片也只给一句 */
   quiet?: boolean;
   /** 文字挂在点的哪一边，默认挂下面；用来避开连线和别的字 */
@@ -220,7 +220,7 @@ export const talk = {
         statusText: '合伙项目 · 进行中',
         lines: ['给初高中师生用的 AI 项目制学习平台，北京十一丰小等学校在用。', '我是合伙人，负责开发和维护，也在歌尔学校带学生做 AI 公司项目。'],
         steps: ['选兴趣', '项目卡', '能力要求', '里程碑', '测试', '结果'],
-        img: { src: '/shots/talk/gschool-team.jpg', alt: '团队背景：哈佛、哥伦比亚、伊利诺伊、北航、中国科学院、微软亚洲研究院、美国东北大学、中国矿业大学、虚拟现实国家重点实验室', cap: 'G School 团队背景（取自项目介绍）', pos: 'top' },
+        img: { src: '/shots/talk/gschool-team.jpg', alt: '团队背景：哈佛、哥伦比亚、伊利诺伊、北航、中国科学院、微软亚洲研究院、美国东北大学、中国矿业大学、虚拟现实国家重点实验室', cap: 'G School 团队背景（取自项目介绍）' },
       },
       {
         id: 'traffic',
@@ -323,10 +323,10 @@ export const talk = {
   },
 
   /**
-   * 03 AI 前后，写软件变了多少（车主 2026-11-19 第二次定）：只留前后用同一个指标量的五项——
-   * 模型能力 → 成本 → 软件更新速度 → 一家公司 → 我自己。不再按「一个人 / 一个团队」分，不写「几十个」「好几年」这类没有数的话。
-   * 依据 docs/research/talk-03-before-after.md（HAN-1891）、talk-03-team.md（HAN-1864）；成本是 Epoch AI 2025-03-12 的价格表（记在 docs/worklog.md）。
-   * kind：bars = 多时点横条；vs = 以前 | 现在两张卡；mine = 我自己的每月柱状图（src/data/dnd.json）。
+   * 03 AI 前后，写软件变了多少（车主 2026-11-19 第三次定）：每一步前后用同一个指标、尽量是同一个产品，数据用到最新——
+   * 模型能力（METR 任务时长）→ 成本（Epoch 2026-09）→ 软件更新速度（VS Code 自己前后）→ 一家公司 → 我自己 → 案例（Boris 怎么做到）。
+   * 依据 docs/research/talk-03-before-after.md、talk-03-team.md，新数据记在 docs/worklog.md。
+   * kind：bars = 多时点横条；vs = 以前 | 现在两张卡；mine = 我自己的每月柱状图（src/data/dnd.json）；how = 案例的做法清单。
    */
   team: {
     no: '03',
@@ -338,37 +338,37 @@ export const talk = {
     levels: [
       {
         k: '模型能力',
-        tag: 'SWE-bench',
+        tag: 'METR',
         kind: 'bars',
-        q: '同一套编程题：33% → 81%',
-        plain: '500 道真实的 GitHub 问题，让模型自己改代码、跑测试，看能解决几道。',
-        case: '同一个 Claude Opus 4、同一套题：标准跑法 72.5%，多跑几次再挑最好的 79.4%。同一个模型，用法不同，分数也不同。',
-        src: 'SWE-bench Verified，500 道人工核过的真实 GitHub 问题：2024-08-13 GPT-4o 33.2%（OpenAI）；2024-10-22 Claude 3.5 Sonnet（新）49.0%；2025-05-22 Claude Sonnet 4 72.7%；2025-11-24 Claude Opus 4.5 80.9%（Anthropic）。各家的跑法不完全一样。72.5% 和 79.4% 出自 Anthropic《Introducing Claude 4》2025-05-22，后者是多次采样再挑选的高算力跑法。',
+        q: 'AI 独立做完的活：4 分钟 → 12 小时',
+        plain: '同一套软件任务，看人类专家要做多久的活，AI 有一半把握独立做完。',
+        case: '2026 年 4 月的 Claude Mythos 预览版超过 16 小时，已经超出这套任务能量准的范围。',
+        src: 'METR《[Time horizons](https://metr.org/time-horizons/)》Time Horizon 1.1 数据文件 benchmark_results_1_1.yaml，2026-11-19 下载，取 50% 时长的点估计：GPT-4（2023-03-14）4.0 分钟；GPT-4o（2024-05-13）7.0 分钟；Claude 3.7 Sonnet（2025-02-24）60 分钟；GPT-5（2025-08-07）203 分钟；Claude Opus 4.5（2025-11-24）293 分钟；Claude Opus 4.6（2026-02-05）719 分钟。Claude Mythos Preview 早期版（2026-04-07）1,045 分钟，METR 写 16 小时以上的测量不可靠。页面 2026-09-08 起不再更新。区间很宽，看量级。',
       },
       {
         k: '成本',
-        tag: 'Price',
+        tag: 'Epoch',
         kind: 'vs',
-        q: 'GPT-4 的水平：每百万词元 $37.5 → $0.18',
-        plain: '同样在 MMLU 考到 86 分以上，两年里最低价格降到原来的约两百分之一。',
-        case: '编程题（HumanEval）考到 GPT-4 的分数：2023 年 3 月 $37.5，2024 年 7 月 Llama 3.1 8B 只要 $0.10。',
-        src: 'Epoch AI《[LLM inference prices have fallen rapidly but unequally across tasks](https://epoch.ai/data-insights/llm-inference-price-trends)》，2025-03-12。价格是输入、输出按 3 : 1 混合的每百万词元美元价。MMLU 门槛 86.0：GPT-4-0314（2023-03-14）$37.50；最便宜的 Gemini 2.0 Flash（2025-02-05，88.0 分）$0.18。HumanEval 门槛 67.0：Llama-3.1-Instruct-8B（2024-07-23）$0.10。',
+        q: '同样的水平：每道题 $0.30 → $0.0004',
+        plain: '同一套博士级科学题考到同一个分数，不到 18 个月，价格降到七百分之一。',
+        case: '把所有题目和模型放在一起算：同样的水平，价格每年降到原来的约 1/13。',
+        src: 'Epoch AI，Luke Emberson、David Roodman《[The plunging price of thought](https://epoch.ai/publications/the-plunging-price-of-thought)》，2026-09-22：o3（2025-01-31）在 GPQA Diamond 上考到去掉猜题底分后 75%（原始约 81%），估计每题平均 30 美分；不到 18 个月后的 GPT-5.6 Luna 以每题 0.0004 美元做到同一分数，降了 725 倍。总体每季度降约 47%，即每年约 13 倍。作者写明：跑分不等于有用的工作，且假设用户总挑最便宜的模型。',
         vs: [
-          { at: '2023-03 · GPT-4', big: '$37.5', k: 'MMLU 86 分，每百万词元' },
-          { at: '2025-02 · Gemini 2.0 Flash', big: '$0.18', k: 'MMLU 88 分，每百万词元' },
+          { at: '2025-01 · o3', big: '$0.30', k: 'GPQA 考到 81 分，每道题的花费' },
+          { at: '2026 · GPT-5.6 Luna', big: '$0.0004', k: '同一个分数，每道题的花费' },
         ],
       },
       {
         k: '软件更新速度',
-        tag: 'Release',
+        tag: 'VS Code',
         kind: 'vs',
-        q: '开发工具：31 天一版 → 1.2 天一版',
-        plain: '数的都是相邻两个版本隔几天。',
-        case: 'Claude Code 2026 年 8 月 18 日到 11 月 17 日，91 天出了 77 个版本。',
-        src: '以前：GitHub microsoft/vscode 的 Release，2022 年 1.64.0（02-03）到 1.74.0（12-07）11 个稳定版，相邻平均 30.7 天；2023 年平均 30.8 天。现在：Claude Code 官方 changelog，2.1.235（2026-08-18）到 2.1.327（2026-11-17），77 个版本，相邻平均 1.20 天。',
+        q: 'VS Code：一个月一版 → 一周一版',
+        plain: '同一个产品，数相邻两个正式版隔几天。',
+        case: '微软在 2026 年 3 月 9 日的 1.111 版说明里写：这是第一个每周发布的正式版。',
+        src: 'Visual Studio Code 官方发布说明。以前：GitHub microsoft/vscode 的 Release，2022 年 1.64.0（02-03）到 1.74.0（12-07）11 个正式版，相邻平均 30.7 天，2023 年 30.8 天，2025 年仍是月更。现在：[1.111](https://code.visualstudio.com/updates/v1_111)（2026-03-09）「the first of our weekly Stable releases」，到 [1.147](https://code.visualstudio.com/updates)（2026-11-18）共 36 个间隔、254 天，平均 7.1 天。',
         vs: [
-          { at: '2022–2023 · VS Code', big: '31 天', k: '稳定版之间平均隔的天数' },
-          { at: '2026 · Claude Code', big: '1.2 天', k: '版本之间平均隔的天数' },
+          { at: '2022–2025', big: '31 天', k: '相邻两个正式版平均隔的天数' },
+          { at: '2026-03 起', big: '7 天', k: '相邻两个正式版平均隔的天数' },
         ],
       },
       {
@@ -393,24 +393,42 @@ export const talk = {
         case: '最近 30 天 705 个，平均每天 24 个。我只提想法、审方案、发版，代码全部由 AI 写。',
         src: '洛山达 DND 助手仓库 dev 分支合并记录（first-parent，剔除发版公告），2026-06-17 到 11-18，共 1,839 个；6 月从 17 日起算，11 月统计到 18 日。订阅花费是车主 2026-11-19 口述的大概数，不是账单。',
       },
+      {
+        k: '案例',
+        tag: 'Boris',
+        kind: 'how',
+        q: 'Claude Code 负责人：一个人一天 150 个 PR',
+        plain: '2 月他每天 10 到 30 个，4 月底有一天做到 150 个。靠的是左边四件事，一个人顶一个团队。',
+        case: '这四件事就是下一页的 Agentic Engineering，我的小程序也是这么做的。',
+        src: 'Boris Cherny：Lenny\'s Podcast 2026-02-19（[YouTube](https://www.youtube.com/watch?v=We7BZVKbCVw)），「every day I ship, like, ten, twenty, thirty pull requests」，当时开 5 个 agent；Sequoia《Training Data》2026-05-05（[YouTube](https://www.youtube.com/watch?v=SlGRN8jh2RI)），「a day last week I did like 150 PRs」，白天约几百个 agent、夜里约几千个，150 是他说在试上限的单日记录。做法出自他 2026-01-02 在 X 上的长帖（[原帖](https://x.com/bcherny/status/2007179832300581177)）：终端 5 个、网页 5–10 个 Claude 同时跑；多数会话先用 Plan 模式；团队共用一份 CLAUDE.md，Claude 错一次就记一条；最重要的是给 Claude 验证自己工作的办法，质量能到 2–3 倍。两场访谈是转写，不是书面报告。',
+      },
     ],
     /** 我自己：每月合入的 PR，数字来自 src/data/dnd.json */
     mine: { unit: '每月合入的 PR', partial: '6 月从 17 日起算，11 月统计到 18 日', cost: [{ k: '6 月', v: '约 $20' }, { k: '10 月', v: '约 $80' }], costK: '每月 AI 订阅' },
-    /** 模型能力：SWE-bench Verified 几个时点 */
+    /** 模型能力：METR 50% 任务时长（分钟），Time Horizon 1.1 */
     swe: {
-      k: 'SWE-bench Verified 得分（500 道题）',
+      k: 'AI 有一半把握独立做完的任务，人类专家要做多久',
       pts: [
-        { at: '2024-08', who: 'GPT-4o', v: 33.2 },
-        { at: '2024-10', who: 'Claude 3.5 Sonnet', v: 49.0 },
-        { at: '2025-05', who: 'Claude Sonnet 4', v: 72.7 },
-        { at: '2025-11', who: 'Claude Opus 4.5', v: 80.9 },
+        { at: '2023-03', who: 'GPT-4', v: 4, label: '4 分钟' },
+        { at: '2024-05', who: 'GPT-4o', v: 7, label: '7 分钟' },
+        { at: '2025-02', who: 'Claude 3.7 Sonnet', v: 60, label: '1 小时' },
+        { at: '2025-08', who: 'GPT-5', v: 203, label: '3.4 小时' },
+        { at: '2025-11', who: 'Claude Opus 4.5', v: 293, label: '4.9 小时' },
+        { at: '2026-02', who: 'Claude Opus 4.6', v: 719, label: '12 小时' },
       ],
     },
+    /** 案例：Boris 的四件事（2026-01-02 长帖、两场访谈） */
+    how: [
+      { k: '同时开很多个 AI', v: '1 月终端 5 个、网页 5–10 个；5 月白天几百个，夜里几千个' },
+      { k: '先定计划再动手', v: '多数会话先用 Plan 模式，计划对了，AI 通常一次写对' },
+      { k: '共用一份规矩', v: 'CLAUDE.md 放进仓库，AI 错一次就记一条' },
+      { k: '让 AI 自己验证', v: '给它跑测试、开浏览器检查的办法，质量能到 2–3 倍' },
+    ],
     readK: '悬停或点一条，看读数',
     caseK: '例子',
     srcK: '依据',
     notes:
-      '3 分钟。← → 一步步讲，每一项都是同一个指标量两个时间点。模型能力：同一套 500 道真实编程题，2024 年 8 月 GPT-4o 解决 33%，2025 年 11 月 Claude Opus 4.5 解决 81%。成本：在 MMLU 上考到 GPT-4 的分数，2023 年 3 月每百万词元 37.5 美元，2025 年 2 月最便宜的 0.18 美元，约两百分之一。软件更新速度：VS Code 31 天一版，Claude Code 1.2 天一版。一家公司：Anthropic 同一个仓库，5 月每天合入 2,500 次，9 月 3 万多次，他们说写代码已经不是瓶颈。我自己：同一个仓库，7 月合入 120 个 PR，10 月 612 个；订阅从每月 20 美元左右涨到 80 美元左右。模型更强、更便宜，下一页讲怎么用工程把它用好。',
+      '3.5 分钟。← → 一步步讲，每一项都是同一个指标量两个时间点。模型能力：METR 用同一套软件任务量 AI 能独立做完多长的活，2023 年 GPT-4 是人类专家 4 分钟的活，2026 年 2 月 Claude Opus 4.6 是 12 小时。成本：同一套博士级科学题考到同一个分数，2025 年 1 月每题 30 美分，不到 18 个月后 0.04 美分，降了 725 倍；放在一起算每年降到约 1/13。软件更新速度：同一个 VS Code，以前一个月一版，今年 3 月起一周一版。一家公司：Anthropic 同一个仓库，5 月每天合入 2,500 次，9 月 3 万多次。我自己：7 月合入 120 个 PR，10 月 612 个，订阅从每月 20 美元左右到 80 美元左右。案例：Claude Code 负责人 Boris，2 月每天 10 到 30 个 PR，4 月底有一天 150 个。他怎么做到的：同时开很多个 AI；先定计划再动手；团队共用一份规矩，AI 错一次记一条；最重要的是让 AI 自己验证。这就是一个人顶一个团队的办法，下一页细讲。',
   },
 
   /**
@@ -835,13 +853,13 @@ export const talk = {
     items: [
       { q: '快', a: '一条反馈，开单后一个半小时合入；一个大需求，切开后 4 天上线。', ref: '见 05' },
       { q: '专业', a: '以代码仓库为核心：AI 写、另一个 AI 审，层层检查过了才合并。', ref: '见 04' },
-      { q: '省', a: 'GPT-4 水平的模型，两年降到约两百分之一的价格；我每月约 $80 的 AI 订阅，5 个月合入 1,839 个 PR。', ref: '见 03' },
+      { q: '省', a: '同样的水平，AI 价格不到 18 个月降到七百分之一；我每月约 $80 的 AI 订阅，5 个月合入 1,839 个 PR。', ref: '见 03' },
     ],
     end: '谢谢',
     ask: '寻求合作',
     askV: '想做定制软件、想用上 AI，扫码加我微信',
     qr: { src: '/shots/talk/wechat-qr.png', alt: '李睿涵的微信二维码' },
     site: 'hanglen.github.io',
-    notes: '1 分钟。三句话：快，一条反馈一个半小时合入，一个大需求切开后 4 天上线；专业，不是随手让 AI 写，是仓库、评审、层层检查；省，同样水平的模型两年降到约两百分之一的价格，我每月约 80 美元的订阅。所以现在是企业落地定制软件和 AI 能力最好的时候。想做的可以扫码加我。谢谢。',
+    notes: '1 分钟。三句话：快，一条反馈一个半小时合入，一个大需求切开后 4 天上线；专业，不是随手让 AI 写，是仓库、评审、层层检查；省，同样水平的 AI 价格不到 18 个月降到七百分之一，我每月约 80 美元的订阅。所以现在是企业落地定制软件和 AI 能力最好的时候。想做的可以扫码加我。谢谢。',
   },
 };
