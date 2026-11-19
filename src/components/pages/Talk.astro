@@ -168,28 +168,16 @@ import { talk } from '../../i18n/talk';
         // data-vt="2-3 3-4"：列出哪两步之间用 View Transition 变形；切换时把这一对写进 data-vt-pair，
         // 页面 CSS 只在这一对上给元素起 view-transition-name，同名元素就从上一步变形到下一步
         const pairs = (root.dataset.vt ?? '').split(/\s+/).filter(Boolean);
-        // 宽屏一页放不下时，把左边的图按比例缩小（zoom 会参与排版），不压到底部的例子色块。
-        // 当前格写了 data-wide="960" 的是横向长图：这一步改成「上面一句结论、下面整宽一张图」，
-        // 图按 960px 宽排好，再按整行宽度放大，字跟着变大，投影上看得清
+        // 宽屏一页放不下时，把左边的图按比例缩小（zoom 会参与排版），不压到底部的例子色块
         const main = root.querySelector<HTMLElement>('.main');
-        const stage = main?.querySelector<HTMLElement>('.stage') ?? null;
-        const side = main?.querySelector<HTMLElement>('.side') ?? null;
+        const stage = main?.firstElementChild as HTMLElement | null;
         const fit = () => {
           if (!main || !stage) return;
           stage.style.zoom = '';
-          stage.style.width = '';
-          const cur = stage.querySelector<HTMLElement>('.frame:not([hidden])');
-          const base = Number(cur?.dataset.wide || 0);
-          main.classList.toggle('wide', !!base && wide.matches);
           if (!wide.matches) return;
-          if (base) stage.style.width = `${base}px`;
-          const gap = parseFloat(getComputedStyle(main).rowGap) || 0;
-          const avail = base && side ? main.clientHeight - side.offsetHeight - gap : main.clientHeight;
+          const avail = main.clientHeight;
           const need = stage.getBoundingClientRect().height;
-          if (base) {
-            const z = Math.min(main.clientWidth / base, need > 0 ? avail / need : 1, 1.7);
-            stage.style.zoom = String(Math.max(0.55, Math.floor(z * 100) / 100));
-          } else if (avail > 0 && need > avail) stage.style.zoom = String(Math.max(0.55, Math.floor((avail / need) * 100) / 100));
+          if (avail > 0 && need > avail) stage.style.zoom = String(Math.max(0.55, Math.floor((avail / need) * 100) / 100));
         };
         if (main) new ResizeObserver(() => fit()).observe(main);
         const sel = (i: number) => {
@@ -442,37 +430,6 @@ import { talk } from '../../i18n/talk';
     grid-template-columns: minmax(0, 1.65fr) minmax(280px, 1fr);
     gap: clamp(24px, 3.4vw, 64px);
     align-items: center;
-  }
-
-  /* 横向长图（data-wide）这一步：上面一句结论、下面整宽一张图（主张-证据版式） */
-  .t-steps .main.wide {
-    grid-template-columns: minmax(0, 1fr);
-    grid-template-rows: auto minmax(0, 1fr);
-    align-items: start;
-    row-gap: clamp(16px, 3vh, 40px);
-  }
-
-  .t-steps .main.wide .side {
-    order: -1;
-  }
-
-  .t-steps .main.wide .sp:not([hidden]) {
-    display: grid;
-    grid-template-columns: minmax(0, 1.15fr) minmax(0, 1fr);
-    gap: 4px clamp(24px, 3vw, 56px);
-    align-items: end;
-  }
-
-  .t-steps .main.wide .sp h3 {
-    margin: 0;
-  }
-
-  .t-steps .main.wide .sp > :nth-child(n + 3) {
-    grid-column: 2;
-  }
-
-  .t-steps .main.wide .stage {
-    justify-self: center;
   }
 
   .t-steps .frame {
