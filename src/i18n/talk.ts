@@ -324,97 +324,103 @@ export const talk = {
   },
 
   /**
-   * 03 一个人 + Agentic Engineering = 一个团队（车主 2026-11-18 定的主线）。
-   * 依据 docs/research/talk-03-team.md（HAN-1864）。口径不同的数各自成行，不放进同一个比较、不互相换算成人头。
-   * 「产出看算力」没有一手材料，只作为车主自己项目的体会讲，讲者备注里说清加 agent 不是线性的。
+   * 03 AI 前后，写软件变了多少（车主 2026-11-19 定：不再讲「一个人 + AE = 一个团队」）。
+   * 依据 docs/research/talk-03-before-after.md（HAN-1891）和 talk-03-team.md（HAN-1864）。
+   * 每步左「以前」右「现在」；口径不同的不相除、不写倍数（调研第 3 节）。我自己的每月 PR 来自 src/data/dnd.json。
    */
   team: {
     no: '03',
-    title: '一个人 + Agentic Engineering = 一个团队',
-    lead: '不是随便一个人，关键是这套工程能力。',
+    title: 'AI 前后，写软件变了多少',
+    lead: '同样的事，以前按月算，现在按天算。',
     hint: '← → 下一步',
+    beforeK: '以前',
+    nowK: '现在',
     levels: [
       {
-        k: '一家公司',
-        tag: 'Anthropic',
-        q: '五个月，每天合入的代码涨了 10 倍',
-        plain: '写代码的不再是瓶颈。',
-        case: '做这套新代码管理系统的只有 7 个人，五个月迁完。',
-        src: 'Anthropic《[Redesigning source control at Anthropic](https://www.anthropic.com/research/redesigning-source-control)》，2026-10-13。口径是合进 monorepo 的改动（code changes merged），不是 GitHub PR；原文写「增加了 10 倍」，没给当时的人数。',
-      },
-      {
-        k: '几个人',
-        tag: 'OpenAI',
-        q: '3 个工程师起步，五个月 1,500 个 PR',
-        plain: '从空仓库开始，人没有手写一行代码。',
-        case: '后来涨到 7 个人，平均每人每天 3.5 个 PR，人变多以后产出还在涨。',
-        src: 'OpenAI，Ryan Lopopolo《[Harness engineering](https://openai.com/index/harness-engineering/)》，2026-02-11。PR 是开出并合入的；他们自己估计用时约为手写的 1/10，是估计，不是对照实验。',
-      },
-      {
         k: '一个人',
-        tag: 'Boris · Lauren',
-        q: '一个人，一天几十个 PR',
-        plain: '一个人同时带几个到几百个 AI。',
-        case: '这些数是他们本人说的，口径各不相同，不放在一起比。',
-        src: 'Boris Cherny（Claude Code 负责人），Lenny\'s Podcast 2026-02-19 和 Sequoia《Training Data》2026-05-05，读的是转写。Lauren Tan 2026-09-21 的 [原帖](https://x.com/poteto/status/2102050467505430555)；她 10-02 补充：2,500 个 PR 不是 2,500 个功能，很多是整理和维护。',
+        tag: 'Per person',
+        q: '一个人：以前一周两个，现在一天几十个',
+        plain: '数的都是合进去的代码改动（PR）。两边口径不同，不算倍数，看量级。',
+        case: 'OpenAI 的实验组，平均每人每天 3.5 个 PR。',
+        src: '以前：LinearB《2023 Software Engineering Benchmarks》，2022-08 至 2023-08，2,000 多家组织的遥测，前 10% 的团队每人每周合入超过 2 个，后 40% 不到 1 个；那时 Copilot 已发售，但还没有编程智能体。现在：Boris Cherny 2026-05 访谈（Sequoia《Training Data》）；OpenAI《[Harness engineering](https://openai.com/index/harness-engineering/)》2026-02-11。',
+        vs: [
+          { at: '2022–2023', big: '每周 2 个', k: '最快那 10% 的团队，每人每周合入的 PR' },
+          { at: '2026', big: '每天几十个', k: 'Claude Code 负责人 Boris 每天发的 PR，最多一天 150 个' },
+        ],
+      },
+      {
+        k: '一个团队',
+        tag: 'Anthropic',
+        q: '一个团队：7 个人，5 个月',
+        plain: '把全公司每天合代码的那个大仓库，从 Git 换成自己做的版本管理，评审和搜索一起换了。',
+        case: '同一段时间，公司每天合入的代码从约 2,500 次涨到 3 万多次。原文的解释：写代码已经不是瓶颈。',
+        src: 'Anthropic《[Redesigning source control at Anthropic](https://www.anthropic.com/research/redesigning-source-control)》，2026-10-13。「以前」是原文的过去式对比：这种迁移「would have taken a company years of iterative migration, with many more engineers」，没有给具体人数和年数。合入次数是 monorepo 的 code changes merged，原文说涨了 10 倍，没拆成 AI 写了多少、人多了多少。',
+        vs: [
+          { at: '原文的说法', big: '好几年', k: '这种迁移以前要更多工程师，好几年一步步迁' },
+          { at: '2026', big: '7 人 · 5 个月', k: '做完新版本管理和评审系统，并把全公司的仓库迁过去' },
+        ],
+      },
+      {
+        k: '一个产品',
+        tag: 'OpenAI',
+        q: '一个产品：3 个人起步，5 个月，百万行代码',
+        plain: '从空仓库开始，人没手写一行，代码全是 AI 写的。',
+        case: '后来涨到 7 个人，人变多以后产出还在涨。',
+        src: 'OpenAI，Ryan Lopopolo《[Harness engineering](https://openai.com/index/harness-engineering/)》，2026-02-11。约 1,500 个 PR 开出并合入；「约为手写时间的 1/10」是他们的估计，不是另一组人手写同一个产品的对照实验。',
+        vs: [
+          { at: '手写（估计）', big: '约 10 倍时间', k: 'OpenAI 自己估计：手写要的时间约是现在的 10 倍' },
+          { at: '2025-08 → 2026-01', big: '5 个月', k: '3 名工程师起步，约 1,500 个 PR，百万行量级' },
+        ],
       },
       {
         k: '工具',
-        tag: 'Changelog',
-        q: 'AI 工具几天就更新一次',
+        tag: 'Release',
+        q: '工具：以前一个月一版，现在一两天一版',
         plain: '追工具追不完，要搭的是不随工具变的系统。',
-        case: 'Claude Code 三个月出了 77 个版本，平均一天多一点一个。',
-        src: '各家官方 changelog，2026-08-18 到 11-18。版本号和产品公告是两种口径：Claude Code、Codex CLI 数版本号，Cursor、Trae 数公告，一条公告是一批功能，所以不说谁更勤快。',
+        case: 'Claude Code 三个月出了 77 个版本。',
+        src: '以前：GitHub microsoft/vscode 的 Release，2022、2023 年稳定版相邻大约 31 天；JetBrains 更新清单，IntelliJ IDEA 2022–2024 每年 3 个功能版。现在：各家官方 changelog，2026-08-18 到 11-18，Claude Code 数版本号，Cursor 数产品公告，两种口径。',
+        vs: [
+          { at: '2022–2023 · 写代码的软件', big: '31 天一版', k: 'VS Code 稳定版；IntelliJ IDEA 一年 3 个大版本' },
+          { at: '2026 · AI 编程工具', big: '1.2 天一版', k: 'Claude Code 的版本号；Cursor 7.9 天一条产品公告' },
+        ],
       },
       {
         k: '我自己',
-        tag: '1,633 PR',
-        q: '我一个人：5 个月 1,633 个 PR',
-        plain: '系统搭好以后，多出来的产出靠算力，不靠加人。',
-        case: '最近 30 天 795 个，平均每天 26 个。6 月起小程序交给 AI，我只提想法、审方案、发版。',
-        src: '洛山达 DND 助手仓库 dev 分支合并记录（first-parent，剔除发版公告），2026-06-17 到 11-06。这是 Git 合并记录，和上面几家的口径不同。',
+        tag: '1,839 PR',
+        q: '我一个人：5 个月 1,839 个 PR',
+        plain: '每月 AI 订阅从约 20 美元涨到约 80 美元，产出跟着涨；同期做的项目也多了，不只这一个。',
+        case: '最近 30 天 705 个，平均每天 24 个。6 月起小程序交给 AI，我只提想法、审方案、发版。',
+        src: '洛山达 DND 助手仓库 dev 分支合并记录（first-parent，剔除发版公告），2026-06-17 到 11-18。订阅花费是车主 2026-11-19 口述的大概数，不是账单。',
+      },
+      {
+        k: '怎么做到的',
+        tag: 'Why',
+        q: '模型变强，工程也变强',
+        plain: '模型：同一套编程题，两年从三成出头做到八成；工程：给 AI 配好工具、规矩和检查（Harness），下一页讲。',
+        case: '同一个 Claude Opus 4、同一套题：标准跑法 72.5%，多跑几次再挑最好的 79.4%。怎么用模型，分数就差一截。',
+        src: 'SWE-bench Verified，500 道人工核过的真实 GitHub 问题：2024-08-13 GPT-4o 33.2%（OpenAI）；2024-10-22 Claude 3.5 Sonnet（新）49.0%；2025-05-22 Claude Sonnet 4 72.7%；2025-11-24 Claude Opus 4.5 80.9%（Anthropic）。各家脚手架不完全一样，看量级。72.5% 和 79.4% 出自 Anthropic《Introducing Claude 4》2025-05-22，后者是多次采样再挑选的高算力跑法。Harness 没有通行的中文译名，页上保留英文。',
       },
     ],
-    /** 1 Anthropic：每天合入多少次 */
-    anth: {
-      unit: '每天合入',
-      bars: [
-        { k: '2026 年 5 月', v: 2500, label: '约 2,500 次' },
-        { k: '2026 年 9 月', v: 30000, label: '超过 30,000 次' },
-      ],
-      x: '10×',
-    },
-    /** 2 OpenAI：从空仓库开始 */
-    oai: [
-      { at: '2025 年 8 月', k: '空仓库，第一次提交', v: '3 名工程师' },
-      { at: '五个月', k: '代码到一百万行这一量级，人没手写一行', v: '约 1,500 个 PR' },
-      { at: '2026 年 2 月', k: '写这篇文章时', v: '7 名工程师' },
-    ],
-    /** 3 一个人：各自的口径写在卡片上 */
-    people: [
-      { who: 'Boris Cherny', role: 'Claude Code 负责人', big: '10–30 个', k: '每天发出的 PR', how: '2026-02 · 同时开 5 个 AI · 他本人的 PR' },
-      { who: 'Boris Cherny', role: '三个月后', big: '几十个', k: '每天的 PR，最多一天 150 个', how: '2026-05 · 白天几百个 AI，夜里几千个' },
-      { who: 'Lauren Tan', role: 'SpaceXSI 首席工程师', big: '2,500 个', k: '一个月合进生产的 PR', how: '2026-08 · 很多是整理和维护，不是 2,500 个功能' },
-    ],
-    /** 4 工具：相邻两次更新平均隔几天 */
-    tools: {
-      unit: '平均几天一更新',
-      rows: [
-        { k: 'Claude Code', v: 1.2, n: '77 个版本', what: '版本号' },
-        { k: 'Codex CLI', v: 2.3, n: '41 个版本', what: '版本号' },
-        { k: 'Codex 应用', v: 4.3, n: '21 条', what: '版本公告' },
-        { k: 'Trae', v: 6.0, n: '13 条', what: '更新日志' },
-        { k: 'Cursor', v: 7.9, n: '11 条', what: '产品公告' },
-      ],
-      win: '2026-08-18 到 11-18',
-    },
     /** 5 我自己：每月合入的 PR，数字来自 src/data/dnd.json */
-    mine: { unit: '每月合入的 PR', partial: '11 月只统计到 6 日' },
+    mine: { unit: '每月合入的 PR', partial: '11 月只统计到 18 日', cost: [{ k: '6 月', v: '约 $20' }, { k: '10 月', v: '约 $80' }], costK: '每月 AI 订阅' },
+    /** 6 怎么做到的：SWE-bench Verified 几个时点 */
+    swe: {
+      k: '模型：同一套编程题的得分',
+      pts: [
+        { at: '2024-08', who: 'GPT-4o', v: 33.2 },
+        { at: '2024-10', who: 'Claude 3.5 Sonnet', v: 49.0 },
+        { at: '2025-05', who: 'Claude Sonnet 4', v: 72.7 },
+        { at: '2025-11', who: 'Claude Opus 4.5', v: 80.9 },
+      ],
+      ae: 'Agentic Engineering',
+      aeV: '给 AI 配好工具、规矩和检查，让它自己写、自己跑、自己改',
+      next: '下一页 →',
+    },
     readK: '悬停或点一条，看读数',
     caseK: '例子',
     srcK: '依据',
     notes:
-      '3 分钟。← → 一步步讲。一家公司：Anthropic 自己的代码库，5 月每天合入两千五百次，9 月超过三万次，他们自己说五个月涨了 10 倍；做这套系统的只有 7 个人。几个人：OpenAI 一个内部产品，3 个工程师从空仓库开始，五个月大约 1,500 个 PR，人没手写一行。一个人：Claude Code 的负责人 Boris，一天十到三十个 PR，同时开着五个 AI；三个月后他说一天几十个，最多一天 150 个。Lauren Tan 一个月 2,500 个 PR 合进生产，她自己说很多是整理和维护，不是 2,500 个功能。这些数都是他们自己说的，口径不一样，不拿来互相比。工具：Claude Code 三个月 77 个版本，追工具追不完，要搭的是不随工具变的系统。我自己：5 个月 1,633 个 PR，10 月一个月 612 个，最近 30 天每天 26 个。我的体会是系统搭好以后，多出来的产出靠烧算力，不靠加人；但不是加多少 AI 就多多少产出，Cursor 试过几百个 AI 一起跑，任务拆不开就会互相卡住，所以下一页讲这套系统怎么搭。',
+      '3 分钟。← → 一步步讲，每步左边以前、右边现在。一个人：AI 之前，LinearB 统计的最快那 10% 的团队，每人每周合两个 PR；现在 Claude Code 的负责人一天几十个，OpenAI 的实验组每人每天 3.5 个。口径不同，不算倍数。一个团队：Anthropic 7 个人用 5 个月，把全公司的大仓库从 Git 换成自己做的版本管理，原文说以前这种事要更多人、好几年；同期每天合入从两千五涨到三万多，他们说写代码已经不是瓶颈。一个产品：OpenAI 3 个工程师从空仓库开始，五个月一百万行，人没手写一行，他们估计手写要 10 倍时间。工具：以前 VS Code 一个月一版，现在 Claude Code 一两天一版，追不完。我自己：5 个月 1,839 个 PR，订阅从每月 20 美元涨到 80 美元左右，产出跟着涨，同期项目也多了。怎么做到的：一半是模型，同一套编程题两年从三成做到八成；一半是工程，给 AI 配好工具、规矩和检查，就是下一页的 Agentic Engineering。',
   },
 
   /**
