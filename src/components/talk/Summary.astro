@@ -1,6 +1,6 @@
 ---
 /**
- * 演讲 07 总结：回答封面的三个问题，每张卡「以前 → 现在」+ 一个真数字；← → 或悬停一问一问讲，讲过的保持亮着。
+ * 演讲 07 总结：回答封面的三个问题，每张卡「以前 → 现在」；← → 或悬停一问一问讲，讲过的保持亮着。
  * 「谢谢」和微信二维码在下一页 08 交流与合作。
  */
 import { talk } from '../../i18n/talk';
@@ -25,7 +25,6 @@ const s = talk.sum;
               <b class="serif">{it.q}</b>
               <p class="was"><small>{s.beforeK}</small>{it.before}</p>
               <p class="now"><small>{s.nowK}</small>{it.now}</p>
-              <span class="num">{it.num}</span>
               <em>{it.ref}</em>
             </button>
           </li>
@@ -142,13 +141,6 @@ const s = talk.sum;
 
   .now small {
     color: var(--accent-ink);
-  }
-
-  .num {
-    padding: 6px 12px;
-    border-radius: var(--r-sm);
-    background: var(--accent-soft);
-    color: var(--ink);
   }
 
   @media (max-width: 900px) {
