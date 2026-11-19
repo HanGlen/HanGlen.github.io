@@ -36,22 +36,22 @@ export interface Node {
 }
 
 export const talk = {
-  title: '如何用 AI 系统化工程能力，帮助企业落地定制软件与 AI 能力 · 李睿涵',
-  description: '青岛中小企业会议分享：一个专业工程师 + Agentic Engineering = 一个团队。怎么做出来、怎么维护、怎么系统化地用 AI 实现这一切。',
+  title: 'AI 时代，企业如何落地定制软件与 AI 能力？· 李睿涵',
+  description: '青岛中小企业会议分享：AI 时代，企业如何落地定制软件与 AI 能力。怎么做出来、怎么维护、怎么系统化地用 AI 实现这一切。',
   keys: '↑ ↓ 翻页 · ← → 切换 · P 讲者备注',
 
   cover: {
     eyebrow: '青岛中小企业会议 · 分享',
     /** *…* 里的字标陶土红 */
-    title: '如何用 AI *系统化工程能力*，\n帮助企业落地*定制软件与 AI 能力*',
+    title: 'AI 时代，\n企业如何落地*定制软件与 AI 能力*？',
     sub: '今天讲三个问题',
     pains: ['怎么做出来', '怎么维护', '怎么系统化地用 AI 实现这一切'],
     name: '李睿涵',
     role: 'AI 应用工程师',
     field: '背景里每个点，是 AI 写完并合入的一个 PR',
-    fieldNote: '洛山达 DND 助手仓库，6 月 17 日到 11 月 6 日，共 {n} 个',
+    fieldNote: '洛山达 DND 助手仓库，6 月 17 日到 11 月 18 日，共 {n} 个',
     next: '往下翻',
-    notes: '0.5 分钟。一句话开场：很多企业想做自己的软件、想用上 AI，外面报价从几千到几十万都有。今天的主线就一句：一个专业工程师加上 Agentic Engineering，就是一个团队。三个问题：东西怎么做出来，做出来怎么维护，怎么把这一切交给 AI 系统化地去做。背景这些点都是 AI 替我写完、合进去的代码改动。',
+    notes: '0.5 分钟。一句话开场：很多企业想做自己的软件、想用上 AI，外面报价从几千到几十万都有。今天讲 AI 时代企业怎么把定制软件和 AI 能力落地。三个问题：东西怎么做出来，做出来怎么维护，怎么把这一切交给 AI 系统化地去做。背景这些点都是 AI 替我写完、合进去的代码改动。',
   },
 
   me: {
@@ -157,7 +157,7 @@ export const talk = {
         y: 450,
         title: '洛山达 DND 助手 · 微信小程序',
         lines: ['帮玩家建 D&D 角色卡、开团的微信小程序。', '今年 6 月起交给几种 AI 分工维护，我只提想法、审方案、发版。'],
-        stat: { v: '1.46 万', k: '累计用户（截至 11 月 6 日）' },
+        stat: { v: '1.52 万', k: '累计用户（截至 11 月 18 日）' },
       },
       {
         id: 'box',
@@ -210,17 +210,18 @@ export const talk = {
       },
       {
         id: 'gschool',
-        label: 'G School · 教育\n合伙项目',
+        label: 'G School · 歌尔投资\n合伙项目',
         group: 'partner',
         status: 'doing',
         ai: 'AI 开发',
         x: 250,
         y: 560,
-        title: 'G School · 教育赛道',
+        title: 'G School · 歌尔投资',
         statusText: '合伙项目 · 进行中',
-        lines: ['合伙项目：给初高中老师和学生用的 AI 项目制学习平台，北京十一丰小等多所学校在用。我负责开发和维护。', '在歌尔学校带学生做 AI 公司项目。'],
+        lines: ['歌尔投资的教育项目，团队来自哈佛、哥伦比亚、微软亚洲研究院等。', '给初高中老师和学生用的 AI 项目制学习平台，北京十一丰小等多所学校在用；我是合伙人，负责开发和维护。'],
+        stat: { v: '歌尔投资', k: '在歌尔学校带学生做 AI 公司项目' },
         steps: ['选兴趣', '项目卡', '能力要求', '里程碑', '测试', '结果'],
-        img: { src: '/shots/talk/gschool-team.jpg', alt: '团队背景：哈佛、哥伦比亚、伊利诺伊、北航、微软亚洲研究院、美国东北大学等', cap: '团队背景，摄于课堂' },
+        img: { src: '/shots/talk/gschool-team.jpg', alt: '团队背景：哈佛、哥伦比亚、伊利诺伊、北航、中国科学院、微软亚洲研究院、美国东北大学、中国矿业大学、虚拟现实国家重点实验室', cap: 'G School 团队背景（取自项目介绍）' },
       },
       {
         id: 'traffic',
@@ -443,8 +444,8 @@ export const talk = {
       {
         k: '工具',
         tag: 'Tools',
-        q: '工具迭代快，基本拉不开差距：先问 AI 用什么',
-        plain: '下面八类是我问完、用过之后的答案，点名字打开官网。',
+        q: '工具迭代快，大家差不多，拉不开差距',
+        plain: '有一个要解决的问题，先问 AI 我需要什么工具。下面八类是我问完、用过之后的答案。',
         case: '做定制软件先看标红的三类。我用 Claude Code、Codex 写代码，GitHub、Linear 放代码管任务，微信云开发放上线。',
         src: '2026-11-17 打开各家官网整理（HAN-1844）。挑的标准：不用写代码就能上手、有免费档、国内能开通。',
       },
@@ -496,8 +497,8 @@ export const talk = {
       {
         k: '验证',
         tag: 'Verify',
-        q: '怎么敢让 AI 自己合并？',
-        plain: '能写成代码和检查的，就不靠人看；越往下越贵，人工只留给最后一层。',
+        q: '怎么信任自己的 Agentic Engineering 系统？',
+        plain: '可以人不看的，就交给代码检查；越往下每查一次越贵，人只看最后一层。',
         ref: 'Lauren Tan（poteto）《[All Code Is Slop (Except Mine)](https://ai.engineer/code/2026/talks/lauren-tan)》，AI Engineer CODE 2026-11-11',
         case: '同一个错，先改结构，再加一道会红的检查，规则文档只留一句：5e / 2024 规则的归属只写在一个文件里，另有门禁盯着。',
         src: '幻灯片原文「how do i trust my agents more? the poteto pyramid」：codebase → static analysis → verification → prose → human review，箭头写着 cost。官方录像是 AI Engineer 整场直播 1:01:02 起；车主给的 B 站视频是转载。',
@@ -515,18 +516,18 @@ export const talk = {
       { k: '放代码、管任务', hot: true, cn: [['Gitee', 'https://gitee.com/'], ['CODING', 'https://coding.net/'], ['TAPD', 'https://www.tapd.cn/'], ['飞书项目', 'https://project.feishu.cn/']], en: [['GitHub', 'https://github.com/'], ['Linear', 'https://linear.app/']] },
       { k: '放上线', hot: true, cn: [['微信云开发', 'https://cloud.weixin.qq.com/cloudbase'], ['腾讯云', 'https://cloud.tencent.com/'], ['火山引擎', 'https://www.volcengine.com/']], en: [['Vercel', 'https://vercel.com/'], ['Zeabur', 'https://zeabur.com/']] },
     ],
-    /** 模型能力：每个领域写领先的那家，悬停看前三，点击打开榜单（docs/research/talk-03-models.md） */
-    modelsHead: ['领域', '现在领先', '榜单'],
+    /** 模型能力：每个领域前三名，写具体型号，有分数的写分数（docs/research/talk-03-models.md） */
+    modelsHead: ['领域', '第 1', '第 2', '第 3', '榜单'],
     models: [
-      { k: '做网页、界面', lead: 'Anthropic 包揽前三', top: 'Claude Fable 5.2 · Claude Opus 5.5 · Claude Sonnet 5.5', board: 'LMArena WebDev', at: '11-13', href: 'https://arena.ai/leaderboard/code/webdev' },
-      { k: '写代码', lead: 'Copilot 第一，Claude 并列第二', top: 'Copilot Fusion 71.2% · Claude Opus 5.5 65.8% · Claude Fable 5.2 65.8%', board: 'Terminal-Bench', at: '11-18', href: 'https://www.tbench.ai/' },
-      { k: '生图、海报', lead: 'OpenAI 包揽前三', top: 'GPT-Image-2.5 Sunburst · GPT-Image-2.6 Sunburst · GPT-Image-2（商业设计榜）', board: 'LMArena 文生图', at: '11-16', href: 'https://arena.ai/leaderboard/image/text-to-image/commercial-design' },
-      { k: '视频', lead: 'Google 包揽前三', top: 'Gemini Omni 1.2 Flash · 1.1 Flash · gemini-omni-flash；国产最高是即梦 Seedance，第 6', board: 'LMArena 文生视频', at: '11-08', href: 'https://arena.ai/leaderboard/video/text-to-video' },
-      { k: '综合', lead: 'Claude 第一，GPT、Gemini 随后', top: 'Claude Fable 5.2 65 · GPT-6.2 Astra 62 · Gemini 4 Carbon 60', board: 'Artificial Analysis', at: '11-18', href: 'https://artificialanalysis.ai/leaderboards/models' },
-      { k: '性价比', lead: 'OpenAI 包揽前三', top: '指数 50 分以上、单次更便宜：GPT-6.1 Terra · GPT-6.2 Sol · GPT-6.2 Astra', board: 'Artificial Analysis', at: '11-18', href: 'https://artificialanalysis.ai/leaderboards/models' },
-      { k: '国产', lead: 'Kimi、千问、腾讯混元', top: 'Kimi K3.1 Pro 46 · Qwen4 Max 43 · 腾讯 Hy4 35', board: 'Artificial Analysis', at: '11-18', href: 'https://artificialanalysis.ai/leaderboards/models' },
-    ],
-    modelsHint: '悬停或点一行，看前三名',
+      { k: '做网页、界面', top: [['Claude Fable 5.2'], ['Claude Opus 5.5'], ['Claude Sonnet 5.5']], note: '前三都是 Anthropic', board: 'LMArena WebDev', at: '11-13', href: 'https://arena.ai/leaderboard/code/webdev' },
+      { k: '写代码', top: [['Copilot Fusion', '71.2%'], ['Claude Opus 5.5', '65.8%'], ['Claude Fable 5.2', '65.8%']], note: '分数是任务完成率；第 2、3 名并列', board: 'Terminal-Bench', at: '11-18', href: 'https://www.tbench.ai/' },
+      { k: '生图、海报', top: [['GPT-Image-2.5 Sunburst'], ['GPT-Image-2.6 Sunburst'], ['GPT-Image-2']], note: '商业设计分榜，前三都是 OpenAI', board: 'LMArena 文生图', at: '11-16', href: 'https://arena.ai/leaderboard/image/text-to-image/commercial-design' },
+      { k: '视频', top: [['Gemini Omni 1.2 Flash'], ['Gemini Omni 1.1 Flash'], ['Gemini Omni Flash']], note: '前三都是 Google；国产最高是即梦 Seedance，第 6', board: 'LMArena 文生视频', at: '11-08', href: 'https://arena.ai/leaderboard/video/text-to-video' },
+      { k: '综合', top: [['Claude Fable 5.2', '65'], ['GPT-6.2 Astra', '62'], ['Gemini 4 Carbon', '60']], note: '分数是 Artificial Analysis 智能指数', board: 'Artificial Analysis', at: '11-18', href: 'https://artificialanalysis.ai/leaderboards/models' },
+      { k: '性价比', top: [['GPT-6.1 Terra'], ['GPT-6.2 Sol'], ['GPT-6.2 Astra']], note: '智能指数 50 分以上、单次调用更便宜的前三', board: 'Artificial Analysis', at: '11-18', href: 'https://artificialanalysis.ai/leaderboards/models' },
+      { k: '国产', top: [['Kimi K3.1 Pro', '46'], ['Qwen4 Max', '43'], ['腾讯 Hy4', '35']], note: '国产模型里智能指数最高的三个', board: 'Artificial Analysis', at: '11-18', href: 'https://artificialanalysis.ai/leaderboards/models' },
+    ] as { k: string; top: [string, string?][]; note: string; board: string; at: string; href: string }[],
+    modelsHint: '悬停或点一行，看这一行的口径',
     harness: {
       model: '模型',
       modelV: '负责想',
@@ -588,6 +589,7 @@ export const talk = {
     /** 验证金字塔：上宽下窄，越往下越贵；每层配小程序仓库里的一件真事（docs/research/talk-04-concepts.md 第 9 节） */
     pyramid: {
       cost: '越往下越贵',
+      sure: '越往上越确定',
       hint: '悬停或点一层，看小程序里的例子',
       layers: [
         { k: '代码结构', en: 'codebase', v: '好的接口、架构、重构', ex: '规则数据只有一条生成链，不手改生成的文件' },
