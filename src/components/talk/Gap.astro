@@ -1,13 +1,13 @@
 ---
 /**
- * 演讲 02「需求在增长」：四条增长线（个人用 AI、企业数字化、软件需求、AI 需求）。
- * 每条一个大数 + 同一口径的折线（纵轴各自从 0 起，坡度如实），下面一行来源，点开看可信度和原文。
- * ← → 一条条讲（还没讲到的先淡着，最后一条讲完出结论）；悬停或聚焦一个点看读数。
- * 依据 docs/research/talk-02-growth.md（HAN-1863）。蓝 = 数字化，陶土红 = AI。
+ * 演讲 02「AI 用得多，做成的少」：AI 调用（折线）→ 企业在用（折线）→ 做成的（两年对比横条）。
+ * 每张一个大数，下面一行来源，点开看可信度和原文。← → 一张张讲（没讲到的先淡着，讲完出结论）；悬停或聚焦看读数。
+ * 依据 docs/research/talk-02-data-v2.md（HAN-1890）。陶土红 = AI 用量，蓝 = 企业。
  */
 import { talk } from '../../i18n/talk';
 
 const g = talk.gap;
+const d = g.done;
 const W = 300;
 const H = 150;
 const PAD = { l: 8, r: 8, t: 14, b: 8 };
@@ -80,6 +80,49 @@ const years = [2024, 2025, 2026];
           </section>
         ))
       }
+      <section class={`card k-${d.kind}`} data-card={g.lines.length} data-reads>
+        <button type="button" class="ch" data-step role="tab" aria-selected="false">
+          <h3 class="serif">{d.k}</h3>
+          <b class="big serif">{d.big}</b>
+          <span class="bk">{d.bigK}</span>
+        </button>
+        <div class="bars" role="img" aria-label={d.rows.map((r) => `${r.k}：${d.years[0]} 年 ${r.a}%，${d.years[1]} 年 ${r.b}%`).join('；')}>
+          <p class="yrs">
+            <span><i class="y0" />{d.years[0]}</span>
+            <span><i class="y1" />{d.years[1]}</span>
+          </p>
+          {
+            d.rows.map((r) => (
+              <div class="row" tabindex="0" data-read={`${r.k}：${d.years[0]} 年 ${r.a}%，${d.years[1]} 年 ${r.b}%`}>
+                <span class="rk">{r.k}</span>
+                <span class="tr">
+                  <i class="y0" style={`--w:${r.a}%`} />
+                  <i class="y1" style={`--w:${r.b}%`} />
+                </span>
+                <b>{r.b}%</b>
+              </div>
+            ))
+          }
+        </div>
+        <p class="t-read" aria-live="polite" data-read-out data-hint={d.say}>
+          {d.say}
+        </p>
+        <details class="src">
+          <summary>
+            <b>{g.srcK}</b>
+            {d.src}
+          </summary>
+          <div class="pop">
+            <p>
+              <b>{g.trustK}</b>
+              {d.trust}
+            </p>
+            <a href={d.href} target="_blank" rel="noopener">
+              {g.openK} ↗
+            </a>
+          </div>
+        </details>
+      </section>
     </div>
     <p class="end serif">{g.end}</p>
     <p class="t-hint">{g.hint}</p>
@@ -108,7 +151,7 @@ const years = [2024, 2025, 2026];
 
   .lines {
     display: grid;
-    grid-template-columns: repeat(4, minmax(0, 1fr));
+    grid-template-columns: repeat(3, minmax(0, 1fr));
     gap: clamp(14px, 1.6vw, 32px);
   }
 
@@ -312,9 +355,85 @@ const years = [2024, 2025, 2026];
     transform: translateY(8px);
   }
 
+
+  /* 第三张：两年对比的横条，浅色是上一年，深色是今年 */
+  .bars {
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    gap: clamp(8px, 1.4vh, 14px);
+    flex: 1;
+  }
+
+  .yrs {
+    margin: 0;
+    display: flex;
+    gap: 14px;
+    font-size: clamp(11px, 0.8vw, 13px);
+    color: var(--ink-3);
+  }
+
+  .yrs i {
+    display: inline-block;
+    width: 10px;
+    height: 10px;
+    margin-right: 5px;
+    border-radius: 2px;
+    vertical-align: -1px;
+  }
+
+  .row {
+    display: grid;
+    grid-template-columns: minmax(0, 1fr) auto;
+    gap: 2px 10px;
+    align-items: center;
+    padding: 4px 6px;
+    border-radius: var(--r-sm);
+    cursor: pointer;
+    outline: none;
+  }
+
+  .row[data-on],
+  .row:focus-visible {
+    background: var(--c-soft);
+  }
+
+  .row .rk {
+    grid-column: 1 / -1;
+    font-size: clamp(12px, 0.95vw, 15px);
+    color: var(--ink-2);
+  }
+
+  .row .tr {
+    display: flex;
+    flex-direction: column;
+    gap: 3px;
+  }
+
+  .row .tr i {
+    display: block;
+    height: 8px;
+    width: var(--w);
+    border-radius: 4px;
+  }
+
+  .y0 {
+    background: var(--line-2);
+  }
+
+  .y1 {
+    background: var(--c);
+  }
+
+  .row b {
+    font-family: var(--mono);
+    font-size: clamp(13px, 1vw, 17px);
+    color: var(--c);
+  }
+
   @media (max-width: 1200px) and (min-width: 901px) {
     .lines {
-      grid-template-columns: repeat(2, minmax(0, 1fr));
+      grid-template-columns: repeat(3, minmax(0, 1fr));
     }
     .chart {
       max-height: 16vh;
