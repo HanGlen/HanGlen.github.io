@@ -79,16 +79,6 @@ const pct = (v: number, of: number) => `${(v / of) * 100}%`;
         <div class="legend">
           <ul>
             {
-              m.legendGroup.map((l) => (
-                <li>
-                  <i class={`sw g-${l.k}`} />
-                  {l.v}
-                </li>
-              ))
-            }
-          </ul>
-          <ul>
-            {
               m.legendStatus.map((l) => (
                 <li>
                   <i class={`shape st-${l.k}`} />
@@ -98,7 +88,6 @@ const pct = (v: number, of: number) => `${(v / of) * 100}%`;
             }
           </ul>
         </div>
-        <p class="hint">{m.hint}</p>
       </div>
 
       {
@@ -520,20 +509,19 @@ const pct = (v: number, of: number) => `${(v / of) * 100}%`;
     color: var(--ink-2);
   }
 
+  /* 卡片只留形状图例（实心、空心、虚线）；颜色分组已经写在画布四角 */
   .legend {
     margin-top: clamp(18px, 3vh, 32px);
-    display: grid;
-    grid-template-columns: 1fr 1fr;
-    gap: 16px;
   }
 
   .legend ul {
     margin: 0;
     padding: 0;
     list-style: none;
-    display: grid;
-    gap: 8px;
-    font-size: clamp(14px, 1.05vw, 17px);
+    display: flex;
+    flex-wrap: wrap;
+    gap: 8px 24px;
+    font-size: clamp(15px, 1.15vw, 19px);
     color: var(--ink-2);
   }
 
@@ -575,12 +563,6 @@ const pct = (v: number, of: number) => `${(v / of) * 100}%`;
     background: transparent;
     border-style: dashed;
     border-width: 2px;
-  }
-
-  .hint {
-    margin: clamp(18px, 3vh, 32px) 0 0;
-    font-size: clamp(14px, 1.1vw, 18px);
-    color: var(--accent-ink);
   }
 
   .tag {

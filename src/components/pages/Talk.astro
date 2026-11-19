@@ -75,7 +75,9 @@ import { talk } from '../../i18n/talk';
         cur = i;
         slides.forEach((s, j) => s.classList.toggle('is-current', j === i));
         [...dots.children].forEach((d, j) => d.toggleAttribute('aria-current', j === i));
-        count.textContent = `${String(i + 1).padStart(2, '0')} / ${String(slides.length).padStart(2, '0')}`;
+        // 页码和页内编号对齐：封面不编号，01 自我介绍就是 01
+        count.textContent = i ? `${String(i).padStart(2, '0')} / ${String(slides.length - 1).padStart(2, '0')}` : '';
+        document.body.dataset.at = String(i);
         notesText.textContent = slides[i].dataset.notes || '';
         history.replaceState(null, '', i ? `#${i + 1}` : location.pathname);
       }
@@ -166,16 +168,28 @@ import { talk } from '../../i18n/talk';
         // data-vt="2-3 3-4"：列出哪两步之间用 View Transition 变形；切换时把这一对写进 data-vt-pair，
         // 页面 CSS 只在这一对上给元素起 view-transition-name，同名元素就从上一步变形到下一步
         const pairs = (root.dataset.vt ?? '').split(/\s+/).filter(Boolean);
-        // 宽屏一页放不下时，把左边的图按比例缩小（zoom 会参与排版），不压到底部的例子色块
+        // 宽屏一页放不下时，把左边的图按比例缩小（zoom 会参与排版），不压到底部的例子色块。
+        // 当前格写了 data-wide="960" 的是横向长图：这一步改成「上面一句结论、下面整宽一张图」，
+        // 图按 960px 宽排好，再按整行宽度放大，字跟着变大，投影上看得清
         const main = root.querySelector<HTMLElement>('.main');
-        const stage = main?.firstElementChild as HTMLElement | null;
+        const stage = main?.querySelector<HTMLElement>('.stage') ?? null;
+        const side = main?.querySelector<HTMLElement>('.side') ?? null;
         const fit = () => {
           if (!main || !stage) return;
           stage.style.zoom = '';
+          stage.style.width = '';
+          const cur = stage.querySelector<HTMLElement>('.frame:not([hidden])');
+          const base = Number(cur?.dataset.wide || 0);
+          main.classList.toggle('wide', !!base && wide.matches);
           if (!wide.matches) return;
-          const avail = main.clientHeight;
+          if (base) stage.style.width = `${base}px`;
+          const gap = parseFloat(getComputedStyle(main).rowGap) || 0;
+          const avail = base && side ? main.clientHeight - side.offsetHeight - gap : main.clientHeight;
           const need = stage.getBoundingClientRect().height;
-          if (avail > 0 && need > avail) stage.style.zoom = String(Math.max(0.55, Math.floor((avail / need) * 100) / 100));
+          if (base) {
+            const z = Math.min(main.clientWidth / base, need > 0 ? avail / need : 1, 1.7);
+            stage.style.zoom = String(Math.max(0.55, Math.floor(z * 100) / 100));
+          } else if (avail > 0 && need > avail) stage.style.zoom = String(Math.max(0.55, Math.floor((avail / need) * 100) / 100));
         };
         if (main) new ResizeObserver(() => fit()).observe(main);
         const sel = (i: number) => {
@@ -391,11 +405,9 @@ import { talk } from '../../i18n/talk';
     font-weight: 600;
   }
 
+  /* 步骤条只留中文名：英文小标签（Tools、METR…）投影上是噪音，读屏仍能读到中文名 */
   .t-steps .line em {
-    font-style: normal;
-    font-family: var(--mono);
-    font-size: clamp(11px, 0.8vw, 14px);
-    color: var(--ink-3);
+    display: none;
   }
 
   .t-steps .line button.seen {
@@ -430,6 +442,37 @@ import { talk } from '../../i18n/talk';
     grid-template-columns: minmax(0, 1.65fr) minmax(280px, 1fr);
     gap: clamp(24px, 3.4vw, 64px);
     align-items: center;
+  }
+
+  /* 横向长图（data-wide）这一步：上面一句结论、下面整宽一张图（主张-证据版式） */
+  .t-steps .main.wide {
+    grid-template-columns: minmax(0, 1fr);
+    grid-template-rows: auto minmax(0, 1fr);
+    align-items: start;
+    row-gap: clamp(16px, 3vh, 40px);
+  }
+
+  .t-steps .main.wide .side {
+    order: -1;
+  }
+
+  .t-steps .main.wide .sp:not([hidden]) {
+    display: grid;
+    grid-template-columns: minmax(0, 1.15fr) minmax(0, 1fr);
+    gap: 4px clamp(24px, 3vw, 56px);
+    align-items: end;
+  }
+
+  .t-steps .main.wide .sp h3 {
+    margin: 0;
+  }
+
+  .t-steps .main.wide .sp > :nth-child(n + 3) {
+    grid-column: 2;
+  }
+
+  .t-steps .main.wide .stage {
+    justify-self: center;
   }
 
   .t-steps .frame {
@@ -615,6 +658,19 @@ import { talk } from '../../i18n/talk';
     color: var(--ink-2);
   }
 
+  /* 分步页：副标题只在第 1 步出现，往后收起来，把位置让给图（宽屏；手机上是普通滚动，不收） */
+  @media (min-width: 901px) {
+    .t-head .lead {
+      max-height: 3em;
+      overflow: hidden;
+      transition: max-height 0.45s var(--ease), opacity 0.3s;
+    }
+    .t-slide:not(.sum):has([data-stepper]:not([data-at='0'])) .t-head .lead {
+      max-height: 0;
+      opacity: 0;
+    }
+  }
+
   .t-tabs {
     display: flex;
     flex-wrap: wrap;
@@ -644,10 +700,14 @@ import { talk } from '../../i18n/talk';
     outline: none;
   }
 
+  /* 「← → 下一步」「悬停看读数」这类操作提示只给讲者，投影时不显示；读屏和键盘照常能用 */
   .t-hint {
-    margin: 0;
-    font-size: 14px;
-    color: var(--ink-3);
+    display: none;
+  }
+
+  [data-hint^='悬停']:not(.on),
+  [data-hint^='鼠标']:not(.on) {
+    opacity: 0;
   }
 
   /* 读数行：悬停一个数据点时换成它的读数 */
@@ -847,6 +907,12 @@ import { talk } from '../../i18n/talk';
     z-index: 20;
     white-space: nowrap;
     pointer-events: none;
+    transition: opacity 0.4s;
+  }
+
+  /* 按键提示只在封面出现一次，翻进正文就收起 */
+  :global(body:not([data-at='0'])) .keys {
+    opacity: 0;
   }
 
   .notes {

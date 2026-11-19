@@ -47,15 +47,24 @@ const smax = Math.max(...t.swe.pts.map((p) => p.v));
             <div class="frame" data-pane={String(i)} hidden={i !== 0} data-reads>
               {l.kind === 'vs' && (
                 <div class="vs">
-                  {(l.vs ?? []).map((v, j) => (
-                    <div class={`side-${j ? 'now' : 'before'} fin`} style={`--d:${j * 2 + 1}`} tabindex="0" data-read={`${j ? t.nowK : t.beforeK}（${v.at}）：${v.big}，${v.k}`}>
-                      <p class="vk">{j ? t.nowK : t.beforeK}</p>
-                      <em>{v.at}</em>
-                      <b class="serif">{v.big}</b>
-                      <span>{v.k}</span>
-                    </div>
-                  ))}
-                  <span class="vsarr fin" style="--d:2" aria-hidden="true">→</span>
+                  {'x' in l && l.x && <p class="times serif fin" style="--d:1">{l.x}</p>}
+                  <ul class="vbars">
+                    {(l.vs ?? []).map((v, j, all) => (
+                      <li class={`fin${j ? ' now' : ''}`} style={`--d:${j + 2}`} tabindex="0" data-read={`${j ? t.nowK : t.beforeK}（${v.at}）：${v.big}，${v.k}`}>
+                        <span class="vh">
+                          <b>{j ? t.nowK : t.beforeK}</b>
+                          <em>{v.at}</em>
+                        </span>
+                        <span class="track">
+                          <i style={`--w:${Math.max(0.5, (v.n / Math.max(...all.map((x) => x.n))) * 100)}%; --d:${j + 2}`} />
+                        </span>
+                        <span class="vv">
+                          <b class="serif">{v.big}</b>
+                          <small>{v.k}</small>
+                        </span>
+                      </li>
+                    ))}
+                  </ul>
                 </div>
               )}
               {l.kind === 'bars' && (
@@ -144,87 +153,95 @@ const smax = Math.max(...t.swe.pts.map((p) => p.v));
     min-width: 0;
   }
 
-  /* 1–4：以前 | 现在，两张卡，中间一个箭头 */
+  /* 2–4：一个大倍数，下面两根按真实比例画的横条（以前 | 现在），差距一眼看得出 */
   .vs {
-    display: grid;
-    grid-template-columns: minmax(0, 1fr) auto minmax(0, 1fr);
-    align-items: stretch;
-    gap: clamp(12px, 1.6vw, 28px);
-  }
-
-  .vs .side-before {
-    grid-column: 1;
-    grid-row: 1;
-  }
-
-  .vs .vsarr {
-    grid-column: 2;
-    grid-row: 1;
-    align-self: center;
-    font-size: clamp(22px, 2vw, 36px);
-    color: var(--ink-3);
-  }
-
-  .vs .side-now {
-    grid-column: 3;
-    grid-row: 1;
-  }
-
-  .vs > div {
     display: flex;
     flex-direction: column;
-    gap: 8px;
-    padding: clamp(16px, 1.8vw, 32px);
-    border: 1px solid var(--line);
-    border-radius: var(--r);
-    background: var(--card);
-    outline: none;
-    transition: box-shadow 0.25s, transform 0.25s var(--ease);
+    gap: clamp(20px, 4vh, 48px);
   }
 
-  .vs > div[data-on],
-  .vs > div:focus-visible {
-    box-shadow: 0 0 0 3px var(--accent-glow);
-  }
-
-  .vs .side-now {
-    border-color: var(--accent);
-    box-shadow: var(--shadow);
-  }
-
-  .vk {
+  .vs .times {
     margin: 0;
-    font-size: clamp(12px, 0.9vw, 15px);
-    letter-spacing: 0.1em;
-    color: var(--ink-3);
-  }
-
-  .side-now .vk {
-    color: var(--accent-ink);
-  }
-
-  .vs em {
-    font-style: normal;
-    font-family: var(--mono);
-    font-size: clamp(12px, 0.9vw, 15px);
-    color: var(--ink-3);
-  }
-
-  .vs b {
-    font-size: clamp(34px, 3.6vw, 68px);
+    font-size: clamp(64px, 8vw, 156px);
     font-weight: 600;
-    line-height: 1.1;
-    color: var(--ink-2);
-  }
-
-  .side-now b {
+    line-height: 1;
+    letter-spacing: -0.01em;
     color: var(--accent);
   }
 
-  .vs span {
-    font-size: clamp(14px, 1.15vw, 20px);
-    line-height: 1.45;
+  .vbars {
+    list-style: none;
+    margin: 0;
+    padding: 0;
+    display: flex;
+    flex-direction: column;
+    gap: clamp(14px, 2.6vh, 28px);
+  }
+
+  .vbars li {
+    display: grid;
+    grid-template-columns: clamp(110px, 9vw, 170px) minmax(0, 1fr) clamp(150px, 13vw, 240px);
+    align-items: center;
+    gap: clamp(12px, 1.2vw, 20px);
+    padding: 6px 8px;
+    border-radius: var(--r-sm);
+    outline: none;
+    transition: background 0.2s;
+  }
+
+  .vbars li[data-on],
+  .vbars li:focus-visible {
+    background: var(--bg-2);
+  }
+
+  .vh,
+  .vv {
+    display: flex;
+    flex-direction: column;
+    gap: 2px;
+  }
+
+  .vh b {
+    font-size: clamp(16px, 1.3vw, 23px);
+    font-weight: 600;
     color: var(--ink-2);
+  }
+
+  .vh em {
+    font-style: normal;
+    font-family: var(--mono);
+    font-size: clamp(12px, 0.95vw, 16px);
+    color: var(--ink-3);
+  }
+
+  .vv b {
+    font-size: clamp(26px, 2.6vw, 48px);
+    font-weight: 600;
+    line-height: 1.05;
+    white-space: nowrap;
+    color: var(--ink-2);
+  }
+
+  .vv small {
+    font-size: clamp(13px, 1vw, 17px);
+    color: var(--ink-3);
+  }
+
+  .vbars .track {
+    height: clamp(30px, 5vh, 56px);
+  }
+
+  .vbars .track i {
+    background: var(--ink-3);
+  }
+
+  .vbars .now .track i {
+    background: var(--accent);
+  }
+
+  .vbars .now .vh b,
+  .vbars .now .vv b {
+    color: var(--accent-ink);
   }
 
   /* 5：每月订阅花费一行 */
@@ -247,23 +264,12 @@ const smax = Math.max(...t.swe.pts.map((p) => p.v));
     color: var(--ink-3);
   }
 
-  /* 6：模型得分 + Agentic Engineering */
   @media (max-width: 900px) {
-    .vs {
+    .vbars li {
       grid-template-columns: 1fr;
-    }
-    .vs .side-before,
-    .vs .vsarr,
-    .vs .side-now {
-      grid-column: 1;
-      grid-row: auto;
-    }
-    .vs .vsarr {
-      transform: rotate(90deg);
-      justify-self: start;
+      gap: 6px;
     }
   }
-
 
   /* 案例：四件事，编号 + 一句 */
   .how {
@@ -301,13 +307,13 @@ const smax = Math.max(...t.swe.pts.map((p) => p.v));
   }
 
   .how b {
-    font-size: clamp(19px, 1.7vw, 30px);
+    font-size: clamp(22px, 2vw, 36px);
     font-weight: 600;
     line-height: 1.2;
   }
 
   .how span {
-    font-size: clamp(14px, 1.1vw, 19px);
+    font-size: clamp(16px, 1.3vw, 23px);
     line-height: 1.5;
     color: var(--ink-2);
   }
@@ -385,161 +391,10 @@ const smax = Math.max(...t.swe.pts.map((p) => p.v));
     background: var(--accent);
   }
 
-  .days .track {
-    height: clamp(16px, 2.4vh, 28px);
-  }
-
   @keyframes grow {
     from {
       transform: scaleX(0);
     }
-  }
-
-  .times {
-    margin: 0;
-    align-self: flex-end;
-    font-size: clamp(56px, 7vw, 132px);
-    font-weight: 600;
-    line-height: 1;
-    color: var(--accent);
-  }
-
-  /* 时间线：三个点 */
-  .tl {
-    list-style: none;
-    margin: 0;
-    padding: clamp(18px, 3vh, 36px) 0 0;
-    display: grid;
-    grid-template-columns: repeat(3, minmax(0, 1fr));
-    gap: clamp(12px, 1.6vw, 28px);
-    position: relative;
-  }
-
-  .tl::before {
-    content: '';
-    position: absolute;
-    left: 8px;
-    right: 8px;
-    top: calc(clamp(18px, 3vh, 36px) + 8px);
-    height: 2px;
-    background: var(--line-2);
-  }
-
-  .tl li {
-    position: relative;
-    display: flex;
-    flex-direction: column;
-    gap: 6px;
-    padding: 30px 12px 12px;
-    border-radius: var(--r-sm);
-    transition: background 0.2s;
-  }
-
-  .tl li[data-on] {
-    background: var(--bg-2);
-  }
-
-  .tl li::before {
-    content: '';
-    position: absolute;
-    left: 12px;
-    top: 0;
-    width: 16px;
-    height: 16px;
-    border-radius: 50%;
-    background: var(--bg);
-    border: 2px solid var(--accent);
-  }
-
-  .tl li.mid::before {
-    background: var(--accent);
-  }
-
-  .tl em {
-    font-style: normal;
-    font-family: var(--mono);
-    font-size: clamp(12px, 0.95vw, 16px);
-    color: var(--accent-ink);
-  }
-
-  .tl b {
-    font-size: clamp(24px, 2.4vw, 44px);
-    font-weight: 600;
-    line-height: 1.15;
-  }
-
-  .tl span {
-    font-size: clamp(14px, 1.15vw, 20px);
-    line-height: 1.45;
-    color: var(--ink-2);
-  }
-
-  /* 一个人：三张卡 */
-  .people {
-    list-style: none;
-    margin: 0;
-    padding: 0;
-    display: grid;
-    grid-template-columns: repeat(3, minmax(0, 1fr));
-    gap: clamp(12px, 1.4vw, 24px);
-  }
-
-  .people li {
-    display: flex;
-    flex-direction: column;
-    gap: 6px;
-    padding: clamp(14px, 1.4vw, 24px);
-    border: 1px solid var(--line);
-    border-radius: var(--r);
-    background: var(--card);
-    box-shadow: var(--shadow);
-    transition: transform 0.3s var(--ease), border-color 0.3s;
-  }
-
-  .people li[data-on] {
-    transform: translateY(-4px);
-    border-color: var(--accent);
-  }
-
-  .people p {
-    margin: 0;
-  }
-
-  .pw {
-    display: flex;
-    flex-direction: column;
-    gap: 2px;
-  }
-
-  .pw b {
-    font-size: clamp(15px, 1.2vw, 21px);
-  }
-
-  .pw span {
-    font-size: clamp(12px, 0.9vw, 15px);
-    color: var(--ink-3);
-  }
-
-  .pb {
-    margin-top: 8px !important;
-    font-size: clamp(32px, 3.2vw, 60px);
-    font-weight: 600;
-    line-height: 1.05;
-    color: var(--accent);
-  }
-
-  .pk {
-    font-size: clamp(14px, 1.1vw, 19px);
-    color: var(--ink);
-  }
-
-  .ph {
-    margin-top: auto !important;
-    padding-top: 10px;
-    border-top: 1px solid var(--line);
-    font-size: clamp(12px, 0.9vw, 15px);
-    line-height: 1.5;
-    color: var(--ink-3);
   }
 
   /* 我自己：每月柱子 */
@@ -628,13 +483,6 @@ const smax = Math.max(...t.swe.pts.map((p) => p.v));
     .hbars li {
       grid-template-columns: 1fr;
       gap: 6px;
-    }
-    .tl,
-    .people {
-      grid-template-columns: 1fr;
-    }
-    .tl::before {
-      display: none;
     }
     .how {
       grid-template-columns: 1fr;
